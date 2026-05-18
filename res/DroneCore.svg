@@ -1,21 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="45" height="380" viewBox="0 0 45 380">
-  <!-- Background: dark charcoal -->
-  <rect width="45" height="380" fill="#1c1c1c"/>
-  <!-- Rack screw holes -->
-  <circle cx="7.5" cy="7.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
-  <circle cx="37.5" cy="7.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
-  <circle cx="7.5" cy="372.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
-  <circle cx="37.5" cy="372.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="380" viewBox="0 0 90 380">
+  <!-- Background -->
+  <rect width="90" height="380" fill="#1c1c1c"/>
+
+  <!-- Rack screw holes (centers match ScrewSilver widget centers) -->
+  <circle cx="22.5" cy="7.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
+  <circle cx="67.5" cy="7.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
+  <circle cx="22.5" cy="372.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
+  <circle cx="67.5" cy="372.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
+
   <!-- Module name -->
-  <text x="22.5" y="22" font-size="5.5" fill="#8888aa" text-anchor="middle" font-family="monospace" font-weight="bold">DRONE</text>
-  <text x="22.5" y="30" font-size="4.5" fill="#666688" text-anchor="middle" font-family="monospace">CORE</text>
-  <!-- PITCH label -->
-  <text x="22.5" y="99" font-size="4" fill="#778877" text-anchor="middle" font-family="monospace">PITCH</text>
-  <!-- DETUNE label -->
-  <text x="22.5" y="170" font-size="4" fill="#887766" text-anchor="middle" font-family="monospace">DETUNE</text>
-  <!-- V/OCT input label -->
-  <text x="22.5" y="281" font-size="3.5" fill="#557755" text-anchor="middle" font-family="monospace">V/OCT</text>
-  <!-- SINE output label -->
-  <text x="22.5" y="329" font-size="3.5" fill="#557799" text-anchor="middle" font-family="monospace">SINE</text>
+  <text x="45" y="22" font-size="5.5" fill="#8888aa" text-anchor="middle" font-family="monospace" font-weight="bold">DRONE CORE</text>
+
+  <!-- Column headers -->
+  <text x="22.5" y="36" font-size="3.5" fill="#555566" text-anchor="middle" font-family="monospace">PITCH</text>
+  <text x="67.5" y="36" font-size="3.5" fill="#555566" text-anchor="middle" font-family="monospace">MOD</text>
+
+  <!-- PITCH section separator -->
+  <line x1="5" y1="30" x2="85" y2="30" stroke="#333" stroke-width="0.5"/>
+
+  <!-- PITCH knob label — left col, knob at y=38mm=112px -->
+  <text x="22.5" y="105" font-size="3.5" fill="#778877" text-anchor="middle" font-family="monospace">PITCH</text>
+
+  <!-- PITCH MOD jack label — right col, jack at y=30mm=89px -->
+  <text x="67.5" y="82" font-size="3.5" fill="#887766" text-anchor="middle" font-family="monospace">MOD</text>
+
+  <!-- PITCH ATN label — right col, trimpot at y=46mm=136px -->
+  <text x="67.5" y="129" font-size="3.5" fill="#665555" text-anchor="middle" font-family="monospace">ATN</text>
+
+  <!-- Section divider -->
+  <line x1="5" y1="153" x2="85" y2="153" stroke="#2a2a2a" stroke-width="0.75"/>
+
+  <!-- DETUNE section -->
+  <!-- DETUNE knob label — left col, knob at y=70mm=207px -->
+  <text x="22.5" y="197" font-size="3.5" fill="#887766" text-anchor="middle" font-family="monospace">DETUNE</text>
+
+  <!-- DETUNE MOD jack label — right col, jack at y=62mm=183px -->
+  <text x="67.5" y="176" font-size="3.5" fill="#887766" text-anchor="middle" font-family="monospace">MOD</text>
+
+  <!-- DETUNE ATN label — right col, trimpot at y=78mm=230px -->
+  <text x="67.5" y="223" font-size="3.5" fill="#665555" text-anchor="middle" font-family="monospace">ATN</text>
+
+  <!-- Section divider -->
+  <line x1="5" y1="250" x2="85" y2="250" stroke="#2a2a2a" stroke-width="0.75"/>
+
+  <!-- I/O section -->
+  <!-- V/OCT label — left col, jack at y=95mm=281px -->
+  <text x="22.5" y="273" font-size="3.5" fill="#557755" text-anchor="middle" font-family="monospace">V/OCT</text>
+
+  <!-- SINE label — right col, jack at y=107mm=316px -->
+  <text x="67.5" y="308" font-size="3.5" fill="#557799" text-anchor="middle" font-family="monospace">SINE</text>
 </svg>
