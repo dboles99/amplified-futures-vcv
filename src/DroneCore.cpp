@@ -27,7 +27,8 @@ struct DroneCore : Module {
 
 	DroneCore() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(PITCH_PARAM, -3.f, 3.f, 0.f, "Pitch", " Oct");
+		// Branca range: E2 (82 Hz) to E6 (1319 Hz) — guitar fundamental limits
+		configParam(PITCH_PARAM, -1.667f, 2.333f, 0.f, "Pitch", " Oct");
 		configParam(PITCH_ATTN_PARAM, -1.f, 1.f, 0.f, "Pitch mod depth");
 		configParam(DETUNE_PARAM, 0.f, 100.f, 0.f, "Detune", " cents");
 		configParam(DETUNE_ATTN_PARAM, -1.f, 1.f, 0.f, "Detune mod depth");
@@ -45,6 +46,8 @@ struct DroneCore : Module {
 		if (inputs[PITCH_MOD_INPUT].isConnected())
 			pitch += inputs[PITCH_MOD_INPUT].getVoltage() * params[PITCH_ATTN_PARAM].getValue() / 5.f;
 
+		// Hard-limit to Branca guitar range: E2 (82 Hz) to E6 (1319 Hz)
+		pitch = clamp(pitch, -1.667f, 2.333f);
 		float freq = dsp::FREQ_C4 * std::pow(2.f, pitch);
 
 		// Detune: base knob + attenuated CV

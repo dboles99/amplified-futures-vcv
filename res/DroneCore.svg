@@ -1,53 +1,152 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="90" height="380" viewBox="0 0 90 380">
-  <!-- Background -->
-  <rect width="90" height="380" fill="#1c1c1c"/>
 
-  <!-- Rack screw holes (centers match ScrewSilver widget centers) -->
-  <circle cx="22.5" cy="7.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
-  <circle cx="67.5" cy="7.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
-  <circle cx="22.5" cy="372.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
-  <circle cx="67.5" cy="372.5" r="3.5" fill="#111" stroke="#444" stroke-width="0.75"/>
+  <!-- ── BACKGROUND ── -->
+  <rect width="90" height="380" fill="#0d160d"/>
+  <rect width="90" height="32" fill="#090e09"/>
 
-  <!-- Module name -->
-  <text x="45" y="22" font-size="5.5" fill="#8888aa" text-anchor="middle" font-family="monospace" font-weight="bold">DRONE CORE</text>
+  <!-- border frame: NYC utility panel feel -->
+  <rect x="1" y="1" width="88" height="378" fill="none" stroke="#1a3a1a" stroke-width="0.75"/>
 
-  <!-- Column headers -->
-  <text x="22.5" y="36" font-size="3.5" fill="#555566" text-anchor="middle" font-family="monospace">PITCH</text>
-  <text x="67.5" y="36" font-size="3.5" fill="#555566" text-anchor="middle" font-family="monospace">MOD</text>
+  <!-- ── RACK SCREWS ── -->
+  <circle cx="22.5" cy="7.5" r="3.5" fill="#080e08" stroke="#2a4a2a" stroke-width="0.75"/>
+  <circle cx="67.5" cy="7.5" r="3.5" fill="#080e08" stroke="#2a4a2a" stroke-width="0.75"/>
+  <circle cx="22.5" cy="372.5" r="3.5" fill="#080e08" stroke="#2a4a2a" stroke-width="0.75"/>
+  <circle cx="67.5" cy="372.5" r="3.5" fill="#080e08" stroke="#2a4a2a" stroke-width="0.75"/>
 
-  <!-- PITCH section separator -->
-  <line x1="5" y1="30" x2="85" y2="30" stroke="#333" stroke-width="0.5"/>
+  <!-- ── HEADER ── -->
+  <!-- module slug in acid green, stencil weight -->
+  <text x="45" y="15" font-size="6.5" fill="#3dff44" text-anchor="middle"
+        font-family="monospace" font-weight="bold" letter-spacing="1">DRONE</text>
+  <text x="45" y="24" font-size="4" fill="#1a8a1a" text-anchor="middle"
+        font-family="monospace" letter-spacing="2">CORE</text>
 
-  <!-- PITCH knob label — left col, knob at y=38mm=112px -->
-  <text x="22.5" y="105" font-size="3.5" fill="#778877" text-anchor="middle" font-family="monospace">PITCH</text>
+  <!-- decorative double-sine motif — two crossing waves, green palette -->
+  <path d="M6,28 C14,24 22,24 30,28 C38,32 46,32 54,28 C62,24 70,24 78,28 C82,30 85,30 88,28"
+        fill="none" stroke="#1a4a1a" stroke-width="0.8"/>
+  <path d="M6,28 C14,32 22,32 30,28 C38,24 46,24 54,28 C62,32 70,32 78,28 C82,26 85,26 88,28"
+        fill="none" stroke="#2a6a2a" stroke-width="0.8"/>
 
-  <!-- PITCH MOD jack label — right col, jack at y=30mm=89px -->
-  <text x="67.5" y="82" font-size="3.5" fill="#887766" text-anchor="middle" font-family="monospace">MOD</text>
+  <!-- ── COLUMN SPLIT ── -->
+  <line x1="45" y1="32" x2="45" y2="352" stroke="#142014" stroke-width="0.5"/>
 
-  <!-- PITCH ATN label — right col, trimpot at y=46mm=136px -->
-  <text x="67.5" y="129" font-size="3.5" fill="#665555" text-anchor="middle" font-family="monospace">ATN</text>
+  <!-- ═══════════════════════════════════════════
+       PITCH  |  knob(22.5,112.3)  jack(67.5,88.6)  trim(67.5,135.9)
+  ═══════════════════════════════════════════ -->
 
-  <!-- Section divider -->
-  <line x1="5" y1="153" x2="85" y2="153" stroke="#2a2a2a" stroke-width="0.75"/>
+  <!-- section header bar -->
+  <rect x="1" y="32" width="88" height="7" fill="#0e1e0e"/>
+  <text x="8" y="38" font-size="3.5" fill="#2a6a2a" font-family="monospace"
+        letter-spacing="1">PITCH</text>
+  <text x="52" y="38" font-size="3.5" fill="#2a6a2a" font-family="monospace"
+        letter-spacing="1">MOD / ATN</text>
 
-  <!-- DETUNE section -->
-  <!-- DETUNE knob label — left col, knob at y=70mm=207px -->
-  <text x="22.5" y="197" font-size="3.5" fill="#887766" text-anchor="middle" font-family="monospace">DETUNE</text>
+  <!-- PITCH label + sine-wave icon, above knob at y=112 -->
+  <g transform="translate(22.5,103)">
+    <path d="M-13,0 C-11,-3 -7,-3 -5,0 C-3,3 1,3 3,0"
+          fill="none" stroke="#88ff44" stroke-width="1.1" stroke-linecap="round"/>
+    <text x="5" y="1.5" font-size="3.8" fill="#88ff44" font-family="monospace"
+          font-weight="bold">PITCH</text>
+  </g>
 
-  <!-- DETUNE MOD jack label — right col, jack at y=62mm=183px -->
-  <text x="67.5" y="176" font-size="3.5" fill="#887766" text-anchor="middle" font-family="monospace">MOD</text>
+  <!-- Branca frequency range annotation below PITCH knob (knob bottom ≈ y=121) -->
+  <text x="9"  y="126" font-size="2.6" fill="#2a6a2a" font-family="monospace"
+        text-anchor="middle">82Hz</text>
+  <line x1="14" y1="124.5" x2="31" y2="124.5" stroke="#1a3a1a" stroke-width="0.5"/>
+  <text x="36" y="126" font-size="2.6" fill="#2a6a2a" font-family="monospace"
+        text-anchor="middle">1319Hz</text>
 
-  <!-- DETUNE ATN label — right col, trimpot at y=78mm=230px -->
-  <text x="67.5" y="223" font-size="3.5" fill="#665555" text-anchor="middle" font-family="monospace">ATN</text>
+  <!-- MOD jack label + wavy icon, above jack at y=88.6 -->
+  <g transform="translate(67.5,80)">
+    <path d="M-11,0 Q-8,-3 -5,0 Q-2,3 1,0"
+          fill="none" stroke="#40ff88" stroke-width="1.1" stroke-linecap="round"/>
+    <text x="3" y="1.5" font-size="3.8" fill="#40ff88" font-family="monospace"
+          font-weight="bold">MOD</text>
+  </g>
 
-  <!-- Section divider -->
-  <line x1="5" y1="250" x2="85" y2="250" stroke="#2a2a2a" stroke-width="0.75"/>
+  <!-- ATN trimpot label + wedge icon, above trimpot at y=135.9 (top≈130) -->
+  <g transform="translate(67.5,122)">
+    <path d="M-10,-3.5 L-10,3.5 L-3,0 Z" fill="none" stroke="#1a6a1a" stroke-width="0.9"/>
+    <text x="-1" y="1.5" font-size="3.8" fill="#1a6a1a" font-family="monospace">ATN</text>
+  </g>
 
-  <!-- I/O section -->
-  <!-- V/OCT label — left col, jack at y=95mm=281px -->
-  <text x="22.5" y="273" font-size="3.5" fill="#557755" text-anchor="middle" font-family="monospace">V/OCT</text>
+  <!-- ── section divider ── -->
+  <rect x="1" y="153" width="88" height="1.5" fill="#1a3a1a"/>
 
-  <!-- SINE label — right col, jack at y=107mm=316px -->
-  <text x="67.5" y="308" font-size="3.5" fill="#557799" text-anchor="middle" font-family="monospace">SINE</text>
+  <!-- ═══════════════════════════════════════════
+       DETUNE  |  knob(22.5,206.7)  jack(67.5,183.1)  trim(67.5,230.4)
+  ═══════════════════════════════════════════ -->
+
+  <rect x="1" y="154.5" width="88" height="7" fill="#0e1e0e"/>
+  <text x="8" y="160.5" font-size="3.5" fill="#2a6a2a" font-family="monospace"
+        letter-spacing="1">DETUNE</text>
+  <text x="52" y="160.5" font-size="3.5" fill="#2a6a2a" font-family="monospace"
+        letter-spacing="1">MOD / ATN</text>
+
+  <!-- DETUNE label + spreading-arrows icon, above knob at y=206.7 -->
+  <g transform="translate(22.5,197)">
+    <!-- two lines fanning right — pitch divergence symbol -->
+    <line x1="-12" y1="0" x2="-4" y2="-4"
+          stroke="#aaff33" stroke-width="1.1" stroke-linecap="round"/>
+    <line x1="-12" y1="0" x2="-4" y2="4"
+          stroke="#aaff33" stroke-width="1.1" stroke-linecap="round"/>
+    <text x="-2" y="1.5" font-size="3.8" fill="#aaff33" font-family="monospace"
+          font-weight="bold">DETUNE</text>
+  </g>
+
+  <!-- Cent range annotation below DETUNE knob (small knob, bottom ≈ y=213) -->
+  <text x="12" y="219" font-size="2.6" fill="#2a6a2a" font-family="monospace"
+        text-anchor="middle">0¢</text>
+  <line x1="16" y1="217.5" x2="29" y2="217.5" stroke="#1a3a1a" stroke-width="0.5"/>
+  <text x="34" y="219" font-size="2.6" fill="#2a6a2a" font-family="monospace"
+        text-anchor="middle">100¢</text>
+
+  <!-- MOD jack label + wavy icon, above jack at y=183.1 -->
+  <g transform="translate(67.5,174)">
+    <path d="M-11,0 Q-8,-3 -5,0 Q-2,3 1,0"
+          fill="none" stroke="#40ff88" stroke-width="1.1" stroke-linecap="round"/>
+    <text x="3" y="1.5" font-size="3.8" fill="#40ff88" font-family="monospace"
+          font-weight="bold">MOD</text>
+  </g>
+
+  <!-- ATN trimpot label + wedge icon, above trimpot at y=230.4 (top≈224) -->
+  <g transform="translate(67.5,217)">
+    <path d="M-10,-3.5 L-10,3.5 L-3,0 Z" fill="none" stroke="#1a6a1a" stroke-width="0.9"/>
+    <text x="-1" y="1.5" font-size="3.8" fill="#1a6a1a" font-family="monospace">ATN</text>
+  </g>
+
+  <!-- ── section divider ── -->
+  <rect x="1" y="250" width="88" height="1.5" fill="#1a3a1a"/>
+
+  <!-- ═══════════════════════════════════════════
+       I/O  |  V/OCT(22.5,280.5)  SINE(67.5,316.0)
+  ═══════════════════════════════════════════ -->
+
+  <rect x="1" y="251.5" width="88" height="7" fill="#0e1e0e"/>
+  <text x="8" y="257.5" font-size="3.5" fill="#2a6a2a" font-family="monospace"
+        letter-spacing="1">I/O</text>
+
+  <!-- V/OCT label — raw "1V/OCT" in mint green, above jack at y=280.5 -->
+  <text x="22.5" y="269" font-size="3" fill="#33cc66" font-family="monospace"
+        text-anchor="middle" font-weight="bold">1V/OCT</text>
+  <!-- small voltage indicator arrow -->
+  <line x1="22.5" y1="271" x2="22.5" y2="274"
+        stroke="#1a6a1a" stroke-width="0.7"/>
+  <polygon points="22.5,277 20,274 25,274" fill="#1a6a1a"/>
+
+  <!-- SINE output label + full sine-wave path, above jack at y=316 -->
+  <g transform="translate(67.5,304)">
+    <path d="M-12,0 C-10,-4 -7,-4 -5,0 C-3,4 0,4 2,0"
+          fill="none" stroke="#3dff44" stroke-width="1.2" stroke-linecap="round"/>
+    <text x="4" y="1.5" font-size="3.8" fill="#3dff44" font-family="monospace"
+          font-weight="bold">SINE</text>
+  </g>
+
+  <!-- bottom: tiny freq note near SINE — shows audio range -->
+  <text x="67.5" y="327" font-size="2.5" fill="#1a5a1a" font-family="monospace"
+        text-anchor="middle">82–1319 Hz</text>
+
+  <!-- bottom accent line -->
+  <line x1="5" y1="352" x2="85" y2="352" stroke="#1a3a1a" stroke-width="0.5"/>
+
 </svg>
