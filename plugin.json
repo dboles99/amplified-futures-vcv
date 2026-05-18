@@ -1,0 +1,23 @@
+{
+  "slug": "branca-rack-modules",
+  "name": "Branca Rack Modules",
+  "version": "2.0.0",
+  "license": "MIT",
+  "brand": "Branca",
+  "author": "Daniel Boles",
+  "authorEmail": "daniel.boles@gmail.com",
+  "authorUrl": "",
+  "pluginUrl": "",
+  "manualUrl": "",
+  "sourceUrl": "",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": [
+    {
+      "slug": "DroneCore",
+      "name": "DroneCore",
+      "description": "Simple sine oscillator — first module test",
+      "tags": ["VCO", "Drone"]
+    }
+  ]
+}

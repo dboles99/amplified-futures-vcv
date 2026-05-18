@@ -1,0 +1,13 @@
+# Ignore all dotfiles except git dotfiles and VS Code workspace settings
+.*
+!.git*
+!.vscode
+
+# Binaries and build targets
+*.a
+*.so
+*.dylib
+*.dll
+/build
+/dep
+/dist
