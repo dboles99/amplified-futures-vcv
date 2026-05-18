@@ -10,10 +10,12 @@
   <!-- Module name -->
   <text x="22.5" y="22" font-size="5.5" fill="#8888aa" text-anchor="middle" font-family="monospace" font-weight="bold">DRONE</text>
   <text x="22.5" y="30" font-size="4.5" fill="#666688" text-anchor="middle" font-family="monospace">CORE</text>
-  <!-- PITCH label and knob area -->
-  <text x="22.5" y="122" font-size="4" fill="#778877" text-anchor="middle" font-family="monospace">PITCH</text>
+  <!-- PITCH label -->
+  <text x="22.5" y="99" font-size="4" fill="#778877" text-anchor="middle" font-family="monospace">PITCH</text>
+  <!-- DETUNE label -->
+  <text x="22.5" y="170" font-size="4" fill="#887766" text-anchor="middle" font-family="monospace">DETUNE</text>
   <!-- V/OCT input label -->
-  <text x="22.5" y="288" font-size="3.5" fill="#557755" text-anchor="middle" font-family="monospace">V/OCT</text>
+  <text x="22.5" y="281" font-size="3.5" fill="#557755" text-anchor="middle" font-family="monospace">V/OCT</text>
   <!-- SINE output label -->
-  <text x="22.5" y="333" font-size="3.5" fill="#557799" text-anchor="middle" font-family="monospace">SINE</text>
+  <text x="22.5" y="329" font-size="3.5" fill="#557799" text-anchor="middle" font-family="monospace">SINE</text>
 </svg>
