@@ -1,7 +1,6 @@
-# Ignore all dotfiles except git dotfiles and VS Code workspace settings
+# Ignore all dotfiles except git dotfiles
 .*
 !.git*
-!.vscode
 
 # Binaries and build targets
 *.a
