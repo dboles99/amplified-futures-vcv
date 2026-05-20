@@ -152,20 +152,27 @@ All modules share:
 
 ---
 
-## Build
+## Building from source
 
-Requires VCV Rack 2 SDK and MSYS2 MinGW64 (Windows).
+Requires [VCV Rack 2 SDK](https://vcvrack.com/downloads/) and [MSYS2](https://www.msys2.org/) with the MinGW64 toolchain (Windows), or the equivalent GCC toolchain on macOS/Linux.
 
-```powershell
-& "D:\dev-vcv\msys64\msys2_shell.cmd" -mingw64 -defterm -no-start -c "cd /d/dev-vcv/plugins/amplified-futures && RACK_DIR=/d/dev-vcv/Rack-SDK make -j4"
+Download the Rack SDK for your platform and set `RACK_DIR` to its path:
+
+```bash
+RACK_DIR=/path/to/Rack-SDK make -j4
 ```
 
-## Install
+The CI workflow (`.github/workflows/build.yml`) shows the full Windows/MSYS2 setup if you need a reference.
 
-```powershell
-Remove-Item "$env:LOCALAPPDATA\Rack2\plugins-win-x64\amplified-futures" -Recurse -Force -ErrorAction SilentlyContinue
-Copy-Item "D:\dev-vcv\plugins\amplified-futures" -Destination "$env:LOCALAPPDATA\Rack2\plugins-win-x64\" -Recurse
-```
+## Installing locally
+
+Copy the built plugin folder into your Rack 2 user plugins directory:
+
+| Platform | Path |
+|---|---|
+| Windows | `%LOCALAPPDATA%\Rack2\plugins-win-x64\` |
+| macOS | `~/Library/Application Support/Rack2/plugins/` |
+| Linux | `~/.Rack2/plugins/` |
 
 ---
 
