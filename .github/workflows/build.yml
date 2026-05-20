@@ -27,7 +27,7 @@ jobs:
 
       - name: Download Rack SDK 2.6.6
         run: |
-          curl -L "https://vcvrack.com/Rack-SDK-2.6.6-win-x64.zip" -o Rack-SDK.zip
+          curl -L "https://vcvrack.com/downloads/Rack-SDK-2.6.6-win-x64.zip" -o Rack-SDK.zip
           7z x Rack-SDK.zip
         shell: pwsh
 
