@@ -1,0 +1,18 @@
+{
+  "plugin": "branca-rack-modules",
+  "model": "WallConductor",
+  "version": "2.0.0",
+  "params": [
+    {"id": 0, "value": 0.25},
+    {"id": 1, "value": 0.2},
+    {"id": 2, "value": 0.7},
+    {"id": 3, "value": 0.0},
+    {"id": 4, "value": 0.5},
+    {"id": 5, "value": 0.0},
+    {"id": 6, "value": 0.0},
+    {"id": 7, "value": 0.0},
+    {"id": 8, "value": 0.0},
+    {"id": 9, "value": 0.0},
+    {"id": 10, "value": 0.0}
+  ]
+}
