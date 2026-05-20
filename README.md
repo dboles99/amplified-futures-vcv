@@ -1,5 +1,10 @@
 # Amplified Futures
 
+[![Build](https://github.com/dboles99/amplified-futures-vcv/actions/workflows/build.yml/badge.svg)](https://github.com/dboles99/amplified-futures-vcv/actions/workflows/build.yml)
+[![GitHub release](https://img.shields.io/github/v/release/dboles99/amplified-futures-vcv)](https://github.com/dboles99/amplified-futures-vcv/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![VCV Rack 2](https://img.shields.io/badge/VCV%20Rack-2-orange)](https://vcvrack.com)
+
 Twelve VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure. No-wave/noise-rock genealogy; built for live performance.
 
 ![Amplified Futures modules in VCV Rack](docs/screenshot.png)
