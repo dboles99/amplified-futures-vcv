@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up MSYS2 MinGW64
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+
+      - name: Download Rack SDK 2.6.6
+        run: |
+          curl -L "https://github.com/VCVRack/Rack/releases/download/v2.6.6/Rack-SDK-2.6.6-win.zip" -o Rack-SDK.zip
+          7z x Rack-SDK.zip
+        shell: pwsh
+
+      - name: Build plugin
+        shell: msys2 {0}
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK" make -j4
