@@ -1,0 +1,13 @@
+{
+  "plugin": "branca-rack-modules",
+  "model": "DroneCore",
+  "version": "2.0.0",
+  "params": [
+    {"id": 0, "value": 0.0},
+    {"id": 1, "value": 0.0},
+    {"id": 2, "value": 60.0},
+    {"id": 3, "value": 0.0},
+    {"id": 4, "value": 1.0},
+    {"id": 5, "value": 0.0}
+  ]
+}

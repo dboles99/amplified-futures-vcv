@@ -1,0 +1,15 @@
+{
+  "plugin": "branca-rack-modules",
+  "model": "Send",
+  "version": "2.0.0",
+  "params": [
+    {"id": 0, "value": 0.3},
+    {"id": 1, "value": 0.3},
+    {"id": 2, "value": 0.5},
+    {"id": 3, "value": 0.5},
+    {"id": 4, "value": 0.0},
+    {"id": 5, "value": 0.0},
+    {"id": 6, "value": 0.0},
+    {"id": 7, "value": 0.0}
+  ]
+}

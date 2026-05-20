@@ -16,8 +16,74 @@
     {
       "slug": "DroneCore",
       "name": "DroneCore",
-      "description": "Simple sine oscillator — first module test",
-      "tags": ["VCO", "Drone"]
+      "description": "Two-voice detuned oscillator for dense harmonic drones.",
+      "tags": ["Oscillator"]
+    },
+    {
+      "slug": "DroneClone",
+      "name": "DroneClone",
+      "description": "8-voice amplified string wall. Mass, tension, jawari buzz, choke collapse. V/OCT + feedback loop. Amplified Futures flagship.",
+      "tags": ["Oscillator", "Physical modeling", "Drone"]
+    },
+    {
+      "slug": "Send",
+      "name": "Send",
+      "description": "2×2 cross-send feedback routing matrix. A→B send, B→A return, A→C/C→A internal feedback bus. Polyphonic.",
+      "tags": ["Mixer", "Effect"]
+    },
+    {
+      "slug": "Choke",
+      "name": "Choke",
+      "description": "4-channel cheap-mixer-as-instrument. GAIN, TONE, MUTE per channel. Fixed auto-pan. MAIN + stereo L/R out with soft saturation.",
+      "tags": ["Mixer"]
+    },
+    {
+      "slug": "Pulse",
+      "name": "Pulse",
+      "description": "16-step no-wave step percussion. 4×4 trigger grid, HIT/DECAY/METAL/CRACK. TRG clock in, audio out.",
+      "tags": ["Sequencer", "Drum"]
+    },
+    {
+      "slug": "Drift",
+      "name": "Drift",
+      "description": "Slow random modulation source. RATE/WANDER/SLEW with CV. SMOOTH, STEP, and GATE outputs. SYNC trigger. V/OCT thru.",
+      "tags": ["Modulation", "Random"]
+    },
+    {
+      "slug": "HarmonicPressure",
+      "name": "Harmonic Pressure",
+      "description": "Harmonic series pitch CV generator. PITCH root + SPREAD ensemble detuning. PARTIAL selects first partial, COUNT sets how many. JUST/EQUAL/MICRO tuning modes. Outputs polyphonic V/oct for String Mass Core.",
+      "tags": ["Tuner", "Quantizer", "Polyphonic"]
+    },
+    {
+      "slug": "StringMassCore",
+      "name": "String Mass Core",
+      "description": "16-voice harmonic mass oscillator. MASS voice count, SPREAD detune, TIMBRE harmonic content. UNIS/HARM/JUST/MICRO modes. HARM mode uses Branca odd-harmonic sections. 1/√N amplitude normalised. Polyphonic.",
+      "tags": ["Oscillator", "Physical modeling", "Drone", "Polyphonic"]
+    },
+    {
+      "slug": "CollapseSat",
+      "name": "Collapse Saturator",
+      "description": "Stereo drive/saturation with collapse. DRIVE pre-gain, BUZZ character (ODD/EVEN/FULL), COLLAPSE gate maxes drive instantly, RECOVERY sets return time. Sidechain input. V/oct thru.",
+      "tags": ["Distortion", "Effect"]
+    },
+    {
+      "slug": "FeedbackGovernor",
+      "name": "Feedback Governor",
+      "description": "Controlled feedback send/return. AMOUNT level, TONE LP filter, DECAY attenuates per pass. KILL button/gate. DC blocker + ±10V safety limiter. V/oct thru.",
+      "tags": ["Effect", "Utility"]
+    },
+    {
+      "slug": "WallConductor",
+      "name": "Wall Conductor",
+      "description": "Section-based performance mixer/conductor. DENSITY sweeps 4 channels in. PRESSURE saturates. WIDTH spreads stereo. FEEDBACK loop. COLLAPSE gate with shaped RECOVERY.",
+      "tags": ["Mixer", "Performance"]
+    },
+    {
+      "slug": "MassDriver",
+      "name": "Mass Driver",
+      "description": "AF-01. 16-channel no-wave signal mixer. Per-channel GAIN + MUTE. Master DENSITY sweep, PRESSURE saturation, WIDTH stereo, FEEDBACK loop, COLLAPSE gate. 5 outputs: OUT L/R, AUX L/R, SUM.",
+      "tags": ["Mixer", "Performance"]
     }
   ]
 }
