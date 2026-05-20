@@ -24,6 +24,7 @@ jobs:
           install: >-
             mingw-w64-x86_64-gcc
             make
+            jq
 
       - name: Download Rack SDK 2.6.6
         run: |
