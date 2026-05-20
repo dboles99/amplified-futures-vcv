@@ -59,7 +59,7 @@ All knobs have attenuverter + CV.
 
 ## Patch tips
 
-- **PARTIAL 1, COUNT 8** = fundamental + 7 partials. The classic Branca harmonic cluster.
+- **PARTIAL 1, COUNT 8** = fundamental + 7 partials. The classic harmonic partial cluster.
 - **PARTIAL 3, COUNT 6** = skip fundamental and octave, start on 5th harmonic — immediately tense, no "root gravity".
 - **EQUAL mode** turns the harmonic series into chromatic clusters — more "wrong note" than "natural harmonic". Useful for noise-rock textures.
 - **SPREAD at 0.3**: adds natural ensemble warmth without losing pitch identity.

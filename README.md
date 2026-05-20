@@ -1,6 +1,6 @@
-# Branca Rack Modules
+# Amplified Futures
 
-**Amplified Futures** — twelve VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure. Branca/noise-rock genealogy; built for live performance.
+Twelve VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure. No-wave/noise-rock genealogy; built for live performance.
 
 ![Amplified Futures modules in VCV Rack](docs/screenshot.png)
 
@@ -91,7 +91,7 @@ Section-based performance mixer/conductor. DENSITY sweeps 4 channels in. PRESSUR
 
 ![StringMassCore panel](docs/panels/StringMassCore.png)
 
-16-voice harmonic mass oscillator. MASS (voice count), SPREAD (detune), TIMBRE (harmonic content). Four modes: UNIS (unison), HARM (Branca odd-harmonic sections), JUST (Ptolemaic JI ratios), MICRO (spectral microtonality). 1/√N amplitude normalised. Polyphonic V/OCT in → audio out.
+16-voice harmonic mass oscillator. MASS (voice count), SPREAD (detune), TIMBRE (harmonic content). Four modes: UNIS (unison), HARM (odd-harmonic sections), JUST (Ptolemaic JI ratios), MICRO (spectral microtonality). 1/√N amplitude normalised. Polyphonic V/OCT in → audio out.
 
 **Inputs:** V/OCT (poly), MASS CV + ATT, SPREAD CV + ATT, TIMBRE CV + ATT
 **Outputs:** OUT (poly audio)
@@ -157,14 +157,14 @@ All modules share:
 Requires VCV Rack 2 SDK and MSYS2 MinGW64 (Windows).
 
 ```powershell
-& "D:\dev-vcv\msys64\msys2_shell.cmd" -mingw64 -defterm -no-start -c "cd /d/dev-vcv/plugins/branca-rack-modules && RACK_DIR=/d/dev-vcv/Rack-SDK make -j4"
+& "D:\dev-vcv\msys64\msys2_shell.cmd" -mingw64 -defterm -no-start -c "cd /d/dev-vcv/plugins/amplified-futures && RACK_DIR=/d/dev-vcv/Rack-SDK make -j4"
 ```
 
 ## Install
 
 ```powershell
-Remove-Item "$env:LOCALAPPDATA\Rack2\plugins-win-x64\branca-rack-modules" -Recurse -Force -ErrorAction SilentlyContinue
-Copy-Item "D:\dev-vcv\plugins\branca-rack-modules" -Destination "$env:LOCALAPPDATA\Rack2\plugins-win-x64\" -Recurse
+Remove-Item "$env:LOCALAPPDATA\Rack2\plugins-win-x64\amplified-futures" -Recurse -Force -ErrorAction SilentlyContinue
+Copy-Item "D:\dev-vcv\plugins\amplified-futures" -Destination "$env:LOCALAPPDATA\Rack2\plugins-win-x64\" -Recurse
 ```
 
 ---

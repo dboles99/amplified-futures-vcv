@@ -1,6 +1,6 @@
 # DroneClone — 22HP
 
-8-voice amplified string wall. The centrepiece of the Amplified Futures signal chain — inspired by the Branca orchestra's massed electric guitar density. Up to 16 polyphonic channels × 8 voices = 128 simultaneous oscillators.
+8-voice amplified string wall. The centrepiece of the Amplified Futures signal chain — inspired by massed electric guitar density. Up to 16 polyphonic channels × 8 voices = 128 simultaneous oscillators.
 
 ---
 
@@ -54,7 +54,7 @@ All knobs have attenuverter + CV input.
 
 ## Patch tips
 
-- **JAWARI + TENSION together** gives the characteristic Branca guitar wall — start at TENSION 0.4, JAWARI 0.2, adjust by ear.
+- **JAWARI + TENSION together** gives the characteristic no-wave guitar wall — start at TENSION 0.4, JAWARI 0.2, adjust by ear.
 - **RTN feedback loop**: patch OUT → FeedbackGovernor → RTN. Keep AMOUNT below 0.4 before pushing TENSION up.
 - **CHOKE as performance event**: patch a manual gate or WallConductor COLLAPSE gate → CHOKE for sudden silence arcs.
 - **MASS at 2–3 with DRIFT at 0.3** gives natural chorus without muddiness. MASS 8 is for wall maximalism only.

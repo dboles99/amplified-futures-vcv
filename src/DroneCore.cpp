@@ -50,7 +50,7 @@ struct DroneCore : Module {
 		configParam(DETUNE_ATTN_PARAM,-1.f,    1.f,    0.f,  "Detune mod depth");
 		configParam(TIMBRE_PARAM,      0.f,    1.f,    0.f,  "Timbre",         "%", 0.f, 100.f);
 		configParam(TIMBRE_ATTN_PARAM,-1.f,    1.f,    0.f,  "Timbre attenuverter");
-		getParamQuantity(TIMBRE_PARAM)->description = "0 = pure sine, 1 = harmonics 2-4 (Branca third-bridge)";
+		getParamQuantity(TIMBRE_PARAM)->description = "0 = pure sine, 1 = harmonics 2-4 (third-bridge harmonic stack)";
 
 		configInput(PITCH_INPUT,    "V/oct pitch");
 		configInput(PITCH_MOD_INPUT,"Pitch modulation CV");

@@ -1,4 +1,4 @@
-# Branca Rack Modules — Feature Backlog
+# Amplified Futures — Feature Backlog
 
 ## Pending
 
@@ -8,7 +8,7 @@
 
 ### Shipping / library prep
 - [ ] **Per-module manuals** — `docs/modules/<slug>.md` for each of the 11 modules: controls reference, signal flow, patch tips.
-- [ ] **Factory presets** — `.vcvs` JSON preset files in `presets/branca-rack-modules/<slug>/`. 2–3 per module minimum.
+- [ ] **Factory presets** — `.vcvs` JSON preset files in `presets/amplified-futures/<slug>/`. 2–3 per module minimum.
 - [ ] **How-to guides** — `docs/guides/` short task-focused docs.
 - [ ] **Playbooks** — `docs/playbooks/` named patch configurations: The Wall, Drone Bed, Feedback Republic, Harmonic Pressure Session, Percussion Slab.
 

@@ -1,6 +1,6 @@
 # Playbook: The Wall
 
-**Concept:** Full Branca orchestra simulation — massed string voices across harmonic sections, conducted live through density sweeps and collapse events.
+**Concept:** Full massed-voice orchestra — string voices across harmonic sections, conducted live through density sweeps and collapse events.
 
 ---
 
