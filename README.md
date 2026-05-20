@@ -6,6 +6,31 @@ Twelve VCV Rack 2 modules for dense experimental sound. Massed oscillators, cont
 
 ---
 
+## What this is
+
+Amplified Futures is a modular instrument system for making large-scale sound masses playable in software. The modules are designed around three ideas:
+
+- **Mass** — stack many voices, then control them as one gesture (DENSITY, MASS knobs)
+- **Pressure** — drive and saturate the sum rather than individual channels (PRESSURE, BUZZ)
+- **Collapse** — a single gate or button instantly deforms the sound, with shaped recovery (COLLAPSE)
+
+Every module has CV + attenuverter on every knob and V/OCT pass-through, so they chain cleanly and play well with the rest of your rack.
+
+---
+
+## Start here
+
+A minimal working patch that covers the core idea:
+
+1. **HarmonicPressure** → generate a polyphonic harmonic series from a root V/OCT. Set COUNT to 8, MODE to JUST.
+2. **StringMassCore** → receive that poly V/OCT, set MASS to 12, SPREAD to 0.3. You have a 12-voice just-intoned mass.
+3. **WallConductor** → feed the stereo output in. Sweep DENSITY slowly. Hit COLLAPSE.
+4. **FeedbackGovernor** → insert between WallConductor's output and its input for a controlled feedback loop. Set DECAY to taste; KILL to reset.
+
+From here, add **DroneClone** for a complementary string-wall layer, **Drift** to modulate SPREAD or DENSITY automatically, and **CollapseSat** after WallConductor for edge and buzz.
+
+---
+
 ## Modules
 
 ---
@@ -173,6 +198,12 @@ Copy the built plugin folder into your Rack 2 user plugins directory:
 | Windows | `%LOCALAPPDATA%\Rack2\plugins-win-x64\` |
 | macOS | `~/Library/Application Support/Rack2/plugins/` |
 | Linux | `~/.Rack2/plugins/` |
+
+## Support
+
+If Amplified Futures is useful to you, a contribution helps fund future modules.
+
+[Donate via PayPal](https://paypal.me/DBoles648)
 
 ---
 
