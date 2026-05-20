@@ -1,15 +1,15 @@
 {
-  "slug": "branca-rack-modules",
-  "name": "Branca Rack Modules",
-  "version": "2.0.0",
+  "slug": "amplified-futures",
+  "name": "Amplified Futures",
+  "version": "1.0.0",
   "license": "MIT",
-  "brand": "Branca",
+  "brand": "Amplified Futures",
   "author": "Daniel Boles",
   "authorEmail": "daniel.boles@gmail.com",
   "authorUrl": "",
-  "pluginUrl": "",
-  "manualUrl": "",
-  "sourceUrl": "",
+  "pluginUrl": "https://github.com/dboles99/amplified-futures-vcv",
+  "manualUrl": "https://github.com/dboles99/amplified-futures-vcv/tree/master/docs/modules",
+  "sourceUrl": "https://github.com/dboles99/amplified-futures-vcv",
   "donateUrl": "",
   "changelogUrl": "",
   "modules": [
@@ -34,7 +34,7 @@
     {
       "slug": "Choke",
       "name": "Choke",
-      "description": "4-channel cheap-mixer-as-instrument. GAIN, TONE, MUTE per channel. Fixed auto-pan. MAIN + stereo L/R out with soft saturation.",
+      "description": "4-channel mixer-as-instrument. GAIN, TONE, MUTE per channel. Fixed auto-pan. MAIN + stereo L/R out with soft saturation.",
       "tags": ["Mixer"]
     },
     {
@@ -58,7 +58,7 @@
     {
       "slug": "StringMassCore",
       "name": "String Mass Core",
-      "description": "16-voice harmonic mass oscillator. MASS voice count, SPREAD detune, TIMBRE harmonic content. UNIS/HARM/JUST/MICRO modes. HARM mode uses Branca odd-harmonic sections. 1/√N amplitude normalised. Polyphonic.",
+      "description": "16-voice harmonic mass oscillator. MASS voice count, SPREAD detune, TIMBRE harmonic content. UNIS/HARM/JUST/MICRO modes. HARM mode uses odd-harmonic sections. 1/√N amplitude normalised. Polyphonic.",
       "tags": ["Oscillator", "Physical modeling", "Drone", "Polyphonic"]
     },
     {

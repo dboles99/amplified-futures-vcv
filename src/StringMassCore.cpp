@@ -6,7 +6,7 @@
 // Design: Amplified Futures (steel finish, 16 HP)
 //   MASS:    1–16 internal voices  (snap, CV-able)
 //   SPREAD:  per-voice detune 0–50 cents
-//   TIMBRE:  sine → Branca third-bridge harmonic stack
+//   TIMBRE:  sine → third-bridge harmonic stack
 //   MODE:    UNIS / HARM / JUST / MICRO (snap)
 //   SECTION: 1 / 2 / 4 harmonic sections (snap, HARM mode only)
 //
@@ -14,7 +14,7 @@
 //   UNIS  — all M voices at fundamental, symmetric ±SPREAD cents
 //   HARM  — M voices divided into SECTION groups; each group at
 //            an odd harmonic (1,3,5,7→octave-reduced), within-
-//            group spread creates Branca-style beating layers
+//            group spread creates dense beating layers
 //   JUST  — M voices across JI chromatic ratios + narrow SPREAD
 //   MICRO — all voices at fundamental with per-voice slow vibrato
 //            at different rates; produces organic shimmer
@@ -189,7 +189,7 @@ struct StringMassCore : Module {
 				phase[v][c] += voiceFreq * args.sampleTime;
 				if (phase[v][c] >= 1.f) phase[v][c] -= 1.f;
 
-				// Waveform: sine + harmonics 2–4 (Branca third-bridge stack)
+				// Waveform: sine + harmonics 2–4 (third-bridge harmonic stack)
 				float p = phase[v][c];
 				float s = (std::sin(2.f * float(M_PI) * p)
 				         + timbre * 0.5f  * std::sin(4.f * float(M_PI) * p)

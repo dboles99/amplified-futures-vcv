@@ -17,7 +17,7 @@
 // EQUAL: each partial rounded to nearest 12-TET semitone
 // MICRO: JI + deterministic per-partial intonation offset
 //        (SPREAD controls magnitude — simulates ensemble tuning
-//        variation the way Branca's 100 guitarists each tune
+//        variation the way 100 massed voices each tune
 //        the same pitch slightly differently)
 // ============================================================
 

@@ -1,6 +1,6 @@
 # Wall Conductor — 22HP
 
-Section-based performance mixer/conductor. The live performance control surface for the Amplified Futures stack — modelled on Glenn Branca's role as a conductor orchestrating massed guitar sections. DENSITY sweeps channels in, PRESSURE saturates, WIDTH spreads, FEEDBACK loops, COLLAPSE drops it all.
+Section-based performance mixer/conductor. The live performance control surface for the Amplified Futures stack — modelled on a conductor orchestrating massed signal sections. DENSITY sweeps channels in, PRESSURE saturates, WIDTH spreads, FEEDBACK loops, COLLAPSE drops it all.
 
 ---
 

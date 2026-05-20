@@ -22,7 +22,7 @@ V/OCT IN ───────────────────────�
 |---|---|---|---|
 | PITCH | 82–1319 Hz | 220 Hz | Base frequency (A2–E6 approx) |
 | DETUNE | 0–100¢ | 12¢ | Symmetric split: ±DETUNE/2 per voice |
-| TIMBRE | 0–1 | 0 | 0 = pure sine; 1 = 2nd+3rd+4th harmonics (Branca third-bridge model) |
+| TIMBRE | 0–1 | 0 | 0 = pure sine; 1 = 2nd+3rd+4th harmonics (third-bridge harmonic stack) |
 
 Every knob has an **attenuverter** (−1 to +1) and a **CV input** (±5V bipolar, scaled by atten).
 

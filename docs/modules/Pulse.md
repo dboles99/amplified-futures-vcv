@@ -1,6 +1,6 @@
 # Pulse — 12HP
 
-16-step no-wave step percussion sequencer. 4×4 toggle grid, white noise synthesis with HIT level, DECAY time, METAL filter, and CRACK transient burst. TRG clock in, audio out. Inspired by primitive drum machine aesthetics and Branca's percussive use of attack.
+16-step no-wave step percussion sequencer. 4×4 toggle grid, white noise synthesis with HIT level, DECAY time, METAL filter, and CRACK transient burst. TRG clock in, audio out. Inspired by primitive drum machine aesthetics and no-wave percussive attack.
 
 ---
 
