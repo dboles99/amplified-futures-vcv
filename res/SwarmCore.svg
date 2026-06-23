@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  SWARM CORE — 14 HP panel  |  Amplified Futures design system
+  Panel: 213 × 380 px  (14 HP × 15.24 px/HP ≈ 213.36 → 213px)
+  Finish: dark oxidised steel (#1F2A1F)
+  Safety Orange header: #FF4A0E
+  mm→px factor: 2.953  (used for control placement coords in C++ only)
+
+  Controls (approx px positions, origin top-left):
+    x1=65   x2=148   (two columns)
+    SPECIMEN  row y=55mm → 162px
+    DENSITY   row y=105mm → 310px
+    DETUNE    row y=155mm → 458px  (off-panel in label — actual C++ uses mm2px)
+    I/O       y bottom rows
+-->
+<svg
+   width="213"
+   height="380"
+   viewBox="0 0 213 380"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Panel body -->
+  <rect x="0" y="0" width="213" height="380" fill="#1F2A1F"/>
+
+  <!-- Safety Orange header bar -->
+  <rect x="0" y="0" width="213" height="26" fill="#FF4A0E"/>
+
+  <!-- Module name (placeholder — NanoVG renders the final text) -->
+  <text
+     x="106.5" y="16"
+     font-family="Sans, Arial" font-size="10" font-weight="bold"
+     fill="#FFFFFF"
+     text-anchor="middle" dominant-baseline="middle">SWARM CORE</text>
+
+  <!-- Sub-label -->
+  <text
+     x="106.5" y="34"
+     font-family="Sans, Arial" font-size="7"
+     fill="#C8C0B0"
+     text-anchor="middle" dominant-baseline="middle">bio-acoustic swarm</text>
+
+  <!-- ─── Row 1: SPECIMEN + PITCH ─── -->
+  <text x="65" y="44" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">SPECIMEN</text>
+  <text x="148" y="44" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">PITCH</text>
+
+  <!-- ─── Row 2: DENSITY + SCATTER ─── -->
+  <text x="65" y="94" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">DENSITY</text>
+  <text x="148" y="94" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">SCATTER</text>
+
+  <!-- ─── Row 3: DETUNE + DECAY ─── -->
+  <text x="65" y="144" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">DETUNE</text>
+  <text x="148" y="144" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">DECAY</text>
+
+  <!-- MODE label for swarm button -->
+  <text x="148" y="191" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">SWARM</text>
+
+  <!-- Separator line -->
+  <line x1="16" y1="286" x2="197" y2="286" stroke="#FF4A0E" stroke-width="0.5" opacity="0.6"/>
+
+  <!-- ─── I/O labels ─── -->
+  <!-- Input section -->
+  <text x="65" y="300" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">TRIG</text>
+  <text x="148" y="300" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">ACTIVE</text>
+
+  <!-- Output section -->
+  <text x="65" y="340" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">OUT L</text>
+  <text x="148" y="340" font-family="Sans" font-size="7" fill="#C8C0B0" text-anchor="middle">OUT R</text>
+
+  <!-- V/OCT CV jack labels (small, under main knob) -->
+  <text x="65" y="88" font-family="Sans" font-size="6" fill="#5A7350" text-anchor="middle">V/OCT</text>
+
+  <!-- Screws (corner markers — actual screw widgets placed in C++) -->
+  <circle cx="7.5"   cy="7.5"   r="3.5" fill="#2A3A2A"/>
+  <circle cx="205.5" cy="7.5"   r="3.5" fill="#2A3A2A"/>
+  <circle cx="7.5"   cy="372.5" r="3.5" fill="#2A3A2A"/>
+  <circle cx="205.5" cy="372.5" r="3.5" fill="#2A3A2A"/>
+
+  <!-- Brand footer -->
+  <text x="106.5" y="370"
+     font-family="Sans" font-size="6"
+     fill="#887860"
+     text-anchor="middle">AMPLIFIED FUTURES</text>
+</svg>

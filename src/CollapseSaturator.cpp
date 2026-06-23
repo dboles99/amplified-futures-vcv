@@ -167,17 +167,6 @@ struct CollapseSaturatorWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.48f, 116.f)), module, CollapseSaturator::OUT_R_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.72f, 116.f)), module, CollapseSaturator::VOCT_OUTPUT));
 	}
-
-	void draw(const DrawArgs& args) override {
-		ModuleWidget::draw(args);
-		if (!APP->window->uiFont) return;
-		nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-		nvgFontSize(args.vg, 11.f);
-		nvgTextLetterSpacing(args.vg, 3.f);
-		nvgFillColor(args.vg, nvgRGB(0x0C, 0x10, 0x0A));
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, box.size.x / 2.f, 11.f, "COLLAPSE", NULL);
-	}
 };
 
 Model* modelCollapseSaturator = createModel<CollapseSaturator, CollapseSaturatorWidget>("CollapseSat");

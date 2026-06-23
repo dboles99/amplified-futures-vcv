@@ -20,3 +20,5 @@ extern Model* modelHarmonicPressure;
 extern Model* modelCollapseSaturator;
 extern Model* modelFeedbackGovernor;
 extern Model* modelMassDriver;
+extern Model* modelSitarGrid;
+extern Model* modelSwarmCore;

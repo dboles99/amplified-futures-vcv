@@ -207,16 +207,6 @@ struct WallConductorWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(97.f,  120.f)), module, WallConductor::OUT_R_OUTPUT));
 	}
 
-	void draw(const DrawArgs& args) override {
-		ModuleWidget::draw(args);
-		if (!APP->window->uiFont) return;
-		nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-		nvgFontSize(args.vg, 11.f);
-		nvgTextLetterSpacing(args.vg, 2.5f);
-		nvgFillColor(args.vg, nvgRGB(0x0C, 0x10, 0x0A));
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, box.size.x / 2.f, 11.f, "WALL CONDUCTOR", NULL);
-	}
 };
 
 Model* modelWallConductor = createModel<WallConductor, WallConductorWidget>("WallConductor");

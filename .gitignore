@@ -10,3 +10,6 @@
 /build
 /dep
 /dist
+
+# InsectSet32 sample bank (324 MB — download separately from Zenodo 7072196)
+/res/insects/

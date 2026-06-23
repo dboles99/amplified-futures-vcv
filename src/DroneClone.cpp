@@ -335,17 +335,6 @@ struct DroneCloneWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(75.f, 116.f)), module, DroneClone::OUT_OUTPUT));
 		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(95.f, 116.f)), module, DroneClone::RTN_INPUT));
 	}
-
-	void draw(const DrawArgs& args) override {
-		ModuleWidget::draw(args);
-		if (!APP->window->uiFont) return;
-		nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-		nvgFontSize(args.vg, 15.f);
-		nvgTextLetterSpacing(args.vg, 3.f);
-		nvgFillColor(args.vg, nvgRGB(0x0C, 0x10, 0x0A));
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, box.size.x / 2.f, 13.f, "DRONECLONE", NULL);
-	}
 };
 
 Model* modelDroneClone = createModel<DroneClone, DroneCloneWidget>("DroneClone");
