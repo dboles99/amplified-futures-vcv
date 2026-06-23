@@ -250,17 +250,6 @@ struct StringMassCoreWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.f, 110.f)), module, StringMassCore::VOCT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(65.f, 110.f)), module, StringMassCore::AUDIO_OUTPUT));
 	}
-
-	void draw(const DrawArgs& args) override {
-		ModuleWidget::draw(args);
-		if (!APP->window->uiFont) return;
-		nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-		nvgFontSize(args.vg, 10.f);
-		nvgTextLetterSpacing(args.vg, 2.f);
-		nvgFillColor(args.vg, nvgRGB(0x0C, 0x10, 0x0A));
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, box.size.x / 2.f, 11.f, "STRING MASS", NULL);
-	}
 };
 
 Model* modelStringMassCore = createModel<StringMassCore, StringMassCoreWidget>("StringMassCore");

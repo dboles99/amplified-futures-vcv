@@ -327,16 +327,6 @@ struct MassDriverWidget : ModuleWidget {
         addOutput(createOutputCentered<PJ301MPort>(
             mm2px(Vec(80.f, 126.f)), module, MassDriver::VOCT_OUTPUT));
     }
-
-    void draw(const DrawArgs& args) override {
-        ModuleWidget::draw(args);
-        nvgFontSize(args.vg, 11.f);
-        nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-        nvgTextLetterSpacing(args.vg, 3.f);
-        nvgFillColor(args.vg, nvgRGB(0x0C, 0x10, 0x0A));
-        nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-        nvgText(args.vg, box.size.x * 0.5f, 13.f, "MASS DRIVER", nullptr);
-    }
 };
 
 Model* modelMassDriver = createModel<MassDriver, MassDriverWidget>("MassDriver");

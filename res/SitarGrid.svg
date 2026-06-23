@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  SITAR GRID — 42 HP panel  |  Amplified Futures design system
+  Panel: 630 × 380 px  (42 HP × 15 px/HP)
+  Finish: dark oxidised steel (#1F2A1F)
+  mm→px factor: 2.953
+
+  Sequencer columns (mm → px):
+    sX: [8,21,34,47,60,73,86,99,113,126] → [23.6,62.0,100.5,138.8,177.2,215.6,254.0,292.4,333.7,372.2]
+  Seq rows:
+    PITCH  knob y=32mm → 94.5px   lights y=22mm → 65.0px
+    RES    knob y=54mm → 159.5px  lights y=44mm → 130.0px
+    RIFF   knob y=76mm → 224.5px  lights y=66mm → 195.0px
+  Right block x (mm→px):
+    rX: [133,146,159,172,185,198] → [393.0,431.3,469.7,508.1,546.5,584.8]
+  Right block rows y (mm→px):
+    25→73.8  41→121.1  55→162.4  69→203.8  85→251.1  106→313.0
+  I/O rows:
+    y=106mm → 313.0px  (inputs)
+    y=120mm → 354.5px  (outputs)
+  Screws: (15,7.5) (615,7.5) (15,372.5) (615,372.5)
+-->
+
+<svg
+   width="630"
+   height="380"
+   viewBox="0 0 630 380"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg">
+
+  <!-- DARK STEEL BACKGROUND -->
+  <rect width="630" height="380" fill="#1F2A1F"/>
+
+  <!-- Subtle vertical grain lines -->
+  <line x1="157.5" y1="0" x2="157.5" y2="380" stroke="#243424" stroke-width="0.5" opacity="0.2"/>
+  <line x1="315"   y1="0" x2="315"   y2="380" stroke="#243424" stroke-width="0.5" opacity="0.2"/>
+  <line x1="472.5" y1="0" x2="472.5" y2="380" stroke="#243424" stroke-width="0.5" opacity="0.2"/>
+
+  <!-- Divider between sequencer block and right block -->
+  <line x1="383" y1="31" x2="383" y2="300" stroke="#3A4A3A" stroke-width="1" opacity="0.6"/>
+
+  <!-- SAFETY ORANGE HEADER -->
+  <rect x="0" y="0" width="630" height="22" fill="#FF4A0E"/>
+
+  <!-- Screw shadows in header -->
+  <circle cx="15"  cy="7.5" r="3" fill="#0C100A" opacity="0.35"/>
+  <circle cx="615" cy="7.5" r="3" fill="#0C100A" opacity="0.35"/>
+
+  <!-- META STRIP -->
+  <rect x="0" y="22" width="630" height="9" fill="#141A12"/>
+
+  <!-- Meta text -->
+  <text x="8"   y="28" font-family="'Space Mono', monospace" font-size="4.5" fill="#6f6960" letter-spacing="0.5">MODAL STRING-RESONANCE SEQUENCER</text>
+  <text x="622" y="28" font-family="'Space Mono', monospace" font-size="4.5" fill="#3e5a35" letter-spacing="0.5" text-anchor="end">42HP / v1.0</text>
+
+  <!-- ══ PITCH BRAIN SECTION ══ -->
+  <!-- Band background -->
+  <rect x="0" y="49" width="382" height="60" fill="#0C100A" opacity="0.45" rx="2"/>
+  <!-- Left accent bar -->
+  <rect x="0" y="49" width="3" height="60" fill="#FF4A0E"/>
+  <!-- Section label -->
+  <text x="10" y="61" font-family="Oswald, 'Arial Narrow', Arial, sans-serif" font-size="6" font-weight="700" fill="#e8e2d4" letter-spacing="1.8">PITCH</text>
+  <text x="48" y="61" font-family="'Space Mono', monospace" font-size="4" fill="#6f6960">8-STEP · RAGA QUANTISED</text>
+  <!-- LEN / DIR labels -->
+  <text x="333.7" y="61" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">LEN</text>
+  <text x="372.2" y="61" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">DIR</text>
+  <!-- Step number dots -->
+  <text x="23.6"  y="76" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">1</text>
+  <text x="62.0"  y="76" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">2</text>
+  <text x="100.5" y="76" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">3</text>
+  <text x="138.8" y="76" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">4</text>
+  <text x="177.2" y="76" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">5</text>
+  <text x="215.6" y="76" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">6</text>
+  <text x="254.0" y="76" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">7</text>
+  <text x="292.4" y="76" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">8</text>
+
+  <!-- ══ RESONANCE BRAIN SECTION ══ -->
+  <rect x="0" y="119" width="382" height="60" fill="#0C100A" opacity="0.40" rx="2"/>
+  <rect x="0" y="119" width="3"   height="60" fill="#E8C547"/>
+  <text x="10" y="131" font-family="Oswald, 'Arial Narrow', Arial, sans-serif" font-size="6" font-weight="700" fill="#e8e2d4" letter-spacing="1.8">RESONANCE</text>
+  <text x="82" y="131" font-family="'Space Mono', monospace" font-size="4" fill="#6f6960">8-STEP · OWN CLK DIV</text>
+  <text x="333.7" y="131" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">LEN</text>
+  <text x="372.2" y="131" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">DIV</text>
+  <!-- Step numbers -->
+  <text x="23.6"  y="146" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">1</text>
+  <text x="62.0"  y="146" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">2</text>
+  <text x="100.5" y="146" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">3</text>
+  <text x="138.8" y="146" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">4</text>
+  <text x="177.2" y="146" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">5</text>
+  <text x="215.6" y="146" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">6</text>
+  <text x="254.0" y="146" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">7</text>
+  <text x="292.4" y="146" font-family="'Space Mono', monospace" font-size="3.5" fill="#4A5A4A" text-anchor="middle">8</text>
+
+  <!-- ══ RIFF BRAIN SECTION ══ -->
+  <rect x="0" y="189" width="382" height="60" fill="#0C100A" opacity="0.40" rx="2"/>
+  <rect x="0" y="189" width="3"   height="60" fill="#5A7350"/>
+  <text x="10" y="201" font-family="Oswald, 'Arial Narrow', Arial, sans-serif" font-size="6" font-weight="700" fill="#e8e2d4" letter-spacing="1.8">RIFF</text>
+  <text x="40" y="201" font-family="'Space Mono', monospace" font-size="4" fill="#6f6960">ARTICULATION · STR/BND/ROLL/MUTE/DRN/REST/ORN/RTN</text>
+  <text x="333.7" y="201" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">LEN</text>
+  <!-- Step labels -->
+  <text x="23.6"  y="216" font-family="'Space Mono', monospace" font-size="3.2" fill="#4A5A4A" text-anchor="middle">STR</text>
+  <text x="62.0"  y="216" font-family="'Space Mono', monospace" font-size="3.2" fill="#4A5A4A" text-anchor="middle">BND</text>
+  <text x="100.5" y="216" font-family="'Space Mono', monospace" font-size="3.2" fill="#4A5A4A" text-anchor="middle">ROL</text>
+  <text x="138.8" y="216" font-family="'Space Mono', monospace" font-size="3.2" fill="#4A5A4A" text-anchor="middle">MUT</text>
+  <text x="177.2" y="216" font-family="'Space Mono', monospace" font-size="3.2" fill="#4A5A4A" text-anchor="middle">DRN</text>
+  <text x="215.6" y="216" font-family="'Space Mono', monospace" font-size="3.2" fill="#4A5A4A" text-anchor="middle">RST</text>
+  <text x="254.0" y="216" font-family="'Space Mono', monospace" font-size="3.2" fill="#4A5A4A" text-anchor="middle">ORN</text>
+  <text x="292.4" y="216" font-family="'Space Mono', monospace" font-size="3.2" fill="#4A5A4A" text-anchor="middle">RTN</text>
+
+  <!-- ══ RIGHT BLOCK — SOUND ENGINE ══ -->
+  <!-- Sub-section labels -->
+  <text x="393" y="61"  font-family="Oswald, 'Arial Narrow', Arial, sans-serif" font-size="5" font-weight="700" fill="#C8C0B0" letter-spacing="1.5">GLOBAL</text>
+  <text x="393" y="113" font-family="Oswald, 'Arial Narrow', Arial, sans-serif" font-size="5" font-weight="700" fill="#C8C0B0" letter-spacing="1.5">STRING</text>
+  <text x="393" y="153" font-family="Oswald, 'Arial Narrow', Arial, sans-serif" font-size="5" font-weight="700" fill="#C8C0B0" letter-spacing="1.5">JAWARI</text>
+  <text x="393" y="194" font-family="Oswald, 'Arial Narrow', Arial, sans-serif" font-size="5" font-weight="700" fill="#C8C0B0" letter-spacing="1.5">SYMPATHETIC</text>
+
+  <!-- Control labels: GLOBAL row -->
+  <text x="393.0" y="85"  font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">ROOT</text>
+  <text x="431.3" y="85"  font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">RAGA</text>
+  <text x="469.7" y="85"  font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">PHRZ</text>
+
+  <!-- Control labels: STRING row -->
+  <text x="393.0" y="133" font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">DAMP</text>
+  <text x="431.3" y="133" font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">BRITE</text>
+  <text x="469.7" y="133" font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">MEEND</text>
+
+  <!-- Control labels: JAWARI row -->
+  <text x="393.0" y="173" font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">BUZZ</text>
+  <text x="431.3" y="173" font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">EDGE</text>
+  <text x="469.7" y="173" font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">CHAOS</text>
+
+  <!-- Control labels: SYMP row -->
+  <text x="393.0" y="214" font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">DECAY</text>
+  <text x="431.3" y="214" font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">SPRD</text>
+  <text x="469.7" y="214" font-family="'Space Mono', monospace" font-size="4" fill="#887860" text-anchor="middle">FEED</text>
+
+  <!-- ══ JHALA BREAKDOWN SECTION ══ -->
+  <rect x="383" y="260" width="247" height="40" fill="#0C100A" opacity="0.5" rx="2"/>
+  <rect x="383" y="260" width="3"   height="40" fill="#FF4A0E"/>
+  <text x="390" y="272" font-family="Oswald, 'Arial Narrow', Arial, sans-serif" font-size="6" font-weight="700" fill="#FF4A0E" letter-spacing="2">JHALA BREAKDOWN</text>
+
+  <!-- Breakdown control labels -->
+  <text x="393.0" y="295" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">INT</text>
+  <text x="431.3" y="295" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">ACCEL</text>
+  <text x="469.7" y="295" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">SA</text>
+  <text x="508.1" y="295" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">CHIK</text>
+  <text x="546.5" y="295" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">ORN</text>
+  <text x="584.8" y="295" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">LAND</text>
+
+  <!-- ══ I/O ROW ══ -->
+  <rect x="0" y="298" width="630" height="7" fill="#0C100A" opacity="0.6"/>
+
+  <!-- Input labels (y≈305px = 103mm) -->
+  <text x="23.6"  y="306" font-family="'Space Mono', monospace" font-size="3.5" fill="#5A7350" text-anchor="middle">V/OCT</text>
+  <text x="62.0"  y="306" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">CLK</text>
+  <text x="100.5" y="306" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">RST</text>
+  <text x="138.8" y="306" font-family="'Space Mono', monospace" font-size="3.5" fill="#FF4A0E" text-anchor="middle">BD▶</text>
+  <text x="177.2" y="306" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">LOCK</text>
+  <text x="215.6" y="306" font-family="'Space Mono', monospace" font-size="3.5" fill="#E8C547" text-anchor="middle">ROOT</text>
+  <text x="254.0" y="306" font-family="'Space Mono', monospace" font-size="3.5" fill="#E8C547" text-anchor="middle">JAW</text>
+
+  <!-- Output labels (y≈349px = 118mm) -->
+  <text x="23.6"  y="348" font-family="'Space Mono', monospace" font-size="3.5" fill="#CC3A0A" text-anchor="middle">OUT L</text>
+  <text x="62.0"  y="348" font-family="'Space Mono', monospace" font-size="3.5" fill="#CC3A0A" text-anchor="middle">OUT R</text>
+  <text x="100.5" y="348" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">DRONE</text>
+  <text x="138.8" y="348" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">SYMP</text>
+  <text x="177.2" y="348" font-family="'Space Mono', monospace" font-size="3.5" fill="#5A7350" text-anchor="middle">PTCH</text>
+  <text x="215.6" y="348" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">GATE</text>
+  <text x="254.0" y="348" font-family="'Space Mono', monospace" font-size="3.5" fill="#887860" text-anchor="middle">RIFF▶</text>
+  <text x="292.4" y="348" font-family="'Space Mono', monospace" font-size="3.5" fill="#E8C547" text-anchor="middle">RES</text>
+
+  <!-- Bottom screw shadows -->
+  <circle cx="15"  cy="372.5" r="3" fill="#0C100A" opacity="0.35"/>
+  <circle cx="615" cy="372.5" r="3" fill="#0C100A" opacity="0.35"/>
+
+</svg>

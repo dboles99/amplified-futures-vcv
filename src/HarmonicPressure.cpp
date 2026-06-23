@@ -168,17 +168,6 @@ struct HarmonicPressureWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(15.f, 114.f)), module, HarmonicPressure::VOCT_INPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(55.f, 114.f)), module, HarmonicPressure::VOCT_OUTPUT));
 	}
-
-	void draw(const DrawArgs& args) override {
-		ModuleWidget::draw(args);
-		if (!APP->window->uiFont) return;
-		nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-		nvgFontSize(args.vg, 9.5f);
-		nvgTextLetterSpacing(args.vg, 1.5f);
-		nvgFillColor(args.vg, nvgRGB(0x0C, 0x10, 0x0A));
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, box.size.x / 2.f, 11.f, "HARM PRESS", NULL);
-	}
 };
 
 Model* modelHarmonicPressure = createModel<HarmonicPressure, HarmonicPressureWidget>("HarmonicPressure");

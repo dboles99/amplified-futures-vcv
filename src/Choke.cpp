@@ -199,17 +199,6 @@ struct ChokeWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(44.45f, 118.f)), module, Choke::OUT_L_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(62.23f, 118.f)), module, Choke::OUT_R_OUTPUT));
 	}
-
-	void draw(const DrawArgs& args) override {
-		ModuleWidget::draw(args);
-		if (!APP->window->uiFont) return;
-		nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-		nvgFontSize(args.vg, 13.f);
-		nvgTextLetterSpacing(args.vg, 5.f);
-		nvgFillColor(args.vg, nvgRGB(0x0C, 0x10, 0x0A));
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, box.size.x / 2.f, 11.f, "CHOKE", NULL);
-	}
 };
 
 Model* modelChoke = createModel<Choke, ChokeWidget>("Choke");

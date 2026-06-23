@@ -156,17 +156,6 @@ struct SendWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(15.24f, 116.f)), module, Send::VOCT_INPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.72f, 116.f)), module, Send::VOCT_OUTPUT));
 	}
-
-	void draw(const DrawArgs& args) override {
-		ModuleWidget::draw(args);
-		if (!APP->window->uiFont) return;
-		nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-		nvgFontSize(args.vg, 13.f);
-		nvgTextLetterSpacing(args.vg, 6.f);
-		nvgFillColor(args.vg, nvgRGB(0x0C, 0x10, 0x0A));
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, box.size.x / 2.f, 11.f, "SEND", NULL);
-	}
 };
 
 Model* modelSend = createModel<Send, SendWidget>("Send");

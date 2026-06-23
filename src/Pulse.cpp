@@ -182,17 +182,6 @@ struct PulseWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.f, 115.f)), module, Pulse::VOCT_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(48.f, 115.f)), module, Pulse::OUT_OUTPUT));
 	}
-
-	void draw(const DrawArgs& args) override {
-		ModuleWidget::draw(args);
-		if (!APP->window->uiFont) return;
-		nvgFontFaceId(args.vg, APP->window->uiFont->handle);
-		nvgFontSize(args.vg, 13.f);
-		nvgTextLetterSpacing(args.vg, 4.f);
-		nvgFillColor(args.vg, nvgRGB(0x0C, 0x10, 0x0A));
-		nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-		nvgText(args.vg, box.size.x / 2.f, 11.f, "PULSE", NULL);
-	}
 };
 
 Model* modelPulse = createModel<Pulse, PulseWidget>("Pulse");
