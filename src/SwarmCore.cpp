@@ -384,38 +384,39 @@ struct SwarmCoreWidget : ModuleWidget {
         addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-        // Row Y positions (mm, converted to px: 1mm = 3.78px, panel height 380px)
+        // Widget positions are in millimetres for Rack's mm2px() helper.
         // Labels row 1: SPECIMEN / PITCH
         const float x1 = 22.f, x2 = 55.f;
-        const float ky1 = 55.f, ky2 = 105.f, ky3 = 155.f;
-        const float jy = 310.f, jy2 = 350.f;
+        const float ky1 = 24.f, ky2 = 58.f, ky3 = 92.f;
+        const float attenDy = 10.f, cvDy = 20.f;
+        const float jy = 108.f, jy2 = 122.f;
 
         // Row 1 — SPECIMEN, PITCH
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x1, ky1)), module, SwarmCore::SPECIMEN_PARAM));
-        addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky1 + 14.f)), module, SwarmCore::PITCH_ATT_PARAM));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky1 + 28.f)), module, SwarmCore::VOCT_INPUT));
+        addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky1 + attenDy)), module, SwarmCore::PITCH_ATT_PARAM));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky1 + cvDy)), module, SwarmCore::VOCT_INPUT));
 
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x2, ky1)), module, SwarmCore::PITCH_PARAM));
 
         // Row 2 — DENSITY, SCATTER
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x1, ky2)), module, SwarmCore::DENSITY_PARAM));
-        addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky2 + 14.f)), module, SwarmCore::DENSITY_ATT_PARAM));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky2 + 28.f)), module, SwarmCore::DENSITY_INPUT));
+        addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky2 + attenDy)), module, SwarmCore::DENSITY_ATT_PARAM));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky2 + cvDy)), module, SwarmCore::DENSITY_INPUT));
 
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x2, ky2)), module, SwarmCore::SCATTER_PARAM));
-        addParam(createParamCentered<Trimpot>(mm2px(Vec(x2, ky2 + 14.f)), module, SwarmCore::SCATTER_ATT_PARAM));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x2, ky2 + 28.f)), module, SwarmCore::SCATTER_INPUT));
+        addParam(createParamCentered<Trimpot>(mm2px(Vec(x2, ky2 + attenDy)), module, SwarmCore::SCATTER_ATT_PARAM));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x2, ky2 + cvDy)), module, SwarmCore::SCATTER_INPUT));
 
         // Row 3 — DETUNE, DECAY
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x1, ky3)), module, SwarmCore::DETUNE_PARAM));
-        addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky3 + 14.f)), module, SwarmCore::DETUNE_ATT_PARAM));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky3 + 28.f)), module, SwarmCore::DETUNE_INPUT));
+        addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky3 + attenDy)), module, SwarmCore::DETUNE_ATT_PARAM));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky3 + cvDy)), module, SwarmCore::DETUNE_INPUT));
 
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x2, ky3)), module, SwarmCore::DECAY_PARAM));
 
         // Mode button
-        addParam(createParamCentered<LEDButton>(mm2px(Vec(x2, ky3 + 14.f)), module, SwarmCore::MODE_PARAM));
-        addChild(createLightCentered<SmallLight<AFOrangeLightSC>>(mm2px(Vec(x2, ky3 + 14.f)), module, SwarmCore::SWARM_LIGHT));
+        addParam(createParamCentered<LEDButton>(mm2px(Vec(x2, ky3 + attenDy)), module, SwarmCore::MODE_PARAM));
+        addChild(createLightCentered<SmallLight<AFOrangeLightSC>>(mm2px(Vec(x2, ky3 + attenDy)), module, SwarmCore::SWARM_LIGHT));
 
         // Trigger input
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, jy)), module, SwarmCore::TRIG_INPUT));
