@@ -325,7 +325,7 @@ struct MassDriverWidget : ModuleWidget {
         addOutput(createOutputCentered<PJ301MPort>(
             mm2px(Vec(100.f, 114.f)), module, MassDriver::OUT_R_OUTPUT));
         addOutput(createOutputCentered<PJ301MPort>(
-            mm2px(Vec(80.f, 126.f)), module, MassDriver::VOCT_OUTPUT));
+            mm2px(Vec(110.f, 114.f)), module, MassDriver::VOCT_OUTPUT));
     }
 };
 
