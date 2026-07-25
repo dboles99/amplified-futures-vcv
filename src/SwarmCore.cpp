@@ -190,11 +190,15 @@ struct SwarmCore : Module {
         DENSITY_INPUT,
         SCATTER_INPUT,
         DETUNE_INPUT,
+        // appended - never insert above this line (Rack serialises by position)
+        CV_INPUT,
         INPUTS_LEN
     };
     enum OutputId {
         OUT_L_OUTPUT,
         OUT_R_OUTPUT,
+        // appended - never insert above this line
+        CV_OUTPUT,
         OUTPUTS_LEN
     };
     enum LightId {
@@ -240,8 +244,10 @@ struct SwarmCore : Module {
         configInput(DENSITY_INPUT, "Density CV");
         configInput(SCATTER_INPUT, "Scatter CV");
         configInput(DETUNE_INPUT,  "Detune CV");
+        configInput(CV_INPUT,      "Decay CV");
         configOutput(OUT_L_OUTPUT, "Out L");
         configOutput(OUT_R_OUTPUT, "Out R");
+        configOutput(CV_OUTPUT,    "Swarm envelope CV");
 
         // Load samples on a background thread so the audio thread is never blocked.
         // bankReady (acquire/release) acts as the publication fence: once set,
@@ -302,7 +308,12 @@ struct SwarmCore : Module {
             0.f, 1.f);
 
         // Decay: 10ms..3s
-        float decaySecs = std::exp2(-6.f + params[DECAY_PARAM].getValue() * 7.8f);
+        // DECAY is the one control with no satellite CV, so the general CV input
+        // modulates it: +/-5V spans the full knob range, unipolar patches still work.
+        float decayKnob = params[DECAY_PARAM].getValue();
+        if (inputs[CV_INPUT].isConnected())
+            decayKnob = clamp(decayKnob + inputs[CV_INPUT].getVoltage() / 10.f, 0.f, 1.f);
+        float decaySecs = std::exp2(-6.f + decayKnob * 7.8f);
         float decayCoef = std::exp(-args.sampleTime / decaySecs);
 
         int numVoices = swarmMode ? std::max(1, (int)(density * NUM_VOICES)) : 1;
@@ -345,10 +356,12 @@ struct SwarmCore : Module {
 
         // Sum voices to stereo
         float outL = 0.f, outR = 0.f;
+        float envSum = 0.f;
         bool anyActive = false;
         for (int v = 0; v < NUM_VOICES; v++) {
             if (!voices[v].active) continue;
             anyActive = true;
+            envSum += voices[v].env;
             const auto& data = noSamples ? std::vector<float>() : bank[voices[v].sampleIdx].data;
             float s;
             if (noSamples) {
@@ -369,6 +382,9 @@ struct SwarmCore : Module {
         float norm = swarmMode ? INV_SQRT_N : 1.f;
         outputs[OUT_L_OUTPUT].setVoltage(clamp(outL * norm * 5.f, -10.f, 10.f));
         outputs[OUT_R_OUTPUT].setVoltage(clamp(outR * norm * 5.f, -10.f, 10.f));
+        // Unipolar 0-10V swarm envelope: the summed voice activity, so the CV
+        // tracks how much of the swarm is currently sounding.
+        outputs[CV_OUTPUT].setVoltage(clamp(envSum * INV_SQRT_N, 0.f, 1.f) * 10.f);
         lights[ACTIVE_LIGHT].setBrightness(anyActive ? 1.f : 0.f);
     }
 };
@@ -386,10 +402,20 @@ struct SwarmCoreWidget : ModuleWidget {
 
         // Widget positions are in millimetres for Rack's mm2px() helper.
         // Labels row 1: SPECIMEN / PITCH
-        const float x1 = 22.f, x2 = 55.f;
-        const float ky1 = 24.f, ky2 = 58.f, ky3 = 92.f;
+        // 14 HP = 71.12 mm. Rows are knob / attenuverter / CV, then one I/O row.
+        // The old layout put TRIG (108), DETUNE CV (112) and OUT L (122) all at
+        // x=22 - three 10.7 mm ports inside 14 mm, so they overlapped on screen.
+        const float x1 = 18.f, x2 = 53.f;
+        const float ky1 = 24.f, ky2 = 56.f, ky3 = 90.f;
         const float attenDy = 10.f, cvDy = 20.f;
-        const float jy = 108.f, jy2 = 122.f;
+        // Row 3 has no room for a vertical satellite stack, so DETUNE's
+        // attenuverter sits beside its knob and its CV joins the input row.
+        const float xAtten3 = 30.5f;
+        const float xMid = 35.45f;
+        // Two I/O rows of three. x values keep the outer ports clear of the
+        // bottom screws (which occupy x 5.1-10.2 mm and 61.0-66.0 mm).
+        const float jxL = 17.f, jxR = 54.f;
+        const float jyIn = 105.f, jyOut = 117.f;
 
         // Row 1 — SPECIMEN, PITCH
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x1, ky1)), module, SwarmCore::SPECIMEN_PARAM));
@@ -407,26 +433,25 @@ struct SwarmCoreWidget : ModuleWidget {
         addParam(createParamCentered<Trimpot>(mm2px(Vec(x2, ky2 + attenDy)), module, SwarmCore::SCATTER_ATT_PARAM));
         addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x2, ky2 + cvDy)), module, SwarmCore::SCATTER_INPUT));
 
-        // Row 3 — DETUNE, DECAY
+        // Row 3 — DETUNE, DECAY (attenuverter beside the knob, CV in the input row)
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x1, ky3)), module, SwarmCore::DETUNE_PARAM));
-        addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky3 + attenDy)), module, SwarmCore::DETUNE_ATT_PARAM));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky3 + cvDy)), module, SwarmCore::DETUNE_INPUT));
-
+        addParam(createParamCentered<Trimpot>(mm2px(Vec(xAtten3, ky3)), module, SwarmCore::DETUNE_ATT_PARAM));
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x2, ky3)), module, SwarmCore::DECAY_PARAM));
 
-        // Mode button
-        addParam(createParamCentered<LEDButton>(mm2px(Vec(x2, ky3 + attenDy)), module, SwarmCore::MODE_PARAM));
-        addChild(createLightCentered<SmallLight<AFOrangeLightSC>>(mm2px(Vec(x2, ky3 + attenDy)), module, SwarmCore::SWARM_LIGHT));
+        // Mode button sits between rows 2 and 3; ACTIVE light below it
+        addParam(createParamCentered<LEDButton>(mm2px(Vec(xMid, ky2 + cvDy)), module, SwarmCore::MODE_PARAM));
+        addChild(createLightCentered<SmallLight<AFOrangeLightSC>>(mm2px(Vec(xMid, ky2 + cvDy)), module, SwarmCore::SWARM_LIGHT));
+        addChild(createLightCentered<SmallLight<AFOrangeLightSC>>(mm2px(Vec(xMid, ky3)), module, SwarmCore::ACTIVE_LIGHT));
 
-        // Trigger input
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, jy)), module, SwarmCore::TRIG_INPUT));
+        // Inputs row: TRIG | DETUNE CV | CV IN
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(jxL,  jyIn)), module, SwarmCore::TRIG_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(xMid, jyIn)), module, SwarmCore::DETUNE_INPUT));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(jxR,  jyIn)), module, SwarmCore::CV_INPUT));
 
-        // Active light
-        addChild(createLightCentered<SmallLight<AFOrangeLightSC>>(mm2px(Vec(x2, jy)), module, SwarmCore::ACTIVE_LIGHT));
-
-        // Outputs
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x1, jy2)), module, SwarmCore::OUT_L_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x2, jy2)), module, SwarmCore::OUT_R_OUTPUT));
+        // Outputs row: OUT L | OUT R | CV OUT
+        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(jxL,  jyOut)), module, SwarmCore::OUT_L_OUTPUT));
+        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(xMid, jyOut)), module, SwarmCore::OUT_R_OUTPUT));
+        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(jxR,  jyOut)), module, SwarmCore::CV_OUTPUT));
     }
 
     void draw(const DrawArgs& args) override {
