@@ -1,7 +1,7 @@
 {
   "slug": "amplified-futures",
   "name": "Amplified Futures",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "license": "MIT",
   "brand": "Amplified Futures",
   "description": "Experimental Rack instruments for drone, feedback, physical modeling, no-wave sequencing, and massed-signal composition.",
@@ -17,98 +17,141 @@
       "slug": "DroneCore",
       "name": "DroneCore",
       "description": "Two-voice detuned oscillator for dense harmonic drones.",
-      "tags": ["Oscillator"],
+      "tags": [
+        "Oscillator"
+      ],
       "keywords": "drone detune beating harmonic oscillator"
     },
     {
       "slug": "DroneClone",
       "name": "DroneClone",
       "description": "8-voice amplified string wall. Mass, tension, jawari buzz, choke collapse. V/OCT + feedback loop. Amplified Futures flagship.",
-      "tags": ["Oscillator", "Physical modeling", "Polyphonic"],
+      "tags": [
+        "Oscillator",
+        "Physical modeling",
+        "Polyphonic"
+      ],
       "keywords": "drone string wall mass jawari feedback"
     },
     {
       "slug": "Send",
       "name": "Send",
       "description": "2×2 cross-send feedback routing matrix. A→B send, B→A return, A→C/C→A internal feedback bus. Polyphonic.",
-      "tags": ["Mixer", "Effect"],
+      "tags": [
+        "Mixer",
+        "Effect"
+      ],
       "keywords": "send return feedback routing matrix polyphonic"
     },
     {
       "slug": "Choke",
       "name": "Choke",
       "description": "4-channel mixer-as-instrument. GAIN, TONE, MUTE per channel. Fixed auto-pan. MAIN + stereo L/R out with soft saturation.",
-      "tags": ["Mixer"],
+      "tags": [
+        "Mixer"
+      ],
       "keywords": "choke mute tone gain saturation autopan"
     },
     {
       "slug": "Pulse",
       "name": "Pulse",
       "description": "16-step no-wave step percussion. 4×4 trigger grid, HIT/DECAY/METAL/CRACK. TRG clock in, audio out.",
-      "tags": ["Sequencer", "Drum"],
+      "tags": [
+        "Sequencer",
+        "Drum"
+      ],
       "keywords": "no-wave percussion trigger grid metal crack"
     },
     {
       "slug": "Drift",
       "name": "Drift",
       "description": "Slow random modulation source. RATE/WANDER/SLEW with CV. SMOOTH, STEP, and GATE outputs. SYNC trigger. V/OCT thru.",
-      "tags": ["Modulation", "Random"],
+      "tags": [
+        "Modulation",
+        "Random"
+      ],
       "keywords": "wander slew smooth step gate sync random"
     },
     {
       "slug": "HarmonicPressure",
       "name": "Harmonic Pressure",
       "description": "Harmonic series pitch CV generator. PITCH root + SPREAD ensemble detuning. PARTIAL selects first partial, COUNT sets how many. JUST/EQUAL/MICRO tuning modes. Outputs polyphonic V/oct for String Mass Core.",
-      "tags": ["Quantizer", "Polyphonic"],
+      "tags": [
+        "Quantizer",
+        "Polyphonic"
+      ],
       "keywords": "harmonic series pitch cv just intonation equal micro tuning partials"
     },
     {
       "slug": "StringMassCore",
       "name": "String Mass Core",
       "description": "16-voice harmonic mass oscillator. MASS voice count, SPREAD detune, TIMBRE harmonic content. UNIS/HARM/JUST/MICRO modes. HARM mode uses odd-harmonic sections. 1/√N amplitude normalised. Polyphonic.",
-      "tags": ["Oscillator", "Physical modeling", "Polyphonic"],
+      "tags": [
+        "Oscillator",
+        "Physical modeling",
+        "Polyphonic"
+      ],
       "keywords": "drone harmonic mass oscillator detune just intonation odd harmonics"
     },
     {
       "slug": "CollapseSat",
       "name": "Collapse Saturator",
       "description": "Stereo drive/saturation with collapse. DRIVE pre-gain, BUZZ character (ODD/EVEN/FULL), COLLAPSE gate maxes drive instantly, RECOVERY sets return time. Sidechain input. V/oct thru.",
-      "tags": ["Distortion", "Effect"],
+      "tags": [
+        "Distortion",
+        "Effect"
+      ],
       "keywords": "saturation collapse buzz sidechain overdrive feedback"
     },
     {
       "slug": "FeedbackGovernor",
       "name": "Feedback Governor",
       "description": "Controlled feedback send/return. AMOUNT level, TONE LP filter, DECAY attenuates per pass. KILL button/gate. DC blocker + ±10V safety limiter. V/oct thru.",
-      "tags": ["Effect", "Utility"],
+      "tags": [
+        "Effect",
+        "Utility"
+      ],
       "keywords": "feedback send return governor limiter kill dc blocker"
     },
     {
       "slug": "WallConductor",
       "name": "Wall Conductor",
       "description": "Section-based performance mixer/conductor. DENSITY sweeps 4 channels in. PRESSURE saturates. WIDTH spreads stereo. FEEDBACK loop. COLLAPSE gate with shaped RECOVERY.",
-      "tags": ["Mixer", "Controller"],
+      "tags": [
+        "Mixer",
+        "Controller"
+      ],
       "keywords": "performance conductor density pressure width collapse feedback"
     },
     {
       "slug": "MassDriver",
       "name": "Mass Driver",
       "description": "AF-01. 16-channel no-wave signal mixer. Per-channel GAIN + MUTE. Master DENSITY sweep, PRESSURE saturation, WIDTH stereo, FEEDBACK loop, COLLAPSE gate. 5 outputs: OUT L/R, AUX L/R, SUM.",
-      "tags": ["Mixer", "Controller"],
+      "tags": [
+        "Mixer",
+        "Controller"
+      ],
       "keywords": "performance no-wave mixer density pressure width collapse feedback"
     },
     {
       "slug": "SitarGrid",
       "name": "Sitar Grid",
       "description": "Modal string-resonance sequencer. Three independent brains: raga-quantised pitch, timbral resonance, articulation/riff. Karplus-Strong string, jawari bridge, 8-voice sympathetic bank. JHALA breakdown engine.",
-      "tags": ["Sequencer", "Physical modeling"],
+      "tags": [
+        "Sequencer",
+        "Physical modeling"
+      ],
       "keywords": "sitar raga jawari sympathetic strings jhala karplus strong performance"
     },
     {
       "slug": "SwarmCore",
       "name": "Swarm Core",
       "description": "Bio-acoustic insect sample engine. Loads InsectSet32 cicada/orthoptera WAVs. SPECIMEN select, PITCH, DENSITY, SCATTER, DETUNE, DECAY. Specimen and Swarm (8-voice) modes. Stereo out.",
-      "tags": ["Sampler", "Drum", "Polyphonic"],
+      "tags": [
+        "Sampler",
+        "Drum",
+        "Polyphonic"
+      ],
       "keywords": "insect bio-acoustic swarm cicada orthoptera sample engine"
     }
   ]
