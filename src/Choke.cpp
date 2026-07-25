@@ -3,7 +3,7 @@
 // ============================================================
 // CHOKE — 4-channel cheap-mixer-as-instrument
 //
-// Design: Amplified Futures (paper finish, 14 HP)
+// Design: Amplified Futures (dark steel finish, 18 HP)
 //   CHANNELS: 4× IN · GAIN · TONE · MUTE (GAIN+TONE each have CV+atten)
 //   MASTER:   MAIN (with CV+atten) · OUT L · OUT R
 //   UTILITY:  V/OCT IN → V/OCT OUT (thru)
@@ -138,7 +138,7 @@ struct Choke : Module {
 };
 
 // ============================================================
-// WIDGET  (14 HP)
+// WIDGET  (18 HP)
 // ============================================================
 
 struct ChokeWidget : ModuleWidget {
@@ -152,11 +152,17 @@ struct ChokeWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		// Channel x-centers (mm)
-		const float xc[4] = { 8.89f, 26.67f, 44.45f, 62.23f };
+		// 18 HP = 91.44 mm. At 14 HP the channels sat 17.78 mm apart with
+		// satellites at +-5 mm, which put CH3's satellites at 49.45 and CH4's at
+		// 57.23 - 7.78 mm between two 10.7 mm ports. Worse, every knob centre was
+		// only 8.6 mm from its own CV jack where 10.09 mm is needed, so all four
+		// channels overlapped, not just the pair that showed it most.
+		// 20 mm channel pitch with a uniform +8 mm satellite gives 10.63 mm.
+		const float xc[4] = { 15.7f, 35.7f, 55.7f, 75.7f };
 
 		for (int i = 0; i < 4; i++) {
-			// Satellite direction: CH1-3 right (+5mm), CH4 left (-5mm)
-			float sx = (i < 3) ? xc[i] + 5.f : xc[i] - 5.f;
+			// Uniform satellite direction - alternating it was what collided.
+			float sx = xc[i] + 8.f;
 
 			// GAIN
 			addParam(createParamCentered<RoundSmallBlackKnob>(
@@ -176,9 +182,9 @@ struct ChokeWidget : ModuleWidget {
 
 			// MUTE LED + button
 			addChild(createLightCentered<SmallLight<RedLight>>(
-				mm2px(Vec(xc[i], 72.f)), module, Choke::MUTE_1_LIGHT + i));
+				mm2px(Vec(xc[i], 70.f)), module, Choke::MUTE_1_LIGHT + i));
 			addParam(createParamCentered<TL1105>(
-				mm2px(Vec(xc[i], 78.f)), module, Choke::MUTE_1_PARAM + i));
+				mm2px(Vec(xc[i], 76.f)), module, Choke::MUTE_1_PARAM + i));
 
 			// IN jack
 			addInput(createInputCentered<PJ301MPort>(
@@ -187,17 +193,18 @@ struct ChokeWidget : ModuleWidget {
 
 		// MAIN + satellite
 		addParam(createParamCentered<RoundBlackKnob>(
-			mm2px(Vec(17.78f, 100.f)), module, Choke::MAIN_PARAM));
+			mm2px(Vec(20.f, 100.f)), module, Choke::MAIN_PARAM));
 		addParam(createParamCentered<Trimpot>(
-			mm2px(Vec(22.78f, 93.f)), module, Choke::MAIN_ATTEN_PARAM));
+			mm2px(Vec(28.f, 93.f)), module, Choke::MAIN_ATTEN_PARAM));
 		addInput(createInputCentered<PJ301MPort>(
-			mm2px(Vec(22.78f, 109.f)), module, Choke::MAIN_CV_INPUT));
+			mm2px(Vec(28.f, 109.f)), module, Choke::MAIN_CV_INPUT));
 
 		// Bottom row: V/OCT IN · V/OCT OUT · OUT L · OUT R
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec( 8.89f, 118.f)), module, Choke::VOCT_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(26.67f, 118.f)), module, Choke::VOCT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(44.45f, 118.f)), module, Choke::OUT_L_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(62.23f, 118.f)), module, Choke::OUT_R_OUTPUT));
+		// y=118 keeps the port bottoms at 123.35 mm, just clear of the screws.
+		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(20.f, 118.f)), module, Choke::VOCT_INPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.f, 118.f)), module, Choke::VOCT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(60.f, 118.f)), module, Choke::OUT_L_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(80.f, 118.f)), module, Choke::OUT_R_OUTPUT));
 	}
 };
 
