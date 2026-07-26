@@ -1,6 +1,6 @@
 # Design System
 
-The Amplified Futures panel language — colours, grid, typography, and widget layout conventions shared across all 12 modules.
+The Amplified Futures panel language — colours, grid, typography, and widget layout conventions shared across all 19 modules.
 
 ---
 
@@ -34,7 +34,7 @@ All module widths are multiples of 1HP (horizontal pitch). One panel unit:
 | 1 mm | 3 px | — |
 | Panel height | 380 px | 128.5 mm |
 
-Module widths: 8HP, 12HP, 14HP, 16HP, 22HP, 32HP.
+Module widths: 8HP, 12HP, 14HP, 16HP, 18HP, 22HP, 32HP.
 
 ---
 
@@ -42,7 +42,7 @@ Module widths: 8HP, 12HP, 14HP, 16HP, 22HP, 32HP.
 
 ### Satellite layout — attenuverter + CV adjacent to each knob
 
-Every main parameter knob has a **Trimpot** (attenuverter, radius 4) and a **PJ301M** (CV jack, radius 5) positioned adjacent to it.
+Every main parameter knob that accepts CV has a **Trimpot** (attenuverter, radius 4) and a **PJ301M** (CV jack, radius 5) positioned adjacent to it. Swarm Core DECAY intentionally omits the attenuverter.
 
 **Vertical layout** (stacked below knob):
 - Attenuverter at `(kx, ky + 18mm)`

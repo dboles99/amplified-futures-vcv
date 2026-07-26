@@ -27,6 +27,7 @@ Pitch & Modulation
 Clock & Sequencing
 - [[Street-Grid-Clock]]
 - [[Pulse]]
+- [[Ratchet]]
 - [[Sitar-Grid]]
 
 Sampling
@@ -41,6 +42,11 @@ Routing & Mixing
 Effects
 - [[Collapse-Saturator]]
 - [[Feedback-Governor]]
+
+Utilities
+- [[Collapse-EG]]
+- [[Quad-VCA]]
+- [[Signal-Bloc]]
 
 ---
 

@@ -1,12 +1,12 @@
 # Street Grid Clock — 12 HP (AF-02)
 
-![Street Grid Clock panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/StreetGridClock.png)
+![Street Grid Clock panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/StreetGridClock.png)
 
 The Branca series had no clock. A patch built only from these modules could not generate its own time — you had to borrow one from another plugin. Street Grid Clock closes that gap: RATE, SWING and BROWNOUT, four divided outputs, and an external clock input for when you would rather be the follower.
 
 BROWNOUT is the one that is not standard issue. It models a mains grid dipping under load — the clock sags and recovers, always slowing and never speeding up, so the patch drags behind the beat rather than running ahead of it.
 
-> **Note:** this page currently shows the flat panel export. A Rack-rendered screenshot will replace it once one has been taken, bringing it in line with the other module pages.
+> **Note:** this page now shows the Rack-rendered screenshot, matching the other module pages.
 
 ---
 

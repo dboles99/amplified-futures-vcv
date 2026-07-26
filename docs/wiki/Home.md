@@ -4,7 +4,7 @@
 [![VCV Rack 2](https://img.shields.io/badge/VCV%20Rack-2-orange)](https://vcvrack.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/dboles99/amplified-futures-vcv/blob/master/LICENSE)
 
-Fifteen VCV Rack 2 modules for dense experimental sound — massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, bio-acoustic sampling, and a clock of its own. No-wave/noise-rock genealogy, built for live performance.
+Nineteen VCV Rack 2 modules for dense experimental sound — massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, bio-acoustic sampling, and a clock of its own. No-wave/noise-rock genealogy, built for live performance.
 
 ![Amplified Futures modules in VCV Rack](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/contact-sheet.png)
 
@@ -18,7 +18,7 @@ Fifteen VCV Rack 2 modules for dense experimental sound — massed oscillators, 
 | **Pressure** | Drive and saturate the sum, not individual channels (PRESSURE, BUZZ) |
 | **Collapse** | A single gate deforms the entire sound with shaped recovery (COLLAPSE) |
 
-Every module shares: CV + attenuverter on every knob, V/OCT pass-through, and the Amplified Futures panel language.
+Every module shares: CV + attenuverter on every CV-able knob, with the documented Swarm Core DECAY exception, plus V/OCT pass-through and the Amplified Futures panel language.
 
 ---
 
@@ -52,13 +52,15 @@ From there: add **[[DroneClone]]** for a string-wall layer, **[[Drift]]** to mod
 | [[Swarm-Core]] | 18 | Sampler | Bio-acoustic insect sample engine |
 | [[Collapse-Saturator]] | 12 | Effect | Stereo drive with collapse |
 | [[Feedback-Governor]] | 12 | Effect | Controlled feedback send/return |
+| [[Collapse-EG]] | 8 | Utility | Attack/decay envelope with misfire and loop |
+| [[Quad-VCA]] | 12 | Utility | Four-channel VCA and mixer |
 
 ---
 
 ## Wiki sections
 
 - **[[Installation]]** — Get the plugin into Rack
-- **[[Module-Reference]]** — All 15 modules with panel images and specs
+- **[[Module-Reference]]** — All 19 modules with panel images and specs
 - **[[Music-Theory]]** — Harmonic series, just intonation, V/OCT frequency reference, chord tables
 - **[[Playbooks]]** — Named patch configurations for live performance
 - **[[Design-System]]** — Panel language, colour system, HP grid

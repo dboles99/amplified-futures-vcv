@@ -7,9 +7,11 @@
 ## Module roster
 
 ```
+StreetGridClock → Pulse → COLLAPSE / downstream accents
 HarmonicPressure → StringMassCore × 2 → WallConductor → CollapseSat → [output]
                                                                 ↑
                                               FeedbackGovernor ←┘ (loop)
+                                     StreetGridClock → CLK / RESET
                                      Drift → DENSITY CV
                                      Pulse → COLLAPSE gate
 ```
@@ -22,6 +24,10 @@ HarmonicPressure → StringMassCore × 2 → WallConductor → CollapseSat → [
 [HarmonicPressure]
   VOCT OUT (8ch) ──────────────────────────► [StringMassCore A] VOCT IN
                  └────────────────────────► [StringMassCore B] VOCT IN
+
+[StreetGridClock] CLK ─────────────────────► [Pulse] TRG
+[StreetGridClock] /8 ──────────────────────► [WallConductor] COLLAPSE IN
+[StreetGridClock] RESET ────────────────────► [Pulse] RESET
 
 [StringMassCore A] OUT ──► [WallConductor] CH1 IN
 [StringMassCore B] OUT ──► [WallConductor] CH2 IN
@@ -60,6 +66,11 @@ HarmonicPressure → StringMassCore × 2 → WallConductor → CollapseSat → [
 - PRESSURE: 0.25, WIDTH: 0.85
 - FEEDBACK: 0.15, RECOVERY: 0.65
 
+### StreetGridClock
+- RATE: 0.4, SWING: 0, BROWNOUT: 0
+- RUN: on
+- RESET: momentary, use for phrase resets
+
 ### Drift (modulating DENSITY)
 - RATE: 0.12, WANDER: 0.35, SLEW: 0.4
 - Connect SMOOTH → WallConductor DENSITY CV (atten: +0.3)
@@ -84,7 +95,7 @@ HarmonicPressure → StringMassCore × 2 → WallConductor → CollapseSat → [
 | Build | As DENSITY crosses 0.5, CH2 enters. Slowly raise FeedbackGovernor AMOUNT to 0.4. |
 | Peak | DENSITY → 1.0 (all sections). Push WallConductor PRESSURE to 0.5. CollapseSat DRIVE up. |
 | Collapse event | Press WallConductor COLLAPSE — hold 2s, release. Wall rises back over 3s. |
-| Second collapse | Pulse at 4/4 kicks driving COLLAPSE gate. Rhythmic drop/rise pattern for 16 bars. |
+| Second collapse | StreetGridClock /8 drives COLLAPSE gate. Rhythmic drop/rise pattern for 16 bars. |
 | Fade | Slowly pull DENSITY back to 0.25. Kill FeedbackGovernor (KILL button). |
 
 ---

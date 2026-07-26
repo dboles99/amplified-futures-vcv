@@ -1,6 +1,6 @@
 # Module Reference
 
-Fifteen modules. Every module has CV + attenuverter on every knob and V/OCT pass-through.
+Nineteen modules. Every CV-able knob uses the satellite attenuverter + jack layout, with Swarm Core DECAY as the documented exception. V/OCT pass-through stays consistent.
 
 ---
 
@@ -56,7 +56,7 @@ Slow random modulation source. RATE (0.01–10 Hz), WANDER (step size), SLEW (sm
 ## Clock & Sequencing
 
 ### Street Grid Clock — 12HP (AF-02)
-![Street Grid Clock](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/StreetGridClock.png)
+![Street Grid Clock](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/StreetGridClock.png)
 
 Master clock — the series previously had none. RATE (20–300 BPM, exponential), SWING (delays odd pulses by up to half a period), BROWNOUT (mains-sag metaphor: dips under load and recovers, only ever slowing). CLK, /2, /4, /8 and RESET outputs, plus EXT CLK input for slaving. At BROWNOUT 0 the timing is bit-identical to a clean clock.
 
@@ -70,6 +70,14 @@ Master clock — the series previously had none. RATE (20–300 BPM, exponential
 16-step no-wave percussion. 4×4 toggle grid, white noise synthesis. HIT level, DECAY time (8–500ms), METAL (body filter and grit), CRACK (4ms transient burst).
 
 → **[[Pulse]]** for full documentation
+
+---
+
+### Ratchet — 8HP (AF-03)
+
+Trigger burst generator. Measures the incoming trigger period, then subdivides it into 1–8 repeats. SPREAD accelerates or decelerates the burst, PROB thins it, and END fires once when the burst closes. `RatchetCore` is unit-tested offline.
+
+→ **[[Ratchet]]** for full documentation
 
 ---
 
@@ -148,6 +156,32 @@ Stereo drive/saturation. Three harmonic modes: ODD (tanh), EVEN (tape-like), FUL
 Controlled feedback send/return. AMOUNT, TONE LP filter (100Hz–20kHz), DECAY per-pass attenuation. KILL button/gate zeros path instantly. DC blocker + ±10V safety limiter.
 
 → **[[Feedback-Governor]]** for full documentation
+
+---
+
+## Utilities
+
+### Collapse EG — 8HP
+
+Standalone attack/decay envelope with CURVE, MISFIRE and LOOP. A compact utility envelope for gates, triggers and stutters.
+
+→ **[[Collapse-EG]]** for full documentation
+
+---
+
+### Quad VCA — 12HP
+
+Four-channel VCA and mixer. Per-channel level controls and CV inputs, with chain normalling and a PRESSURE-saturated mix output.
+
+→ **[[Quad-VCA]]** for full documentation
+
+---
+
+### Signal Bloc — 10HP (AF-06)
+
+CV glue with no character knob: two attenuverter/offset channels, a precision three-input adder, and a buffered 1-to-3 mult. Every section is polyphonic and clamps to ±12 V. `BlocCore` is unit-tested offline.
+
+→ **[[Signal-Bloc]]** for full documentation
 
 ---
 

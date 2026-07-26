@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![VCV Rack 2](https://img.shields.io/badge/VCV%20Rack-2-orange)](https://vcvrack.com)
 
-Fifteen VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, bio-acoustic sampling, and a master clock. No-wave/noise-rock genealogy; built for live performance.
+Nineteen VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, bio-acoustic sampling, and a master clock. No-wave/noise-rock genealogy; built for live performance. The Windows x64 release is about 248 MB because Swarm Core ships the InsectSet32 bank.
 
 ![Amplified Futures modules in VCV Rack](docs/panels/rack/contact-sheet.png)
 
@@ -19,7 +19,29 @@ Amplified Futures is a modular instrument system for making large-scale sound ma
 - **Pressure** — drive and saturate the sum rather than individual channels (PRESSURE, BUZZ)
 - **Collapse** — a single gate or button instantly deforms the sound, with shaped recovery (COLLAPSE)
 
-Every module has CV + attenuverter on every knob and V/OCT pass-through, so they chain cleanly and play well with the rest of your rack.
+Every knob that takes CV uses the satellite attenuverter + jack layout, with Swarm Core DECAY as the documented exception. V/OCT pass-through stays consistent, so the modules chain cleanly and play well with the rest of your rack.
+
+The current line-up is:
+
+- DroneCore
+- DroneClone
+- Send
+- Choke
+- Pulse
+- Drift
+- WallConductor
+- StringMassCore
+- HarmonicPressure
+- CollapseSat
+- FeedbackGovernor
+- MassDriver
+- SitarGrid
+- SwarmCore
+- StreetGridClock
+- CollapseEG
+- QuadVCA
+- Ratchet
+- SignalBloc
 
 ---
 
@@ -208,7 +230,7 @@ Controlled feedback send/return. AMOUNT level. TONE LP filter (100Hz → 20kHz).
 ## Design system
 
 All modules share:
-- **CV + attenuverter** on every knob (trimpot + jack adjacent to each control)
+- **CV + attenuverter** on every CV-able knob, with the documented Swarm Core DECAY exception
 - **V/OCT pass-through** on every module — chain freely
 - **Amplified Futures palette** — safety orange header (`#FF4A0E`), dark steel body (`#1F2A1F`), signal yellow CV jacks, thru-green V/OCT jacks, ember audio jacks
 - **Module name** drawn via C++ NanoVG (not SVG text) for font-independent rendering
