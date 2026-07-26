@@ -162,6 +162,15 @@
         "Clock generator",
         "Utility"
       ]
+    },
+    {
+      "slug": "CollapseEG",
+      "name": "Collapse EG",
+      "description": "Attack/decay envelope with opt-in misfire and loop",
+      "tags": [
+        "Envelope generator",
+        "Utility"
+      ]
     }
   ]
 }
