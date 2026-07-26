@@ -16,18 +16,30 @@ How to build and install Amplified Futures locally.
 
 ## Windows (MSYS2 MinGW64)
 
+MSYS2 uses Unix-style paths, so a Windows path like `C:\dev\Rack-SDK` is written `/c/dev/Rack-SDK` in the command below. Substitute your own two paths:
+
 ```powershell
-# Build
+& "C:\msys64\msys2_shell.cmd" -mingw64 -defterm -no-start -c `
+  "cd /c/dev/branca-rack-modules && RACK_DIR=/c/dev/Rack-SDK make -j4"
+```
+
+Then copy the folder into your Rack plugins directory — see [[Installation]] for the path and, importantly, the name it has to have.
+
+Set `RACK_DIR` explicitly. The Makefile default is `../..`, which is only correct if your clone sits two directories inside the SDK; it usually does not.
+
+<details>
+<summary>Author's setup (what CI mirrors)</summary>
+
+```powershell
 & "D:\dev-vcv\msys64\msys2_shell.cmd" -mingw64 -defterm -no-start -c `
   "cd /d/dev-vcv/plugins/branca-rack-modules && RACK_DIR=/d/dev-vcv/Rack-SDK make -j4"
 
-# Install (copies to amplified-futures/ to match plugin slug)
 $dst = "$env:LOCALAPPDATA\Rack2\plugins-win-x64\amplified-futures"
 Remove-Item $dst -Recurse -Force -ErrorAction SilentlyContinue
 Copy-Item "D:\dev-vcv\plugins\branca-rack-modules" -Destination $dst -Recurse
 ```
 
-Adjust paths to match your local Rack SDK location. Use `-j4` (parallel build). Set `RACK_DIR` explicitly — the Makefile default (`../..`) is wrong for a non-standard layout.
+</details>
 
 ---
 
@@ -39,15 +51,7 @@ cd path/to/branca-rack-modules
 make -j4
 ```
 
-Copy the built plugin folder to your Rack 2 user plugins directory:
-
-| Platform | Path |
-|---|---|
-| Windows | `%LOCALAPPDATA%\Rack2\plugins-win-x64\` |
-| macOS | `~/Library/Application Support/Rack2/plugins/` |
-| Linux | `~/.Rack2/plugins/` |
-
-The folder must be named **`amplified-futures`** (matching the plugin slug in plugin.json). Do not use the local source folder name (`branca-rack-modules`).
+Once built, see [[Installation]] for where the plugin folder goes and — the part people get wrong — what it must be named.
 
 ---
 
