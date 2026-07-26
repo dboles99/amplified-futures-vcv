@@ -1,70 +1,80 @@
-# Pulse — 12HP
+# Pulse — 12 HP
 
-![Pulse panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/Pulse.png)
+![Pulse in VCV Rack](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/Pulse.png)
 
-16-step no-wave step percussion sequencer. 4×4 toggle grid, white noise synthesis with HIT level, DECAY time, METAL filter, and CRACK transient burst. TRG clock in, audio out. Inspired by primitive drum machine aesthetics and no-wave percussive attack.
+Sixteen-step noise percussion on a 4×4 grid. One voice, one sound, four knobs to shape it — white noise through a body filter, with a separate crack transient on the attack. There is no sample bank and no pitch: Pulse makes a single percussive noise event and lets you place sixteen of them in time. It exists to put a rhythmic edge against material that otherwise has none.
+
+---
+
+## Sound in 60 seconds
+
+1. Add Pulse. Patch a clock into **TRG** and **OUT** to your interface.
+2. Click some step buttons in the 4×4 grid. Lit steps fire; unlit ones pass.
+3. You hear a noise hit on each lit step, with the default HIT 75%, DECAY 30%, METAL 20%, CRACK 40%.
+4. Turn **DECAY** up. Hits stretch from a tick towards a wash — 8 ms at the bottom of the dial, half a second at the top.
+5. Turn **METAL** up. The body filter opens from 80 Hz towards 360 Hz and raw noise takes over — the hit moves from a thud to a hiss.
 
 ---
 
 ## Signal flow
 
-```
-TRG IN ──► [step counter] ──► active step? ──► [noise burst]
-                                               ├─ HIT   : amplitude
-                                               ├─ DECAY : 8–500ms exponential decay
-                                               ├─ METAL : LP filter (360→80Hz)
-                                               └─ CRACK : 4ms transient burst (attack click)
-                                               └──► OUT
-```
-
-The 4×4 grid is 16 steps in rows of 4. Each lit button = that step fires when clocked.
+~~~text
+TRG IN (clock) ──► step counter, advances 0…15 and wraps
+                          │
+                   step lit? ──► fire: env = 1, crackEnv = 1
+                          │
+   white noise ──┬─ 1-pole LP ──► body    (METAL shifts 360 → 80 Hz)
+                 ├─ raw × METAL ────────► grit
+                 └─ raw × crackEnv × CRACK ► 4 ms transient
+                          │
+                 × exponential env (DECAY 8–500 ms) × HIT
+                          │
+                    2× tanh ──► OUT
+V/OCT IN ─────────────────────────────────────────► V/OCT THRU
+~~~
 
 ---
 
 ## Controls
 
-| Control | Range | Notes |
-|---|---|---|
-| HIT | 0–1 | Peak amplitude of triggered burst |
-| DECAY | 0–1 | 0 = 8ms (tight click), 1 = 500ms (long thud) |
-| METAL | 0–1 | Low-pass filter on noise — 0 = open (hi-hat), 1 = dark (kick/thud) |
-| CRACK | 0–1 | Adds 4ms sharp transient on top of noise burst — "attack click" |
-| Grid (4×4) | Toggle | 16 step on/off buttons |
+![Pulse panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/Pulse.png)
+
+| Control | Range | Default | What it does |
+|---|---|---|---|
+| STEP ×16 | on / off | all off | 4×4 toggle grid. Green-red LED shows state and playhead |
+| HIT | 0–100% | 75% | Output level of the hit, before the output saturator |
+| DECAY | 0–100% | 30% | Envelope decay, 8 ms to 500 ms |
+| METAL | 0–100% | 20% | Body filter and grit. Low is a dull thud at 360 Hz; high opens to 80 Hz and mixes in raw noise |
+| CRACK | 0–100% | 40% | Level of the 4 ms transient burst on the attack |
+
+HIT, DECAY, METAL and CRACK each have an attenuverter (−1 to +1) and a CV input. The step buttons do not.
+
+METAL is worth understanding because it does two things at once: it lowers the body filter's corner *and* raises the amount of unfiltered noise in the mix. That is why it moves the sound from body to hiss rather than simply brightening it.
 
 ---
 
 ## Ports
 
-| Port | Type | Notes |
+| Port | Direction | Notes |
 |---|---|---|
-| TRG IN | Input | Clock pulse — fires next step on rising edge |
-| OUT | Output | Percussive noise audio |
-| V/OCT IN | Input | Pass-through |
-| V/OCT THRU | Output | Pass-through |
+| TRG | Input | Clock. Each trigger advances one step; lit steps fire |
+| HIT / DECAY / METAL / CRACK CV | Input | One per knob, each via its attenuverter |
+| OUT | Output | Audio, soft-clipped |
+| V/OCT IN → THRU | In / Out | Pass-through, so Pulse can sit inline in a pitch chain |
 
 ---
 
-## Sound shaping guide
+## Patch recipes
 
-The four controls interact to produce all percussion types from this white-noise engine:
+**Work clock.** Steps 1, 5, 9, 13 lit — four on the floor. DECAY 20%, METAL 10%, CRACK 60%. A hard, dry pulse under a drone.
 
-| Style | DECAY | METAL | CRACK | Character |
-|---|---|---|---|---|
-| Hi-hat closed | 0.0 | 0.0 | 0.3 | Short click, open noise |
-| Hi-hat open | 0.3 | 0.0 | 0.1 | Longer hiss |
-| Snare-like | 0.2 | 0.3 | 0.7 | Mid-filtered with crack |
-| Kick/thud | 0.6 | 0.8 | 0.2 | Dark low thud |
-| Noise burst | 0.8 | 0.0 | 0.0 | Long open noise hit |
-| Click only | 0.0 | 0.0 | 1.0 | Pure transient, no tail |
+**Broken grid.** Steps 1, 4, 7, 11, 14 lit. DECAY 45%, METAL 40%. The pattern is sixteen long but never lands where a bar expects it to.
 
----
+**Noise wash.** Most steps lit, DECAY 90%, METAL 80%, HIT 50%. The hits overlap into continuous noise rather than reading as rhythm.
 
-## Patch tips
+**Stochastic hits.** [[Drift]] GATE → TRG instead of a clock, Drift RATE 60%. The grid advances irregularly, so the same sixteen steps produce a different rhythm every pass.
 
-- **Run two Pulse modules**: one for hi-hat texture (METAL 0, DECAY 0.1), one for thud (METAL 0.7, DECAY 0.5). Offset their grids.
-- **HIT CV from Drift** STEP output: stochastic velocity for humanised irregular feel.
-- **Slow clock (0.5–2Hz) + full grid on**: produces a continuous noise texture with slow amplitude envelope — useful as a modulation source or noise bed.
-- **GATE → MUTE CV** on Choke: rhythmic gating of drone channels on each hit.
+**Gate source.** Pulse is also a rhythm generator for other modules — use its clock to drive [[Swarm-Core]] TRG, or gate [[Choke]] MUTE inputs, so percussion and texture share a grid.
 
 ---
 
@@ -72,14 +82,16 @@ The four controls interact to produce all percussion types from this white-noise
 
 | Module | Routing |
 |---|---|
-| [[Drift]] | GATE output as irregular clock |
-| [[Choke]] | GATE → MUTE CVs for rhythmic drone gating |
-| [[Wall-Conductor]] | GATE → COLLAPSE IN for beat-synced drops |
-| [[Collapse-Saturator]] | OUT → SC IN for sidechain drive pumping |
-| [[Feedback-Governor]] | GATE → KILL GATE for rhythmic feedback chopping |
+| [[Drift]] | GATE → TRG for irregular, non-repeating triggering |
+| [[Choke]] | Pulse into a channel, or its clock into MUTE for rhythmic gating |
+| [[Swarm-Core]] | Share a clock so insect calls land on the percussion grid |
+| [[Collapse-Saturator]] | OUT → IN; saturation thickens the noise body considerably |
+| [[Wall-Conductor]] | OUT → channel input as the rhythmic layer under the wall |
 
 ---
 
 ## See also
 
-[[Drift]] · [[Choke]] · [[Wall-Conductor]] · [[Playbooks]]
+[[Drift]] · [[Swarm-Core]] · [[Choke]] · [[Playbooks]]
+
+**Full parameter spec:** [`docs/modules/Pulse.md`](https://github.com/dboles99/amplified-futures-vcv/blob/master/docs/modules/Pulse.md)
