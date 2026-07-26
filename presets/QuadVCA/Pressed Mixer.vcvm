@@ -1,0 +1,12 @@
+{
+  "plugin": "amplified-futures",
+  "model": "QuadVCA",
+  "params": [
+    {"value": 0.85},
+    {"value": 0.70},
+    {"value": 0.55},
+    {"value": 0.40},
+    {"value": 0.65},
+    {"value": 1.0}
+  ]
+}

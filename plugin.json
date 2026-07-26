@@ -171,6 +171,16 @@
         "Envelope generator",
         "Utility"
       ]
+    },
+    {
+      "slug": "QuadVCA",
+      "name": "Quad VCA",
+      "description": "Four-channel VCA and mixer with normalled inputs and output saturation",
+      "tags": [
+        "VCA",
+        "Mixer",
+        "Utility"
+      ]
     }
   ]
 }
