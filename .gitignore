@@ -13,3 +13,7 @@
 
 # InsectSet32 sample bank (324 MB — download separately from Zenodo 7072196)
 /res/insects/
+
+# Python bytecode from tools/
+__pycache__/
+*.pyc
