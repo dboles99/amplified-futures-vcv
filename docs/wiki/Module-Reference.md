@@ -1,13 +1,13 @@
 # Module Reference
 
-Twelve modules. Every module has CV + attenuverter on every knob and V/OCT pass-through.
+Fourteen modules. Every module has CV + attenuverter on every knob and V/OCT pass-through.
 
 ---
 
 ## Oscillators
 
 ### DroneCore — 8HP
-![DroneCore](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/DroneCore.png)
+![DroneCore](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/DroneCore.png)
 
 Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢), TIMBRE (sine to harmonic stack). Polyphonic.
 
@@ -16,7 +16,7 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢), TIMBRE (sine to ha
 ---
 
 ### DroneClone — 22HP
-![DroneClone](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/DroneClone.png)
+![DroneClone](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/DroneClone.png)
 
 8-voice amplified string wall. MASS, TENSION, SHIMMER, JAWARI (sitar buzz), WEIGHT, DRIFT. CHOKE gate + RTN feedback input. Up to 128 simultaneous oscillators.
 
@@ -25,7 +25,7 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢), TIMBRE (sine to ha
 ---
 
 ### String Mass Core — 16HP
-![StringMassCore](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/StringMassCore.png)
+![StringMassCore](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/StringMassCore.png)
 
 16-voice harmonic mass oscillator. Four modes: UNIS, HARM (odd-harmonic sections), JUST (Ptolemaic JI ratios), MICRO (spectral microtonality). 1/√N amplitude normalised.
 
@@ -36,7 +36,7 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢), TIMBRE (sine to ha
 ## Pitch & Modulation
 
 ### Harmonic Pressure — 14HP
-![HarmonicPressure](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/HarmonicPressure.png)
+![HarmonicPressure](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/HarmonicPressure.png)
 
 Harmonic series pitch CV generator. PITCH root, PARTIAL (starting harmonic), COUNT (output channels). JUST / EQUAL / MICRO tuning modes. Polyphonic V/OCT output.
 
@@ -45,7 +45,7 @@ Harmonic series pitch CV generator. PITCH root, PARTIAL (starting harmonic), COU
 ---
 
 ### Drift — 12HP
-![Drift](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/Drift.png)
+![Drift](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/Drift.png)
 
 Slow random modulation source. RATE (0.01–10 Hz), WANDER (step size), SLEW (smoothing). Three simultaneous outputs: SMOOTH (slewed), STEP (raw), GATE (pulse on step).
 
@@ -53,19 +53,41 @@ Slow random modulation source. RATE (0.01–10 Hz), WANDER (step size), SLEW (sm
 
 ---
 
-### Pulse — 12HP
-![Pulse](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/Pulse.png)
+## Sequencing
 
-16-step no-wave percussion. 4×4 toggle grid, white noise synthesis. HIT level, DECAY time (8–500ms), METAL (LP filter), CRACK (transient burst).
+### Pulse — 12HP
+![Pulse](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/Pulse.png)
+
+16-step no-wave percussion. 4×4 toggle grid, white noise synthesis. HIT level, DECAY time (8–500ms), METAL (body filter and grit), CRACK (4ms transient burst).
 
 → **[[Pulse]]** for full documentation
+
+---
+
+### Sitar Grid — 42HP
+![Sitar Grid](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/SitarGrid.png)
+
+Modal string-resonance sequencer. Three independent sequencing brains — PITCH (raga-quantised), RES (timbral, own clock division), RIFF (articulation) — driving a Karplus-Strong string through a jawari nonlinear bridge, with an 8-voice sympathetic bank and a chikari drone. JHALA breakdown state machine. Six ragas. Separate MAIN, DRONE and SYMP outputs.
+
+→ **[[Sitar-Grid]]** for full documentation
+
+---
+
+## Sampling
+
+### Swarm Core — 18HP
+![Swarm Core](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/SwarmCore.png)
+
+Bio-acoustic insect sample engine over the InsectSet32 bank (CC-BY 4.0). Specimen mode plays one pitched voice per trigger; Swarm mode fires up to 8, scattered in time and detuned across a fixed stereo spread. Note the 2–5 second bank load on first patch load.
+
+→ **[[Swarm-Core]]** for full documentation
 
 ---
 
 ## Routing & Mixing
 
 ### Send — 12HP
-![Send](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/Send.png)
+![Send](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/Send.png)
 
 2×2 cross-send feedback routing matrix. A→B send, B→A return, A→C / C→A internal C-bus (one-sample delayed). Polyphonic.
 
@@ -73,8 +95,8 @@ Slow random modulation source. RATE (0.01–10 Hz), WANDER (step size), SLEW (sm
 
 ---
 
-### Choke — 14HP
-![Choke](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/Choke.png)
+### Choke — 18HP
+![Choke](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/Choke.png)
 
 4-channel performance mixer. Per-channel GAIN + TONE, fixed auto-pan spread, MUTE buttons. MAIN master with soft saturation. Stereo L/R out.
 
@@ -83,7 +105,7 @@ Slow random modulation source. RATE (0.01–10 Hz), WANDER (step size), SLEW (sm
 ---
 
 ### Wall Conductor — 22HP
-![WallConductor](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/WallConductor.png)
+![WallConductor](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/WallConductor.png)
 
 Section-based performance conductor. DENSITY sweeps 4 channels in progressively. PRESSURE saturates. WIDTH spreads stereo. FEEDBACK loop. COLLAPSE gate with shaped RECOVERY.
 
@@ -92,7 +114,7 @@ Section-based performance conductor. DENSITY sweeps 4 channels in progressively.
 ---
 
 ### Mass Driver — 32HP (AF-01)
-![MassDriver](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/MassDriver.png)
+![MassDriver](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/MassDriver.png)
 
 16-channel no-wave mixer. Per-channel GAIN + MUTE. DENSITY sweep, PRESSURE saturation, WIDTH stereo, FEEDBACK loop, COLLAPSE gate. Five outputs: OUT L/R, AUX L/R, SUM.
 
@@ -103,7 +125,7 @@ Section-based performance conductor. DENSITY sweeps 4 channels in progressively.
 ## Effects
 
 ### Collapse Saturator — 12HP
-![CollapseSat](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/CollapseSat.png)
+![CollapseSat](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/CollapseSat.png)
 
 Stereo drive/saturation. Three harmonic modes: ODD (tanh), EVEN (tape-like), FULL (hard clip). COLLAPSE gate instantly maxes drive with shaped RECOVERY. Sidechain input.
 
@@ -112,7 +134,7 @@ Stereo drive/saturation. Three harmonic modes: ODD (tanh), EVEN (tape-like), FUL
 ---
 
 ### Feedback Governor — 12HP
-![FeedbackGovernor](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/FeedbackGovernor.png)
+![FeedbackGovernor](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/FeedbackGovernor.png)
 
 Controlled feedback send/return. AMOUNT, TONE LP filter (100Hz–20kHz), DECAY per-pass attenuation. KILL button/gate zeros path instantly. DC blocker + ±10V safety limiter.
 
@@ -122,14 +144,20 @@ Controlled feedback send/return. AMOUNT, TONE LP filter (100Hz–20kHz), DECAY p
 
 ## Signal flow overview
 
-```
+```text
 [HarmonicPressure] ──► V/OCT poly ──► [StringMassCore] ──► [WallConductor] ──► [CollapseSat] ──► OUT
                                        [DroneCore]     ──►        ▲
                                        [DroneClone]    ──►        │
                                             ↕                     │
                                          [Send]              [FeedbackGovernor] (loop)
+                                       [SitarGrid]     ──►        │   MAIN / DRONE / SYMP as three sources
+                                       [SwarmCore]     ──►        │   texture layer, stereo
                                        [Drift] ──► CV ──► (any knob)
-                                       [Pulse] ──► gates ──► COLLAPSE, MUTE, KILL
+                                       [Pulse] ──► gates ──► COLLAPSE, MUTE, KILL, TRG
                                        [Choke] ──► section sub-mixing
                                        [MassDriver] ──► 16-channel alternative to WallConductor
+                                                        AUX (pre-drive) ──► [CollapseSat] parallel path
+
+[SitarGrid] PITCH CV + GATE ──► can drive [StringMassCore] / [DroneClone] instead of its own string
+[SwarmCore] CV OUT ──────────► envelope of its own swarm, for driving anything
 ```

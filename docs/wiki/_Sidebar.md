@@ -4,6 +4,13 @@
 
 ---
 
+### Getting started
+
+- [[Installation]]
+- [[Building-from-Source]]
+
+---
+
 ### Modules
 
 **[[Module-Reference]]**
@@ -16,7 +23,13 @@ Oscillators
 Pitch & Modulation
 - [[Harmonic-Pressure]]
 - [[Drift]]
+
+Sequencing
 - [[Pulse]]
+- [[Sitar-Grid]]
+
+Sampling
+- [[Swarm-Core]]
 
 Routing & Mixing
 - [[Send]]
@@ -35,4 +48,3 @@ Effects
 - [[Music-Theory]]
 - [[Playbooks]]
 - [[Design-System]]
-- [[Building-from-Source]]
