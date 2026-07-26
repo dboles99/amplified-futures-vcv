@@ -1,4 +1,8 @@
 #pragma once
+// Copyright (c) 2026 Daniel Boles
+// SPDX-License-Identifier: MIT
+// Part of the Amplified Futures Branca Series. See LICENSE.
+
 #include <rack.hpp>
 
 
@@ -22,3 +26,4 @@ extern Model* modelFeedbackGovernor;
 extern Model* modelMassDriver;
 extern Model* modelSitarGrid;
 extern Model* modelSwarmCore;
+extern Model* modelStreetGridClock;

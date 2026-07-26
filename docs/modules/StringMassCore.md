@@ -30,14 +30,14 @@ V/OCT IN ───────────────────────�
 
 | Param | Index | Range | Default | Notes |
 | --- | --- | --- | --- | --- |
-| MASS | 0 | 1–16 | 8 | Active voices per channel. Snap-enabled |
+| MASS | 0 | 1–16 | 4 | Active voices per channel. Snap-enabled |
 | MASS ATTEN | 1 | −1 to +1 | 0 | Attenuverter for MASS CV |
-| SPREAD | 2 | 0–50¢ | 0 | Detune spread within section or around unison |
+| SPREAD | 2 | 0–100% | 30% | Detune spread. Full scale = 50 cents total across the voice set; JUST mode narrows it to 30% of that |
 | SPREAD ATTEN | 3 | −1 to +1 | 0 | Attenuverter for SPREAD CV |
-| TIMBRE | 4 | 0–1 | 0 | Harmonic blend: 0 = pure sine, 1 = odd-harmonic stack |
+| TIMBRE | 4 | 0–100% | 30% | Harmonic blend: 0 = pure sine, 100% = odd-harmonic stack |
 | TIMBRE ATTEN | 5 | −1 to +1 | 0 | Attenuverter for TIMBRE CV |
-| MODE | 6 | 0–3 | 0 | 0=UNIS, 1=HARM, 2=JUST, 3=MICRO. Snap-enabled |
-| SECTION | 7 | 1/2/4 | 1 | Harmonic section count (HARM mode only). Snap-enabled |
+| MODE | 6 | 0–3 | **1 (HARM)** | 0=UNIS, 1=HARM, 2=JUST, 3=MICRO. Snap-enabled |
+| SECTION | 7 | 0/1/2 → 1/2/4 sections | 1 (= 2 sections) | Harmonic section count (HARM mode only). Snap-enabled |
 
 ---
 
@@ -46,7 +46,7 @@ V/OCT IN ───────────────────────�
 | Mode | Description |
 | --- | --- |
 | UNIS | All M voices at input pitch, symmetric ±SPREAD/2 cents detuning |
-| HARM | M voices distributed across 8 odd-harmonic sections (1, 3/2, 5/4, 7/4, 9/8, 11/8, 13/8, 15/8 — octave reduced). SPREAD controls within-section detune |
+| HARM | M voices distributed across the first SECTION entries of an 8-ratio odd-harmonic table (1, 3/2, 5/4, 7/4, 9/8, 11/8, 13/8, 15/8 — octave reduced). SECTION selects 1, 2 or 4 sections, not 8; SPREAD controls within-section detune |
 | JUST | M voices across Ptolemaic just-intonation 12-note chromatic ratios. SPREAD adds ensemble colour |
 | MICRO | All voices at fundamental with per-voice slow vibrato at distinct rates — organic ensemble shimmer |
 
