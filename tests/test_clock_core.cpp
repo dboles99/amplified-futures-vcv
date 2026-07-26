@@ -102,6 +102,67 @@ int main() {
         check(even, "swing=0 is exactly even");
     }
 
+    // The whole design rests on this: brownout 0 must be EXACTLY steady, not
+    // nearly steady. A clock that cannot be trusted to hold time goes unused.
+    {
+        ClockCore a, b;
+        a.setSampleRate(SR); b.setSampleRate(SR);
+        a.reset(); b.reset();
+        std::vector<int> steady  = clkEdges(a, SR, 5.f, 120.f, 0.f, 0.f);
+        std::vector<int> steady2 = clkEdges(b, SR, 5.f, 120.f, 0.f, 0.f);
+        check(steady == steady2, "brownout=0 is deterministic");
+        bool exact = true;
+        for (size_t i = 2; i < steady.size(); ++i)
+            if ((steady[i] - steady[i - 1]) != (steady[1] - steady[0])) exact = false;
+        check(exact, "brownout=0 is EXACTLY steady");
+    }
+
+    // Turned up, it must actually perturb timing.
+    {
+        ClockCore c; c.setSampleRate(SR); c.reset();
+        std::vector<int> sag = clkEdges(c, SR, 20.f, 120.f, 0.f, 1.f);
+        bool varies = false;
+        for (size_t i = 2; i < sag.size(); ++i)
+            if ((sag[i] - sag[i - 1]) != (sag[1] - sag[0])) varies = true;
+        check(varies, "brownout>0 perturbs timing");
+        check(sag.size() > 10, "brownout does not stall the clock");
+    }
+
+    // Sag must only ever SLOW the clock. A brownout that ran fast would be
+    // a wobble, not a sag, and would push the patch ahead of the beat.
+    {
+        ClockCore c; c.setSampleRate(SR); c.reset();
+        std::vector<int> sag = clkEdges(c, SR, 30.f, 120.f, 0.f, 1.f);
+        int minGap = 1 << 30;
+        for (size_t i = 1; i < sag.size(); ++i)
+            if (sag[i] - sag[i - 1] < minGap) minGap = sag[i] - sag[i - 1];
+        check(minGap >= 23900, "sag never runs FASTER than nominal");
+    }
+
+    // Reset must clear the sag state and the RNG too, or a reset taken while
+    // BROWNOUT is up inherits the previous run's dip. The earlier
+    // reproducibility test uses brownout=0, so it could never catch this.
+    {
+        ClockCore c; c.setSampleRate(SR);
+        c.reset();
+        std::vector<int> first = clkEdges(c, SR, 6.f, 120.f, 0.f, 1.f);
+        c.reset();
+        std::vector<int> second = clkEdges(c, SR, 6.f, 120.f, 0.f, 1.f);
+        check(first == second, "reset is reproducible WITH brownout up");
+    }
+
+    // External clock: divisions must still be exact ratios.
+    {
+        ClockCore c; c.setSampleRate(SR); c.reset();
+        int clk = 0, d2 = 0, d4 = 0, d8 = 0;
+        for (int i = 0; i < 64; ++i) {
+            ClockCore::Ticks t = c.tickExternal();
+            clk += t.clk; d2 += t.div2; d4 += t.div4; d8 += t.div8;
+        }
+        check(clk == 64, "external clock emits one pulse per edge");
+        check(d2 == 32 && d4 == 16 && d8 == 8, "external divisions are exact");
+    }
+
     std::printf(g_failures ? "\nFAILED (%d)\n" : "\nAll ClockCore tests passed\n",
                 g_failures);
     return g_failures ? 1 : 0;
