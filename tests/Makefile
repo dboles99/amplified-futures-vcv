@@ -4,7 +4,7 @@
 CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 
-BINS = test_clock_core test_env_core
+BINS = test_clock_core test_env_core test_vca_core
 
 test: $(BINS)
 	@for b in $(BINS); do echo "== $$b"; ./$$b || exit 1; echo; done
@@ -14,6 +14,9 @@ test_clock_core: test_clock_core.cpp ../src/dsp/ClockCore.hpp
 
 test_env_core: test_env_core.cpp ../src/dsp/EnvCore.hpp
 	$(CXX) $(CXXFLAGS) -o $@ test_env_core.cpp
+
+test_vca_core: test_vca_core.cpp ../src/dsp/VcaCore.hpp
+	$(CXX) $(CXXFLAGS) -o $@ test_vca_core.cpp
 
 clean:
 	rm -f $(BINS) $(addsuffix .exe,$(BINS))
