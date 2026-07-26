@@ -11,7 +11,7 @@ CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 # three Linux ELF binaries dropped into this directory once did exactly that,
 # and `make test` skipped three of four suites while still exiting 0.
 EXE     := $(if $(filter Windows_NT,$(OS)),.exe,)
-BINS     = test_clock_core test_env_core test_vca_core test_ratchet_core
+BINS     = test_clock_core test_env_core test_vca_core test_ratchet_core test_bloc_core
 TARGETS  = $(addsuffix $(EXE),$(BINS))
 
 test: $(TARGETS)
@@ -28,6 +28,9 @@ test_vca_core$(EXE): test_vca_core.cpp ../src/dsp/VcaCore.hpp
 
 test_ratchet_core$(EXE): test_ratchet_core.cpp ../src/dsp/RatchetCore.hpp
 	$(CXX) $(CXXFLAGS) -o $@ test_ratchet_core.cpp
+
+test_bloc_core$(EXE): test_bloc_core.cpp ../src/dsp/BlocCore.hpp
+	$(CXX) $(CXXFLAGS) -o $@ test_bloc_core.cpp
 
 clean:
 	rm -f $(BINS) $(addsuffix .exe,$(BINS))
