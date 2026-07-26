@@ -1,4 +1,4 @@
-# Swarm Core — 14HP
+# Swarm Core — 18 HP
 
 Bio-acoustic insect sample engine. Loads WAV files from the InsectSet32 sample bank (cicadidae / orthoptera, CC-BY 4.0, Zenodo 7072196). SPECIMEN select, PITCH, DENSITY, SCATTER, DETUNE, DECAY. Two modes: Specimen (single-voice pitched playback) and Swarm (8-voice detuned, time-scattered stereo cloud).
 
