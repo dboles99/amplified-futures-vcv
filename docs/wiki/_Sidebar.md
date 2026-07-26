@@ -24,7 +24,8 @@ Pitch & Modulation
 - [[Harmonic-Pressure]]
 - [[Drift]]
 
-Sequencing
+Clock & Sequencing
+- [[Street-Grid-Clock]]
 - [[Pulse]]
 - [[Sitar-Grid]]
 

@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![VCV Rack 2](https://img.shields.io/badge/VCV%20Rack-2-orange)](https://vcvrack.com)
 
-Fourteen VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, bio-acoustic sampling. No-wave/noise-rock genealogy; built for live performance.
+Fifteen VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, bio-acoustic sampling, and a master clock. No-wave/noise-rock genealogy; built for live performance.
 
 ![Amplified Futures modules in VCV Rack](docs/panels/rack/contact-sheet.png)
 
@@ -68,8 +68,8 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢ spread), TIMBRE (sin
 
 2×2 cross-send feedback routing matrix. A→B send, B→A return, A→C/C→A internal feedback bus. One-sample delayed C-bus for safe self-oscillation without instability. Polyphonic.
 
-**Inputs:** A IN, B IN, C IN (feedback bus), SEND CV + ATT per path
-**Outputs:** A OUT, B OUT, C OUT
+**Inputs:** A IN, B IN, CV + ATT per send path
+**Outputs:** A OUT, B OUT — the C bus is internal, with no jacks of its own
 
 ---
 
@@ -92,6 +92,17 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢ spread), TIMBRE (sin
 
 **Inputs:** TRG (clock/trigger), HIT CV, DECAY CV, METAL CV, CRACK CV
 **Outputs:** OUT (audio)
+
+---
+
+### STREET GRID CLOCK — 12HP (AF-02)
+
+![Street Grid Clock panel](docs/panels/StreetGridClock.png)
+
+Master clock. The series previously had none — a patch built only from these modules could not generate its own time. RATE (20–300 BPM, exponential), SWING (delays odd pulses by up to half a period), BROWNOUT (a mains-sag metaphor: the grid dips under load and recovers, only ever slowing, never speeding up; at exactly 0 the timing is bit-identical to a clean clock). RUN and RESET buttons. Four divided outputs plus RESET, and an EXT CLK input for slaving to something else. `ClockCore` is host-independent and unit-tested offline.
+
+**Inputs:** RATE CV + ATT, SWING CV + ATT, BROWNOUT CV + ATT, EXT CLK, RESET
+**Outputs:** CLK, /2, /4, /8, RESET
 
 ---
 

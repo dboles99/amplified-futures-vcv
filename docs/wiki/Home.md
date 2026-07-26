@@ -4,7 +4,7 @@
 [![VCV Rack 2](https://img.shields.io/badge/VCV%20Rack-2-orange)](https://vcvrack.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/dboles99/amplified-futures-vcv/blob/master/LICENSE)
 
-Fourteen VCV Rack 2 modules for dense experimental sound — massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, and bio-acoustic sampling. No-wave/noise-rock genealogy, built for live performance.
+Fifteen VCV Rack 2 modules for dense experimental sound — massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, bio-acoustic sampling, and a clock of its own. No-wave/noise-rock genealogy, built for live performance.
 
 ![Amplified Futures modules in VCV Rack](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/contact-sheet.png)
 
@@ -47,6 +47,7 @@ From there: add **[[DroneClone]]** for a string-wall layer, **[[Drift]]** to mod
 | [[Choke]] | 18 | Mixer | 4-channel performance mixer |
 | [[Wall-Conductor]] | 22 | Mixer | Section-based performance mixer |
 | [[Mass-Driver]] | 32 | Mixer | 16-channel no-wave mixer (AF-01) |
+| [[Street-Grid-Clock]] | 12 | Clock | Master clock with swing and brownout sag (AF-02) |
 | [[Sitar-Grid]] | 42 | Sequencer | Modal string-resonance sequencer |
 | [[Swarm-Core]] | 18 | Sampler | Bio-acoustic insect sample engine |
 | [[Collapse-Saturator]] | 12 | Effect | Stereo drive with collapse |
@@ -57,7 +58,7 @@ From there: add **[[DroneClone]]** for a string-wall layer, **[[Drift]]** to mod
 ## Wiki sections
 
 - **[[Installation]]** — Get the plugin into Rack
-- **[[Module-Reference]]** — All 14 modules with panel images and specs
+- **[[Module-Reference]]** — All 15 modules with panel images and specs
 - **[[Music-Theory]]** — Harmonic series, just intonation, V/OCT frequency reference, chord tables
 - **[[Playbooks]]** — Named patch configurations for live performance
 - **[[Design-System]]** — Panel language, colour system, HP grid

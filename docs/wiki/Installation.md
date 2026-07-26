@@ -32,13 +32,13 @@ Unzip the `.vcvplugin` into your Rack 2 user plugins directory, or copy the buil
 >
 > If you built from source, the source directory is called `branca-rack-modules` — **rename it when you copy it in**. A mismatched folder name means the modules simply never appear, with no error message anywhere in the interface.
 
-Restart Rack. The fourteen modules appear in the module browser under **Amplified Futures**.
+Restart Rack. The fifteen modules appear in the module browser under **Amplified Futures**.
 
 ---
 
 ## 3. Check it worked
 
-Right-click the Rack canvas and search for `DroneCore`. If it is there, so are the other thirteen.
+Right-click the Rack canvas and search for `DroneCore`. If it is there, so are the other fourteen.
 
 Swarm Core is worth a second look: it loads its sample bank on a background thread and stays silent for 2–5 seconds after you add it. That is normal. If it plays noise bursts instead of insects, the bank did not ship with your copy — check that `res/insects/insectset32/` exists inside the plugin folder.
 
