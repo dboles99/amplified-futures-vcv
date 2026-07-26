@@ -7,6 +7,7 @@
 ## Module roster
 
 ```
+StreetGridClock → Pulse → Choke / collapse accents
 Pulse → StringMassCore (triggered, not sustained)
       → Choke MUTE CVs (rhythmic gating of drone layers)
       → WallConductor COLLAPSE (downbeat drops)
@@ -20,6 +21,9 @@ DroneCore × 2 → Choke (sustained layers being muted rhythmically)
 ## Patch diagram
 
 ```
+[StreetGridClock] CLK ──► [Pulse] TRG IN
+[StreetGridClock] /8 ──► [WallConductor] COLLAPSE IN
+
 [Pulse] GATE ──► [StringMassCore] — use GATE to trigger env (not native, see note)
 [Pulse] OUT  ──► [Choke] CH3 IN  (percussion hit as audio channel)
 
@@ -48,10 +52,14 @@ DroneCore × 2 → Choke (sustained layers being muted rhythmically)
 
 ## Starting parameters
 
+### StreetGridClock (master rhythm)
+- RATE: 0.42, SWING: 0.15, BROWNOUT: 0
+- RUN: on
+
 ### Pulse (primary rhythm)
 - Kick Pattern preset: steps 0, 4, 8, 12
 - HIT: 0.7, DECAY: 0.45, METAL: 0.65, CRACK: 0.35
-- Clock: 120 BPM external or use Drift B GATE
+- Clock: StreetGridClock CLK, 120 BPM equivalent
 
 ### Drift A (velocity modulation)
 - RATE: 0.55, WANDER: 0.85, SLEW: 0.0 (raw steps for velocity jumps)
@@ -59,7 +67,7 @@ DroneCore × 2 → Choke (sustained layers being muted rhythmically)
 
 ### Drift B (clock source — irregular time)
 - RATE: 0.4, WANDER: 0.6, SLEW: 0.0
-- GATE → Pulse TRG IN (for unclocked version)
+- GATE → StreetGridClock RESET or Pulse TRG IN for fills
 
 ### HarmonicPressure
 - PARTIAL: 3, COUNT: 4, TUNING: EQUAL
@@ -94,8 +102,8 @@ DroneCore × 2 → Choke (sustained layers being muted rhythmically)
 | Add sub | Unmute Choke CH2 (DroneCore B at −1V). Low body under kicks. |
 | Add texture | Unmute Choke CH4 (StringMassCore). Harmonic mass on every beat. |
 | Full mix | All channels. Drift velocity making hits irregular. |
-| WallConductor drops | Tie step 0 gate (separate clock → first beat only) to WallConductor COLLAPSE. Hear the wall drop on bar 1. |
-| Sparse clock | Switch Pulse TRG to Drift B GATE. Irregular hits — rhythm dissolves into texture. |
+| WallConductor drops | StreetGridClock /8 to WallConductor COLLAPSE. Hear the wall drop on bar 1. |
+| Sparse clock | Keep StreetGridClock running, but switch Pulse TRG to Drift B GATE for irregular hits — rhythm dissolves into texture. |
 | Noise flood | Push Pulse METAL to 0.0 and DECAY to 0.8 — becomes continuous noise bed. |
 
 ---

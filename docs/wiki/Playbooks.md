@@ -11,6 +11,7 @@ Named patch configurations for live performance. Each playbook describes a signa
 - **Feedback has a safe limit.** FeedbackGovernor AMOUNT above 0.5 with DECAY below 0.3 = runaway. KILL button is your abort.
 - **Drift rates in prime-number ratios** (0.07, 0.11, 0.17 Hz) prevent synchronisation and give each modulation source independent character.
 - **WallConductor DENSITY** is the main performance fader — more expressive than individual volume control.
+- **Street Grid Clock** gives the patch its own time. Use it when you want the system to clock itself instead of borrowing tempo from elsewhere.
 
 ---
 
@@ -18,11 +19,11 @@ Named patch configurations for live performance. Each playbook describes a signa
 
 | Playbook | Modules | Character |
 |---|---|---|
-| [The Wall](#the-wall) | HarmonicPressure → StringMassCore × 2 → WallConductor → CollapseSat + FeedbackGovernor | Full massed-voice orchestra. Density sweeps and collapse events. |
+| [The Wall](#the-wall) | StreetGridClock → Pulse → HarmonicPressure → StringMassCore × 2 → WallConductor → CollapseSat + FeedbackGovernor | Full massed-voice orchestra. Density sweeps and self-clocked collapse events. |
 | [Drone Bed](#drone-bed) | DroneCore × 4 → Choke, Drift × 2 | Pure sustain. 4 detuned layers with Drift-animated timbre. No clock. |
 | [Feedback Republic](#feedback-republic) | DroneClone × 2 ↔ Send ↔ FeedbackGovernor, Drift, Pulse | Cross-feedback system. C-bus governed loop. Kill events as rhythm. |
 | [Harmonic Pressure Session](#harmonic-pressure-session) | HarmonicPressure → StringMassCore → WallConductor → CollapseSat | PARTIAL as primary performance control. Ascend the harmonic series live. |
-| [Percussion Slab](#percussion-slab) | Pulse → Choke, DroneCore × 2, StringMassCore, Drift | Rhythmic structure driving drone muting. Irregular Drift clock for texture dissolution. |
+| [Percussion Slab](#percussion-slab) | StreetGridClock → Pulse → Choke, DroneCore × 2, StringMassCore, Drift | Rhythmic structure driving drone muting. Clocked slab with Drift for texture dissolution. |
 
 ---
 
@@ -33,6 +34,10 @@ Named patch configurations for live performance. Each playbook describes a signa
 ### Module routing
 
 ```
+[StreetGridClock] CLK ─────────────────────► [Pulse] TRG
+[StreetGridClock] /8 ──────────────────────► [WallConductor] COLLAPSE IN
+[StreetGridClock] RESET ────────────────────► [Pulse] RESET
+
 [HarmonicPressure]
   VOCT OUT (8ch) ─────────────────────► [StringMassCore A] VOCT IN
                └───────────────────────► [StringMassCore B] VOCT IN
@@ -61,6 +66,8 @@ Named patch configurations for live performance. Each playbook describes a signa
 
 **WallConductor:** DENSITY 0.25, PRESSURE 0.25, WIDTH 0.85, FEEDBACK 0.15, RECOVERY 0.65
 
+**StreetGridClock:** RATE 0.4, SWING 0, BROWNOUT 0, RUN on
+
 **Drift:** RATE 0.12, WANDER 0.35, SLEW 0.4 — SMOOTH → WallConductor DENSITY CV (atten +0.3)
 
 **CollapseSat:** DRIVE 0.25, BUZZ EVEN, RECOVERY 0.6
@@ -77,7 +84,7 @@ Named patch configurations for live performance. Each playbook describes a signa
 | Build | As DENSITY crosses 0.5, CH2 enters. Slowly raise FeedbackGovernor AMOUNT to 0.4. |
 | Peak | DENSITY → 1.0 (all sections). Push WallConductor PRESSURE to 0.5. CollapseSat DRIVE up. |
 | Collapse event | Press WallConductor COLLAPSE — hold 2s, release. Wall rises back over 3s. |
-| Second collapse | Pulse at 4/4 driving COLLAPSE gate. Rhythmic drop/rise for 16 bars. |
+| Second collapse | StreetGridClock /8 drives COLLAPSE gate. Rhythmic drop/rise for 16 bars. |
 | Fade | Slowly pull DENSITY back to 0.25. Kill FeedbackGovernor (KILL button). |
 
 > **Safety:** Keep FeedbackGovernor AMOUNT below 0.45 before pushing PRESSURE above 0.5. If feedback runaway starts, press KILL.
@@ -259,6 +266,9 @@ All 4 DroneCores share same V/OCT source or run free at PITCH 0V.
 ### Module routing
 
 ```
+[StreetGridClock] CLK ──► [Pulse] TRG IN
+[StreetGridClock] /8 ──► [WallConductor] COLLAPSE IN
+
 [Pulse] GATE ──► [Choke] MUTE CV CH1  (mutes drone A on hit)
 [Pulse] GATE ──► [Choke] MUTE CV CH2  (inverted atten −1 → opens CH2 on hit)
 [Pulse] OUT  ──► [Choke] CH3 IN       (percussion hit as audio)
@@ -277,6 +287,8 @@ All 4 DroneCores share same V/OCT source or run free at PITCH 0V.
 ```
 
 ### Starting parameters
+
+**StreetGridClock:** RATE 0.42, SWING 0.15, BROWNOUT 0, RUN on
 
 **Pulse:** Steps 0, 4, 8, 12. HIT 0.7, DECAY 0.45, METAL 0.65, CRACK 0.35
 
@@ -304,8 +316,8 @@ All 4 DroneCores share same V/OCT source or run free at PITCH 0V.
 | Add sub | Unmute Choke CH2 (DroneCore B at −1V). Low body. |
 | Add texture | Unmute Choke CH4 (StringMassCore). Harmonic mass on every beat. |
 | Full mix | All channels. Drift velocity making hits irregular. |
-| WallConductor drops | Tie step 0 gate → WallConductor COLLAPSE. Bar 1 drops. |
-| Sparse clock | Switch Pulse TRG to Drift B GATE. Rhythm dissolves into texture. |
+| WallConductor drops | StreetGridClock /8 → WallConductor COLLAPSE. Bar 1 drops. |
+| Sparse clock | Keep StreetGridClock running, but switch Pulse TRG to Drift B GATE. Rhythm dissolves into texture. |
 | Noise flood | Push Pulse METAL to 0.0 and DECAY to 0.8 — continuous noise bed. |
 
 ---

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Amplified Futures — VCV Rack Modules</title>
-  <meta name="description" content="No-wave signal instruments for VCV Rack 2. Dense oscillator masses, controlled feedback, performance collapse. 15 open-source modules. MIT license.">
+  <meta name="description" content="No-wave signal instruments for VCV Rack 2. Dense oscillator masses, controlled feedback, performance collapse. 19 open-source modules. MIT license.">
   <style>
     :root {
       --orange:   #FF4A0E;
@@ -429,7 +429,7 @@
   <p class="hero-desc">
     A no-wave signal instrument series for dense oscillator masses,
     controlled feedback, and performance collapse.
-    12 modules for VCV Rack 2.
+    19 modules for VCV Rack 2.
   </p>
   <div class="hero-tags">
     <span class="hero-tag">Dense oscillator masses</span>
@@ -456,7 +456,7 @@
     <img src="panels/WallConductor.png"    alt="Wall Conductor">
     <img src="panels/Drift.png"            alt="Drift">
     <img src="panels/Pulse.png"            alt="Pulse">
-    <img src="panels/StreetGridClock.png"  alt="Street Grid Clock">
+    <img src="panels/rack/StreetGridClock.png"  alt="Street Grid Clock">
     <img src="panels/SitarGrid.png"        alt="Sitar Grid">
     <img src="panels/SwarmCore.png"        alt="Swarm Core">
     <img src="panels/CollapseSat.png"      alt="Collapse Saturator">
@@ -639,7 +639,7 @@
 
     <div class="module-card">
       <div class="module-panel">
-        <img src="panels/StreetGridClock.png" alt="Street Grid Clock panel">
+        <img src="panels/rack/StreetGridClock.png" alt="Street Grid Clock panel">
       </div>
       <div class="module-info">
         <div class="module-name">Street Grid Clock <span style="color:var(--orange)">AF-02</span></div>
@@ -694,6 +694,67 @@
           <span class="tag tag-audio">STEREO</span>
           <span class="tag tag-audio">16CH</span>
           <span class="tag tag-af">AF-01</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card">
+      <div class="module-panel">
+        <img src="panels/CollapseEG.png" alt="Collapse EG panel">
+      </div>
+      <div class="module-info">
+        <div class="module-name">Collapse EG <span style="color:var(--orange)">AF-04</span></div>
+        <div class="module-meta-row">8HP</div>
+        <div class="module-desc">Attack/decay envelope with CURVE shaping, MISFIRE for unreliable triggering, and LOOP for free-running cycles. ENV, INV and EOC outputs.</div>
+        <div class="module-tags">
+          <span class="tag tag-cv">CV OUT</span>
+          <span class="tag tag-af">AF-04</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card">
+      <div class="module-panel">
+        <img src="panels/QuadVCA.png" alt="Quad VCA panel">
+      </div>
+      <div class="module-info">
+        <div class="module-name">Quad VCA <span style="color:var(--orange)">AF-05</span></div>
+        <div class="module-meta-row">12HP</div>
+        <div class="module-desc">Four-channel VCA and mixer. Per-channel level and CV, inputs normalled down the chain, and a PRESSURE-saturated mix output.</div>
+        <div class="module-tags">
+          <span class="tag tag-audio">AUDIO</span>
+          <span class="tag tag-af">AF-05</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card">
+      <div class="module-panel">
+        <img src="panels/Ratchet.png" alt="Ratchet panel">
+      </div>
+      <div class="module-info">
+        <div class="module-name">Ratchet <span style="color:var(--orange)">AF-03</span></div>
+        <div class="module-meta-row">8HP</div>
+        <div class="module-desc">Trigger burst generator. Measures the incoming period and subdivides it into 1–8 repeats. SPREAD accelerates or decelerates the burst, PROB thins it, END closes it.</div>
+        <div class="module-tags">
+          <span class="tag tag-seq">RANDOM</span>
+          <span class="tag tag-af">AF-03</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card">
+      <div class="module-panel">
+        <img src="panels/SignalBloc.png" alt="Signal Bloc panel">
+      </div>
+      <div class="module-info">
+        <div class="module-name">Signal Bloc <span style="color:var(--orange)">AF-06</span></div>
+        <div class="module-meta-row">10HP</div>
+        <div class="module-desc">CV glue with no character knob. Two attenuverter/offset channels, a precision three-input adder, and a buffered 1-to-3 mult. Every section polyphonic.</div>
+        <div class="module-tags">
+          <span class="tag tag-poly">POLY</span>
+          <span class="tag tag-cv">CV</span>
+          <span class="tag tag-af">AF-06</span>
         </div>
       </div>
     </div>
