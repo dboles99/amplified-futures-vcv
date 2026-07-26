@@ -75,6 +75,33 @@ int main() {
         check(ea == eb, "reset gives reproducible timing");
     }
 
+    // Swing delays every second pulse. The PAIR period must stay constant,
+    // or the clock would drift away from the host tempo.
+    {
+        ClockCore c; c.setSampleRate(SR); c.reset();
+        std::vector<int> e = clkEdges(c, SR, 4.f, 120.f, 0.5f, 0.f);
+        check(e.size() >= 6, "swung clock still pulses");
+        bool alternates = true, pairsConstant = true;
+        for (size_t i = 2; i + 1 < e.size(); i += 2) {
+            int shortGap = e[i] - e[i - 1];
+            int longGap  = e[i - 1] - e[i - 2];
+            if (!(longGap > shortGap)) alternates = false;
+            if (std::abs((longGap + shortGap) - 48000) > 4) pairsConstant = false;
+        }
+        check(alternates, "swing makes gaps alternate long/short");
+        check(pairsConstant, "swung pair period stays 2 beats");
+    }
+
+    // Zero swing must be exactly even - no residual offset.
+    {
+        ClockCore c; c.setSampleRate(SR); c.reset();
+        std::vector<int> e = clkEdges(c, SR, 3.f, 120.f, 0.f, 0.f);
+        bool even = true;
+        for (size_t i = 2; i < e.size(); ++i)
+            if ((e[i] - e[i - 1]) != (e[1] - e[0])) even = false;
+        check(even, "swing=0 is exactly even");
+    }
+
     std::printf(g_failures ? "\nFAILED (%d)\n" : "\nAll ClockCore tests passed\n",
                 g_failures);
     return g_failures ? 1 : 0;
