@@ -5,9 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![VCV Rack 2](https://img.shields.io/badge/VCV%20Rack-2-orange)](https://vcvrack.com)
 
-Twelve VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure. No-wave/noise-rock genealogy; built for live performance.
+Fourteen VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, bio-acoustic sampling. No-wave/noise-rock genealogy; built for live performance.
 
-![Amplified Futures modules in VCV Rack](docs/screenshot.png)
+![Amplified Futures modules in VCV Rack](docs/panels/rack/contact-sheet.png)
 
 ---
 
@@ -55,10 +55,10 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢ spread), TIMBRE (sin
 
 ![DroneClone panel](docs/panels/DroneClone.png)
 
-8-voice amplified string wall. MASS (active voice count), TENSION (harmonic edge), SHIMMER (air), JAWARI (rattle/buzz), WEIGHT (sub body), DRIFT (per-voice wander). CHOKE button/gate collapses the wall. RTN feedback input for self-patching loops. Polyphonic — up to 16 poly channels × 8 voices = 128 simultaneous oscillators.
+8-voice amplified string wall. FUNDAMENTAL (±2 Oct), SPREAD (per-voice detune), MASS (active voice count), TENSION (harmonic edge), WEIGHT (sub body), SHIMMER (air), JAWARI (rattle/buzz), DRIFT (per-voice wander), DECAY (voice envelope), CHOKE AMT (collapse depth). CHOKE button/gate collapses the wall. RTN feedback input for self-patching loops. Polyphonic — up to 16 poly channels × 8 voices = 128 simultaneous oscillators.
 
 **Inputs:** V/OCT (poly), RTN (feedback return), CHOKE gate, CV + ATT per knob
-**Outputs:** OUT L/R (stereo audio), THRU (V/OCT pass-through)
+**Outputs:** OUT (polyphonic audio, 1/√8 normalised), THRU (V/OCT pass-through)
 
 ---
 
@@ -73,7 +73,7 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢ spread), TIMBRE (sin
 
 ---
 
-### CHOKE — 14HP
+### CHOKE — 18HP
 
 ![Choke panel](docs/panels/Choke.png)
 
@@ -92,6 +92,28 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢ spread), TIMBRE (sin
 
 **Inputs:** TRG (clock/trigger), HIT CV, DECAY CV, METAL CV, CRACK CV
 **Outputs:** OUT (audio)
+
+---
+
+### SITAR GRID — 42HP
+
+![Sitar Grid panel](docs/panels/SitarGrid.png)
+
+Modal string-resonance sequencer. Three independent sequencing brains — PITCH (raga-quantised, 8 steps, forward/pendulum/random), RES (timbral, 8 steps, its own clock division), RIFF (articulation, 8 steps) — driving a Karplus-Strong string through a jawari nonlinear bridge, with an 8-voice sympathetic resonator bank and a chikari drone string. Six ragas: Bilawal, Yaman, Bhairav, Bhairavi, Kafi, Khamaj. JHALA breakdown state machine (IDLE → BUILD → ACCEL → JHALA → LAND).
+
+**Inputs:** CLOCK, RESET, V/OCT, ROOT CV, JAWARI CV, BD GATE (breakdown), LOCK GATE
+**Outputs:** MAIN L/R, DRONE (chikari), SYMP (sympathetics), PITCH CV, GATE, RIFF TRIG, RES CV
+
+---
+
+### SWARM CORE — 18HP
+
+![Swarm Core panel](docs/panels/SwarmCore.png)
+
+Bio-acoustic insect sample engine over the InsectSet32 bank (Zenodo 7072196, CC-BY 4.0). Specimen mode plays a single pitched voice per trigger; Swarm mode fires up to 8 voices, scattered in time by SCATTER, detuned by DETUNE, across a fixed stereo pan spread. SPECIMEN browses the bank, DENSITY sets the voice count, DECAY shapes playback. The bank loads on a background thread — the module is silent for 2–5 seconds on first patch load, and falls back to a noise burst if the sample folder is absent.
+
+**Inputs:** TRIG, V/OCT, DENSITY CV, SCATTER CV, DETUNE CV, DECAY CV (no attenuverter)
+**Outputs:** OUT L/R, CV OUT (swarm envelope, 0–10 V)
 
 ---
 
@@ -203,6 +225,8 @@ Copy the built plugin folder into your Rack 2 user plugins directory:
 | Windows | `%LOCALAPPDATA%\Rack2\plugins-win-x64\` |
 | macOS | `~/Library/Application Support/Rack2/plugins/` |
 | Linux | `~/.Rack2/plugins/` |
+
+The folder must be named **`amplified-futures`**, matching the plugin slug — not the source folder name. A mismatch means the modules never appear, with no error shown. Full instructions, including troubleshooting: [Installation](https://github.com/dboles99/amplified-futures-vcv/wiki/Installation).
 
 ## Support
 
