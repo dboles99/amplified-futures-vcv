@@ -1,0 +1,11 @@
+{
+  "plugin": "amplified-futures",
+  "model": "CollapseEG",
+  "params": [
+    {"value": 0.25},
+    {"value": 0.45},
+    {"value": -0.4},
+    {"value": 0.55},
+    {"value": 1.0}
+  ]
+}

@@ -27,3 +27,4 @@ extern Model* modelMassDriver;
 extern Model* modelSitarGrid;
 extern Model* modelSwarmCore;
 extern Model* modelStreetGridClock;
+extern Model* modelCollapseEG;
