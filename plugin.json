@@ -1,7 +1,7 @@
 {
   "slug": "amplified-futures",
   "name": "Amplified Futures",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "license": "MIT",
   "brand": "Amplified Futures",
   "description": "Experimental Rack instruments for drone, feedback, physical modeling, no-wave sequencing, and massed-signal composition.",
@@ -153,6 +153,15 @@
         "Polyphonic"
       ],
       "keywords": "insect bio-acoustic swarm cicada orthoptera sample engine"
+    },
+    {
+      "slug": "StreetGridClock",
+      "name": "Street Grid Clock",
+      "description": "Master clock with swing and opt-in brownout tempo sag",
+      "tags": [
+        "Clock generator",
+        "Utility"
+      ]
     }
   ]
 }
