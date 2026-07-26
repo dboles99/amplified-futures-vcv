@@ -1,0 +1,14 @@
+{
+  "plugin": "amplified-futures",
+  "model": "StreetGridClock",
+  "params": [
+    {"value": 0.42},
+    {"value": 0.42},
+    {"value": 0.65},
+    {"value": 0.0},
+    {"value": 0.0},
+    {"value": 0.0},
+    {"value": 0.0},
+    {"value": 0.0}
+  ]
+}
