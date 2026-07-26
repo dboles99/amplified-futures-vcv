@@ -181,6 +181,16 @@
         "Mixer",
         "Utility"
       ]
+    },
+    {
+      "slug": "Ratchet",
+      "name": "Ratchet",
+      "description": "Trigger burst generator; subdivides the incoming clock, with spread and per-repeat probability",
+      "tags": [
+        "Clock modulator",
+        "Random",
+        "Utility"
+      ]
     }
   ]
 }

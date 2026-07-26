@@ -1,3 +1,4 @@
-test_clock_core
-test_clock_core.exe
+# Test binaries: the Windows .exe, and any bare-named build from another
+# platform. Only the sources and the Makefile belong in the repo.
 *.exe
+test_*_core
