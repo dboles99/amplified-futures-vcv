@@ -29,3 +29,4 @@ extern Model* modelSwarmCore;
 extern Model* modelStreetGridClock;
 extern Model* modelCollapseEG;
 extern Model* modelQuadVCA;
+extern Model* modelRatchet;

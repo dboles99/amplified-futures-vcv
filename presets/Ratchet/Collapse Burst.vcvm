@@ -1,0 +1,10 @@
+{
+  "plugin": "amplified-futures",
+  "model": "Ratchet",
+  "params": [
+    {"value": 8.0},
+    {"value": 0.0},
+    {"value": 0.85},
+    {"value": 0.55}
+  ]
+}
