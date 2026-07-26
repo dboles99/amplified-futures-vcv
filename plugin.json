@@ -191,6 +191,17 @@
         "Random",
         "Utility"
       ]
+    },
+    {
+      "slug": "SignalBloc",
+      "name": "Signal Bloc",
+      "description": "CV glue: two attenuverter/offset channels, a precision 3-input adder, and a buffered 1-to-3 mult",
+      "tags": [
+        "Utility",
+        "Attenuator",
+        "Mixer",
+        "Polyphonic"
+      ]
     }
   ]
 }
