@@ -37,3 +37,9 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE"
           RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK" make -j4
+
+      - name: Run core tests
+        shell: msys2 {0}
+        run: |
+          cd "$GITHUB_WORKSPACE/tests"
+          make test
