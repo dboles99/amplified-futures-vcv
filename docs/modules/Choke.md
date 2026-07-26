@@ -1,4 +1,4 @@
-# Choke — 14HP
+# Choke — 18 HP
 
 4-channel mixer built as a performance instrument. Fixed auto-pan spread, per-channel GAIN and TONE, MUTE buttons, MAIN master with soft saturation. Stereo L/R output. The immediate mixing surface for the Amplified Futures signal chain.
 
