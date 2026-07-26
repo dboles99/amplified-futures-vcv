@@ -1,98 +1,87 @@
-# String Mass Core — 16HP
+# String Mass Core — 16 HP
 
-![String Mass Core panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/StringMassCore.png)
+![String Mass Core in VCV Rack](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/StringMassCore.png)
 
-16-voice harmonic mass oscillator. The synthesis engine for the Amplified Futures harmonic series — generates dense polyphonic chord masses in four tuning modes. 1/√N amplitude normalised. Takes polyphonic V/OCT from HarmonicPressure or any pitch source.
+Sixteen-voice harmonic mass oscillator. Where DroneClone shapes a wall by harmonic content, String Mass Core shapes it by *tuning* — MODE decides how the voices are distributed in pitch, from plain unison through odd-harmonic sections, Ptolemaic just intonation, and a microtonal mode where every voice drifts at its own rate. The sum is 1/√M normalised, so raising MASS adds density without adding level.
+
+---
+
+## Sound in 60 seconds
+
+1. Add String Mass Core. Patch a V/OCT source into **V/OCT IN** and **OUT** to your interface.
+2. It arrives in **HARM** mode with MASS 4, SPREAD 30% and TIMBRE 30% — hold a note and you already have four voices across two harmonic sections.
+3. Turn **MODE** to UNIS. The four voices collapse onto one pitch and beat against each other.
+4. Raise **MASS** towards 16. Density climbs; loudness does not.
+5. Turn **MODE** to JUST. The voices redistribute onto just-intonation ratios and the mass locks into a chord.
 
 ---
 
 ## Signal flow
 
-```
-V/OCT IN (poly) ──► per-channel, per-voice frequency calculation
-                    ├─ UNIS: all voices at V/OCT ± SPREAD detune
-                    ├─ HARM: voices assigned to 8 odd-harmonic sections
-                    ├─ JUST: voices on Ptolemaic JI ratios (12-note)
-                    └─ MICRO: spectral microtonality (per-partial spread)
+~~~text
+V/OCT IN (poly) ──► [MODE decides how the M voices are tuned]
+                     ├─ UNIS:  all M at input pitch, spread symmetrically
+                     ├─ HARM:  M divided across SECTION harmonic sections
+                     ├─ JUST:  M across Ptolemaic 12-note JI ratios
+                     │          (spread narrowed to 30%)
+                     └─ MICRO: all at fundamental, each voice given slow
+                                vibrato at its own rate
 
-MASS ──► active voice count (1–16)
-SPREAD ──► detune in cents (0–100¢) within each section
-TIMBRE ──► harmonic content (sine → odd harmonic stack)
-
-sum ──► 1/√N normalise ──► tanh soft clip ──► OUT (poly)
-V/OCT IN ────────────────────────────────────► V/OCT THRU
-```
+                      [TIMBRE] blends sine → odd-harmonic stack
+                              │
+        sum of M voices ──► × 1/√M ──► tanh ──► OUT (poly)
+V/OCT IN ──────────────────────────────────────────► V/OCT THRU
+~~~
 
 ---
 
 ## Controls
 
-| Control | Range | Notes |
-|---|---|---|
-| MASS | 1–16 | Active voices per channel. More = denser, normalised amplitude |
-| SPREAD | 0–100¢ | Detune spread within section or around unison |
-| TIMBRE | 0–1 | Harmonic blend: 0 = pure sine, 1 = odd-harmonic stack |
-| MODE | UNIS / HARM / JUST / MICRO | Tuning mode (switch) |
+![String Mass Core panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/StringMassCore.png)
 
-All knobs have attenuverter + CV.
-
----
-
-## Modes
-
-### UNIS — Unison
-All voices at the input pitch ± SPREAD/2 symmetric detuning. The simplest mode — a thick chorus. Useful for drone walls where pitch identity matters more than harmonic structure.
-
-### HARM — Odd Harmonic Sections
-16 voices distributed across 8 sections based on the odd harmonic series (partials 1, 3, 5, 7, 9, 11, 13, 15 divided into one octave):
-
-| Section | Ratio | Interval above root | Frequency multiplier |
+| Control | Range | Default | What it does |
 |---|---|---|---|
-| 1 | 1:1 | Unison | 1.000 |
-| 2 | 3:2 | Perfect 5th | 1.500 |
-| 3 | 5:4 | Major 3rd | 1.250 |
-| 4 | 7:4 | Harmonic 7th (flat) | 1.750 |
-| 5 | 9:8 | Major 2nd | 1.125 |
-| 6 | 11:8 | Augmented 4th (neutral) | 1.375 |
-| 7 | 13:8 | Minor 6th+ (neutral) | 1.625 |
-| 8 | 15:8 | Major 7th | 1.875 |
+| MASS | 1–16 voices | 4 | Active voices per channel. Snaps to integers |
+| SPREAD | 0–100% | 30% | Detune spread. Full scale is 50 cents across the voice set |
+| TIMBRE | 0–100% | 30% | 0 is a pure sine; 100% is an odd-harmonic stack |
+| MODE | UNIS / HARM / JUST / MICRO | **HARM** | How the voices are distributed in pitch. Snaps |
+| SECTION | 1 / 2 / 4 sections | 2 | Harmonic section count — **HARM mode only**. Snaps |
 
-SPREAD controls within-section detune. The canonical Amplified Futures mode.
+MASS, SPREAD and TIMBRE each have an attenuverter (−1 to +1) and a CV input. MODE and SECTION are knob-only.
 
-### JUST — Ptolemaic Just Intonation
-Voices mapped to a 12-note chromatic scale in Ptolemaic (5-limit) just intonation. See **[[Music-Theory]]** for the full ratio table. Produces natural harmonic locking — intervals are pure, not tempered.
+SPREAD reads as a percentage but the underlying range is 50 cents end to end, so 30% is roughly 15 cents of total spread. In JUST mode it is scaled to 30% of that, keeping the ratios legible.
 
-### MICRO — Spectral Microtonality
-Deterministic per-voice frequency offsets derived from the spectral series. Each voice gets a unique micro-pitch with no simple interval relationship. The most dissonant mode — useful for noise textures and extreme harmonic pressure.
+### The four modes
+
+| Mode | How the voices are tuned |
+|---|---|
+| **UNIS** | All voices at the input pitch, spread symmetrically across ±SPREAD |
+| **HARM** | Voices divided evenly across SECTION harmonic sections, spread within each. The default |
+| **JUST** | Voices across Ptolemaic just-intonation ratios, with spread narrowed so the intervals stay clear |
+| **MICRO** | All voices at the fundamental, each given slow vibrato at its own distinct rate. Shimmer that never repeats |
 
 ---
 
 ## Ports
 
-| Port | Type | Notes |
+| Port | Direction | Notes |
 |---|---|---|
-| V/OCT IN | Input | Polyphonic (each channel = one chord/note) |
-| V/OCT THRU | Output | Pass-through |
-| OUT | Output | Polyphonic normalised audio |
-| CV (×3) | Input | CV for MASS, SPREAD, TIMBRE |
+| V/OCT IN | Input | Polyphonic pitch; sets the channel count |
+| CV ×3 | Input | MASS, SPREAD and TIMBRE, each via its attenuverter |
+| OUT | Output | Polyphonic mixed audio, 1/√M normalised then soft-clipped |
+| V/OCT THRU | Output | Pass-through at the same channel count |
 
 ---
 
-## Amplitude normalisation
+## Patch recipes
 
-With N active voices, each voice's amplitude is scaled by 1/√N. This keeps the perceived loudness roughly constant as MASS changes — adding voices fills out the texture rather than clipping the output.
+**Harmonic partial stack.** MODE HARM, SECTION 4, MASS 8, SPREAD 16%, TIMBRE 30%, fed eight channels from [[Harmonic-Pressure]] at PARTIAL 1, COUNT 8. Each channel gets eight voices across four sections — dense but coherent.
 
-At MASS 16 each voice is at 1/4 amplitude, but the perceptual density is high. The output is then soft-clipped with tanh to catch occasional transient peaks.
+**Just intonation drone.** MODE JUST, MASS 6, SPREAD 8%, TIMBRE 10%, on a single V/OCT channel. Six voices on Ptolemaic ratios; they lock naturally and stay warm.
 
----
+**Unison chorus wall.** MODE UNIS, MASS 4, SPREAD 25%, TIMBRE 0, with [[Drift]] SMOOTH → SPREAD CV at attenuverter +0.4. The spread wavers slowly — a chorus without a chorus module.
 
-## Patch tips
-
-- **HARM mode + HarmonicPressure → V/OCT**: the canonical Amplified Futures patch. HarmonicPressure outputs harmonic partials; StringMassCore spreads voices within each section.
-- **MASS 4–8, SPREAD 8–15¢**: sweet spot for dense but focused wall texture without muddiness.
-- **UNIS mode + SPREAD → Drift SMOOTH**: drifting unison chorus. Pair with Choke for channel mixing.
-- **JUST mode** works well for tonal drone chord work — the JI ratios produce natural harmonic locking.
-- **TIMBRE → 0.3–0.5**: adds harmonic bite without full odd-harmonic saturation. Full TIMBRE (1.0) gives dense buzzy character.
+**Spectral shimmer.** MODE MICRO, MASS 12, SPREAD 40%, TIMBRE 20%. Every voice vibrates at its own rate, so the twelve never lock into a pattern.
 
 ---
 
@@ -100,14 +89,16 @@ At MASS 16 each voice is at 1/4 amplitude, but the perceptual density is high. T
 
 | Module | Routing |
 |---|---|
-| [[Harmonic-Pressure]] | Primary V/OCT source |
-| [[Wall-Conductor]] | CH inputs as section sources |
-| [[Collapse-Saturator]] | Post-mass saturation |
-| [[Drift]] | SMOOTH → SPREAD CV for slow detune breathing |
-| [[Mass-Driver]] | 16 channels from StringMassCore × multiple into Mass Driver banks |
+| [[Harmonic-Pressure]] | V/OCT OUT → V/OCT IN; the intended pitch source |
+| [[Wall-Conductor]] | OUT → channel input, for DENSITY and COLLAPSE over the mass |
+| [[Drift]] | SMOOTH → SPREAD or MASS CV for slow structural movement |
+| [[Collapse-Saturator]] | OUT → IN to add edge to an otherwise clean mass |
+| [[DroneClone]] | Run alongside — tuning-shaped mass against harmonics-shaped wall |
 
 ---
 
 ## See also
 
-[[Harmonic-Pressure]] · [[Music-Theory]] · [[Playbooks]] · [[Wall-Conductor]]
+[[DroneCore]] · [[DroneClone]] · [[Harmonic-Pressure]] · [[Music-Theory]] · [[Playbooks]]
+
+**Full parameter spec:** [`docs/modules/StringMassCore.md`](https://github.com/dboles99/amplified-futures-vcv/blob/master/docs/modules/StringMassCore.md)
