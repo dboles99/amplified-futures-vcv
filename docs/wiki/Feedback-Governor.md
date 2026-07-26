@@ -1,76 +1,85 @@
-# Feedback Governor — 12HP
+# Feedback Governor — 12 HP
 
-![Feedback Governor panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/FeedbackGovernor.png)
+![Feedback Governor in VCV Rack](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/FeedbackGovernor.png)
 
-Controlled feedback send/return. Takes a signal, filters it, attenuates it per-pass, and returns it — creating a governed feedback loop that decays rather than runs away. KILL button/gate zeros the path instantly. DC blocker and ±10V safety limiter on every pass.
+Feedback that behaves. Patch a signal into SEND, take RETURN back into your chain, and the module gives you a loop you can actually play: AMOUNT sets how much comes back, TONE filters what comes back, and DECAY makes each pass quieter than the last so the loop dies away instead of building. AMOUNT is hard-capped at 0.95, there is a DC blocker on the path, and the output hard-clips at ±10 V.
+
+KILL zeroes the whole thing instantly, which is the control you will reach for on stage.
+
+---
+
+## Sound in 60 seconds
+
+1. Put Feedback Governor in a loop: something's output → **SEND**, and **RETURN** back into that same something's input, or into [[Send]] IN B.
+2. AMOUNT starts at 50%, TONE at 80%, DECAY at 0%.
+3. Send a short sound through. It repeats, and with DECAY at zero it keeps repeating.
+4. Raise **DECAY**. Each pass is now quieter — at 100% that is −24 dB per pass, so the tail dies in a few repeats.
+5. Turn **TONE** down. The returns get darker each pass, the way real feedback in a room does.
+6. Press **KILL**. Silence, immediately.
 
 ---
 
 ## Signal flow
 
-```
-SEND IN ──► TONE (1-pole LP, 100Hz–20kHz) ──► DECAY attenuation ──► RETURN OUT
-                │                                     │
-AMOUNT ────────►│ level control                       │ per-pass: effAmount = AMOUNT × 0.5^(DECAY×4)
-                │                                     │
-KILL BTN/IN ──► │ zeros lpState + hpState, bypass ───┘
-                │
-DC blocker ────► hpState tracking (5Hz HP)
-Safety limiter ► clamp(−10V, +10V)
-```
+~~~text
+SEND IN ──► feedback path
+              │
+              ├─ × AMOUNT                    (0–95%, hard capped)
+              ├─ × 2^(−4 × DECAY)            (at 100%: −24 dB per pass)
+              ├─ 1-pole LP, TONE 100 Hz → 20 kHz
+              ├─ DC blocker (5 Hz high-pass)
+              └─ hard clip at ±10 V
+              │
+     KILL button / KILL gate ──► zero the path
+              │
+              ▼
+          RETURN OUT ──► back into the chain
+
+V/OCT IN ─────────────────────────────► V/OCT THRU
+~~~
 
 ---
 
 ## Controls
 
-| Control | Range | Notes |
-|---|---|---|
-| AMOUNT | 0–1 | Output level of the return signal |
-| TONE | 0–1 | LP filter cutoff: 0 = 100Hz (very dark), 1 = 20kHz (full open) |
-| DECAY | 0–1 | Per-pass attenuation: 0 = no decay (stable loop), 1 = 1/16× per pass (fast fade) |
-| KILL | Button | Zeros the feedback path immediately |
+![Feedback Governor panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/FeedbackGovernor.png)
 
-AMOUNT and TONE have attenuverter + CV. DECAY has attenuverter + CV.
-
----
-
-## DECAY formula
-
-`effectiveAmount = AMOUNT × 0.5^(DECAY × 4)`
-
-| DECAY | Multiplier | dB per pass | Character |
+| Control | Range | Default | What it does |
 |---|---|---|---|
-| 0.0 | 1.000× | 0 dB | No attenuation — stable self-sustaining loop |
-| 0.25 | 0.500× | −6 dB | Halves per pass — fades over ~5 passes |
-| 0.5 | 0.250× | −12 dB | Fades quickly — reverb-like tail |
-| 0.75 | 0.125× | −18 dB | Short tail |
-| 1.0 | 0.0625× | −24 dB | Very fast fade — almost just delay |
+| AMOUNT | 0–100% | 50% | Feedback level. Internally capped at 0.95 so unity is unreachable |
+| TONE | 0–100% | 80% | Lowpass on the feedback path: 100 Hz at zero, 20 kHz at full |
+| DECAY | 0–100% | 0% | Per-pass attenuation. 0% sustains; 100% is −24 dB every pass |
+| KILL | button + gate | — | Zeroes the feedback path instantly |
 
-At DECAY 0, AMOUNT controls loop level — above 1.0 effective level (impossible with AMOUNT ≤ 1) the loop would grow; the safety limiter prevents this.
+AMOUNT, TONE and DECAY each have an attenuverter (−1 to +1) and a CV input. KILL has a gate input.
+
+The interaction to learn is AMOUNT against DECAY. AMOUNT sets how loud the loop is; DECAY sets whether it is a sustain or a tail. High AMOUNT with zero DECAY is a drone that never ends. High AMOUNT with high DECAY is a big, short reverb-like swell.
 
 ---
 
 ## Ports
 
-| Port | Type | Notes |
+| Port | Direction | Notes |
 |---|---|---|
-| SEND IN | Input | Signal entering the feedback path |
-| GATE IN | Input | KILL gate — high = path zeroed |
-| RETURN OUT | Output | Processed feedback return |
-| CV (×3) | Input | CV for AMOUNT, TONE, DECAY |
-| V/OCT IN | Input | Pass-through |
-| V/OCT THRU | Output | Pass-through |
+| SEND | Input | Signal in from the chain |
+| AMOUNT / TONE / DECAY CV | Input | One per knob, each via its attenuverter |
+| KILL | Input | Gate — zeroes the path, same as the button |
+| RETURN | Output | Processed signal, back into the chain |
+| V/OCT IN → THRU | In / Out | Pass-through |
 
 ---
 
-## Patch tips
+## Patch recipes
 
-- **Basic loop**: DroneClone OUT → SEND; RETURN → DroneClone RTN. Set DECAY 0.2, TONE 0.6, AMOUNT 0.3. The feedback gradually darkens and fades.
-- **KILL as performance event**: patch to a manual button or Pulse GATE out for sudden feedback silences.
-- **TONE automation**: Drift SMOOTH → TONE CV. The feedback tail slowly darkens and brightens as the loop cycles.
-- **DECAY → 0 (no decay) + AMOUNT 0.2**: stable self-sustaining feedback loop. Add TONE CV for filter animation.
-- **DECAY → 0.8**: feedback tail dies within 4–5 passes — useful as a reverb-like tail without true reverb character.
-- Always patch **KILL → COLLAPSE IN** on CollapseSat when using heavy feedback — prevents DC buildup on collapse events.
+**The standard loop.** [[Wall-Conductor]] L OUT → SEND, RETURN → [[Send]] IN B with B→A up. Feedback around the whole wall, with tone and decay under your hands.
+
+**String wall recirculation.** [[DroneClone]] OUT → SEND, RETURN → DroneClone RTN. AMOUNT below 40% before pushing TENSION, or the wall and the loop compound each other.
+
+**Dark tail.** AMOUNT 70%, TONE 25%, DECAY 60%. Each pass darker and quieter — an echo that decays into low rumble rather than hiss.
+
+**Endless drone.** AMOUNT 90%, DECAY 0%, TONE 80%. Feed it once and it sustains. KILL is how you end it.
+
+**Rhythmic kill.** [[Pulse]] gate → KILL. The feedback tail is chopped on the grid while the source underneath continues.
 
 ---
 
@@ -78,14 +87,16 @@ At DECAY 0, AMOUNT controls loop level — above 1.0 effective level (impossible
 
 | Module | Routing |
 |---|---|
-| [[DroneClone]] | OUT → SEND; RETURN → RTN — primary use case |
-| [[Send]] | C OUT → SEND for C-bus feedback governing |
-| [[Wall-Conductor]] | RETURN → CH input |
-| [[Drift]] | SMOOTH → TONE CV for feedback tone animation |
-| [[Pulse]] | GATE → KILL GATE for rhythmic feedback chopping |
+| [[Send]] | RETURN → IN B, so the B→A path carries the loop |
+| [[DroneClone]] | RETURN → RTN, the module's dedicated feedback return |
+| [[Wall-Conductor]] | L/R OUT → SEND for feedback around the whole mix |
+| [[Mass-Driver]] | OUT → SEND, RETURN → a spare channel |
+| [[Pulse]] | Gate → KILL for rhythmic interruption of the tail |
 
 ---
 
 ## See also
 
-[[Send]] · [[DroneClone]] · [[Collapse-Saturator]] · [[Playbooks]]
+[[Send]] · [[Collapse-Saturator]] · [[Wall-Conductor]] · [[DroneClone]] · [[Playbooks]]
+
+**Full parameter spec:** [`docs/modules/FeedbackGovernor.md`](https://github.com/dboles99/amplified-futures-vcv/blob/master/docs/modules/FeedbackGovernor.md)
