@@ -1,126 +1,111 @@
-# Mass Driver — 32HP (AF-01)
+# Mass Driver — 32 HP (AF-01)
 
-![Mass Driver panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/MassDriver.png)
+![Mass Driver in VCV Rack](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/MassDriver.png)
 
-16-channel no-wave signal mixer. Per-channel GAIN and MUTE. Master DENSITY sweep, PRESSURE saturation, WIDTH stereo spread, FEEDBACK loop, COLLAPSE gate. Five outputs: OUT L/R, AUX L/R, SUM. The centrepiece of the AF-01 module series.
+Sixteen-channel no-wave signal mixer, and the flagship of the AF-01 series. Wall Conductor's ideas at four times the width: DENSITY sweeps sixteen channels rather than four, PRESSURE and MASS separate drive from output level, and three output pairs let you take the same mix saturated, clean, or in mono. Channels 1–8 run down the left spine, 9–16 down the right, with the master controls in the centre.
+
+If Wall Conductor is a performance surface, Mass Driver is a whole desk.
+
+---
+
+## Sound in 60 seconds
+
+1. Add Mass Driver. Patch sources into any of **CH1**–**CH16**, and **OUT L/R** to your interface.
+2. DENSITY starts at 100% and MASS at 75%, so everything patched is already audible.
+3. Sweep **DENSITY** down. Channels drop away in order, sixteen to one.
+4. Raise **PRESSURE** towards 100%. Drive climbs from 1× to 4× into the saturator.
+5. Take **AUX L/R** to a second pair of inputs. That is the same mix *before* PRESSURE — clean, for parallel processing.
+6. Hit **COLLAPSE**. Everything ducks at once.
 
 ---
 
 ## Signal flow
 
-```
-CH 1–16 IN
-    │
-    ├─ MUTE (per-channel toggle)
-    │
-    ├─ GAIN (per-channel 0–2×)
-    │
-    ├─ DENSITY sweep (fades channels 1→16 in sequence)
-    │
-    ├─ WIDTH pan spread (linear L→R across 16 channels)
-    │
-    ├────────────────────────────────┐
-    │                                │
-    AUX L/R (pre-pressure stereo)   SUM (mono pre-pressure)
-    │
-    ├─ PRESSURE saturation (tanh)
-    │
-    ├─ FEEDBACK loop (1-sample, capped 0.92)
-    │
-    ├─ COLLAPSE gate (instant drop, 1.5s recovery)
-    │
-    └─ OUT L / OUT R
-```
+~~~text
+CH1–16 IN ──► × GAIN (0–2×) × densityGain × (1 − muted)
+                     │
+                     ├─ pan: linear spread across 16 channels, −WIDTH … +WIDTH
+                     └─ constant-power sum into mixL / mixR
+                     │
+        mix += previous output × FEEDBACK   [one-sample bus, capped 0.92]
+                     │
+        ┌────────────┴─────────────┬──────────────────┐
+        │                          │                  │
+   pre-PRESSURE               mono sum          × PRESSURE drive (1–4×)
+   × MASS                     × MASS                  │ tanh
+        │                          │             × collapseEnv × MASS
+        ▼                          ▼                  ▼
+    AUX L / AUX R              SUM (mono)       OUT L / OUT R
+
+V/OCT IN ─────────────────────────────────────────────► V/OCT THRU
+~~~
 
 ---
 
 ## Controls
 
-| Control | Range | Function |
-|---|---|---|
-| GAIN 1–16 | 0–2× | Per-channel level |
-| MUTE 1–16 | Toggle | Per-channel mute (state saved) |
-| DENSITY | 0–1 | Sweeps channels 1→16 in progressively |
-| PRESSURE | 0–1 | tanh saturation drive (0=clean, 1=hard clip) |
-| WIDTH | 0–1 | Stereo spread — 0=mono centre, 1=channels hard L↔R |
-| MASS | 0–1 | Master output level (0–5V scale) |
-| FEEDBACK | 0–1 | Feedback loop amount (capped at 0.92× per pass) |
-| COLLAPSE | Button/gate | Instantly drops output to zero; 1.5s recovery |
+![Mass Driver panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/MassDriver.png)
 
----
+| Control | Range | Default | What it does |
+|---|---|---|---|
+| GAIN ×16 | 0–2× | 0.75 | Per-channel level. CH1–8 on the left spine, CH9–16 on the right |
+| MUTE ×16 | button | off | Per-channel mute |
+| DENSITY | 0–100% | 100% | Sweeps 0 to 16 channels in |
+| PRESSURE | 0–100% | 25% | Drive into tanh, 1× to 4× |
+| WIDTH | 0–100% | 80% | Stereo spread. 0 is mono, 100% is full L/R |
+| MASS | 0–100% | 75% | Master output level, applied to all three output pairs |
+| FEEDBACK | 0–100% | 0% | One-sample recirculation, internally capped at 0.92 |
+| COLLAPSE | button + gate | — | Instant duck to silence |
 
-## DENSITY sweep behaviour
+DENSITY, PRESSURE, WIDTH, MASS and FEEDBACK each have an attenuverter (−1 to +1) and a CV input. The per-channel GAIN knobs and MUTE buttons do not.
 
-DENSITY sweeps channels in from 1 to 16. Each channel's contribution is `clamp(DENSITY×16 − i, 0, 1)` where i is the 0-indexed channel number.
-
-| DENSITY | Channels fully active |
-|---|---|
-| 0.0 | None |
-| 0.25 | CH 1–4 |
-| 0.50 | CH 1–8 |
-| 0.75 | CH 1–12 |
-| 1.0 | All 16 |
-
-At 0.25 only channels 1–4 are at full level; at 1.0 all 16 channels are fully open. This gives a smooth mass-building gesture from a single fader.
-
----
-
-## AUX outputs
-
-AUX L/R taps the signal after DENSITY and WIDTH but **before** PRESSURE and COLLAPSE. Use for:
-- Parallel compression (process AUX separately and blend back)
-- Clean reference send to reverb or delay
-- Pre-saturation recording
-- Sidechaining CollapseSat from a clean copy of the mix
-
----
-
-## COLLAPSE
-
-Pressing or gating COLLAPSE instantly zeros the output. The signal recovers with a 1.5-second exponential return to full level. At high FEEDBACK values, COLLAPSE also clears the feedback state, preventing runaway on re-entry.
+MASS and PRESSURE are worth keeping distinct in your head: PRESSURE decides how hard the signal hits the saturator, MASS decides how loud the result is. Raising PRESSURE and lowering MASS gives more distortion at the same volume.
 
 ---
 
 ## Ports
 
-| Port | Type | Function |
+| Port | Direction | Notes |
 |---|---|---|
-| CH 1–16 | Audio in | Per-channel signal inputs |
-| DENSITY CV | CV in | Modulates DENSITY knob |
-| PRESSURE CV | CV in | Modulates PRESSURE knob |
-| WIDTH CV | CV in | Modulates WIDTH knob |
-| MASS CV | CV in | Modulates MASS knob |
-| FEEDBACK CV | CV in | Modulates FEEDBACK knob |
-| COLLAPSE | Gate in | Triggers COLLAPSE when high |
-| V/OCT | Thru | V/OCT passthrough (unprocessed) |
-| OUT L / OUT R | Audio out | Full processed stereo |
-| AUX L / AUX R | Audio out | Pre-pressure stereo |
-| SUM | Audio out | Mono pre-pressure sum |
+| CH1–16 | Input | Channel audio |
+| DENSITY / PRESSURE / WIDTH / MASS / FEEDBACK CV | Input | One per master knob, each via its attenuverter |
+| COLLAPSE | Input | Gate — collapses, same as holding the button |
+| OUT L / OUT R | Output | Main stereo, post-PRESSURE, post-collapse, post-MASS |
+| AUX L / AUX R | Output | The same stereo mix **before** PRESSURE, with MASS applied |
+| SUM | Output | Mono sum, with MASS applied |
+| V/OCT IN → THRU | In / Out | Pass-through |
 
 ---
 
-## Patch tips
+## Patch recipes
 
-- **Mass build**: Start DENSITY at 0, PRESSURE at 0. Slowly raise DENSITY to bring in channel mass. Then push PRESSURE for harmonic density.
-- **Feedback wall**: Set FEEDBACK to 0.6–0.75. Keep MASS below 0.5 to prevent runaway. Use COLLAPSE to reset.
-- **Section separation**: Route different source types (oscillators, string masses, percussion) to channel groups. DENSITY sweeps them all in as one gesture.
-- **32 channels**: Run two Mass Drivers in series — first handles CH 1–16, AUX feeds second MassDriver for a 32-channel system with two independent COLLAPSE events.
+**Parallel saturation.** OUT L/R and AUX L/R both to your interface, or to two channels of another mixer. Blend the driven and clean versions of the identical mix — parallel distortion without a second module.
+
+**Sixteen-voice assembly.** Sixteen sources, DENSITY at 0, swept up across a long take. Each quarter-turn brings in four more channels. The most direct use of the module.
+
+**Mono check.** SUM to a single input. WIDTH can be pushed hard on OUT L/R while SUM confirms nothing collapses badly when summed.
+
+**Feedback mass.** FEEDBACK 60%, PRESSURE 60%, MASS 40%. The recirculation accumulates and saturates each pass; the internal 0.92 cap keeps it from running away, and MASS keeps the level sane.
+
+**Structural collapse.** [[Drift]] GATE → COLLAPSE at a slow RATE. Occasional, unpredictable silences across the whole sixteen-channel wall.
 
 ---
 
 ## Known pairings
 
-| Module | Role |
+| Module | Routing |
 |---|---|
-| [[String-Mass-Core]] × 4 | 16 voices of harmonic mass per channel bank |
-| [[Harmonic-Pressure]] | Polyphonic V/OCT → StringMassCore → Mass Driver |
-| [[Wall-Conductor]] | Feeds Mass Driver AUX for a second-stage DENSITY+COLLAPSE layer |
-| [[Feedback-Governor]] | External feedback loop in parallel with Mass Driver FEEDBACK |
-| [[Collapse-Saturator]] | Post-process OUT L/R for additional harmonic character |
-| [[Drift]] | DENSITY CV for slow autonomous mass evolution |
+| [[DroneClone]] | Several instances across the channel spines |
+| [[String-Mass-Core]] | OUT → a channel; DENSITY then acts over the whole mass |
+| [[Collapse-Saturator]] | AUX L/R → IN for a second, differently-shaped distortion path |
+| [[Feedback-Governor]] | OUT → Feedback Governor → a spare channel, a loop with tone control |
+| [[Drift]] | SMOOTH → DENSITY or MASS CV for slow structural movement |
+| [[Wall-Conductor]] | Use Wall Conductor for sub-sections and Mass Driver as the master |
 
 ---
 
 ## See also
 
-[[Wall-Conductor]] · [[String-Mass-Core]] · [[Feedback-Governor]] · [[Playbooks]]
+[[Wall-Conductor]] · [[Choke]] · [[Collapse-Saturator]] · [[Design-System]] · [[Playbooks]]
+
+**Full parameter spec:** [`docs/modules/MassDriver.md`](https://github.com/dboles99/amplified-futures-vcv/blob/master/docs/modules/MassDriver.md)
