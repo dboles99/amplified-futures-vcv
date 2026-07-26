@@ -1,127 +1,87 @@
-# Harmonic Pressure — 14HP
+# Harmonic Pressure — 14 HP
 
-![Harmonic Pressure panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/HarmonicPressure.png)
+![Harmonic Pressure in VCV Rack](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/HarmonicPressure.png)
 
-Harmonic series pitch CV generator. Generates a polyphonic V/OCT output where each channel corresponds to one partial of the harmonic series above a root pitch. Designed as the primary tuning source for StringMassCore.
+Harmonic series pitch CV generator, and the tuning source the rest of the system is built around. It emits a polyphonic V/OCT where every channel is one partial of the harmonic series above a root — no quantiser, no scale table, just the ratios themselves. Patch it into String Mass Core or DroneClone and the mass tunes itself.
 
-The module turns music theory into patch cable routing: each channel of its output is a pure harmonic partial, calculated exactly according to acoustic physics.
+---
+
+## Sound in 60 seconds
+
+1. Add Harmonic Pressure and [[String-Mass-Core]]. Patch **V/OCT OUT** → String Mass Core **V/OCT IN**, and its OUT to your interface.
+2. Harmonic Pressure starts at PARTIAL 1, COUNT 8, TUNING JUST — eight partials of the harmonic series.
+3. You hear a stack built on pure ratios. Nothing is tempered.
+4. Raise **PARTIAL** to 4. The stack starts on the fourth harmonic instead of the fundamental — the same series, higher and tighter.
+5. Turn **TUNING** to EQUAL. Every partial snaps to the nearest 12-TET semitone and the stack loses its lock. Turn it back.
 
 ---
 
 ## Signal flow
 
-```
-PITCH (root V/OCT) ──► harmonic series calculation
-PARTIAL (first) ──► starting partial number (1 = fundamental, 2 = octave, etc.)
-COUNT (how many) ──► output channel count
-
-for i in 0..COUNT:
-    n = PARTIAL + i
-    V/OCT[i] = PITCH + log2(n)        ← JUST mode (exact harmonic series)
-             | round(V/OCT × 12) / 12  ← EQUAL mode (12-TET quantised)
-             | + spectral micro offset  ← MICRO mode
-
-SPREAD ──► per-partial ensemble colour (small cents offset, deterministic)
-
-──► VOCT OUT (polyphonic, COUNT channels)
-```
+~~~text
+V/OCT IN (root) ──► + PITCH offset (±2 Oct)
+                          │
+                          ├─ partial n = PARTIAL … PARTIAL+COUNT−1
+                          │  voct(n) = root + log2(n)
+                          │
+                          ├─ TUNING JUST:  exact ratios, untouched
+                          ├─ TUNING EQUAL: each partial rounded to
+                          │                 the nearest 12-TET semitone
+                          └─ TUNING MICRO: JI plus a deterministic
+                                            per-partial offset
+                          │
+                     + SPREAD ensemble detune
+                          │
+                          ▼
+              V/OCT OUT — COUNT polyphonic channels
+~~~
 
 ---
 
 ## Controls
 
-| Control | Range | Notes |
-|---|---|---|
-| PITCH | −5 to +5V | Root pitch in V/OCT (0V = C4) |
-| PARTIAL | 1–16 | First partial to output. 1 = fundamental, 2 = 1 octave up, 3 = perfect 5th + octave |
-| COUNT | 1–16 | Number of partials output (= output channel count) |
-| SPREAD | 0–1 | Ensemble colour — small per-partial detune for natural chorus |
-| TUNING | JUST / EQUAL / MICRO | Tuning mode (switch) |
+![Harmonic Pressure panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/HarmonicPressure.png)
 
-All knobs have attenuverter + CV.
+| Control | Range | Default | What it does |
+|---|---|---|---|
+| PITCH | −2 to +2 Oct | 0 | Octave offset applied to the root before the series is built |
+| SPREAD | 0–100% | 0 | Per-partial ensemble detuning. In MICRO it sets the offset magnitude |
+| PARTIAL | 1–16 | 1 | Which harmonic the series starts on. Snaps |
+| COUNT | 1–16 | 8 | How many partials, and therefore how many output channels. Snaps |
+| TUNING | JUST / EQUAL / MICRO | JUST | How the partials are tuned. Snaps |
 
----
+PITCH and SPREAD have an attenuverter (−1 to +1) and a CV input. PARTIAL, COUNT and TUNING are knob-only.
 
-## Tuning modes
+### The three tuning modes
 
-| Mode | Description | Harmonic character |
-|---|---|---|
-| JUST | Exact harmonic series: partial n at root + log₂(n) V/OCT | Natural acoustic resonance, dissonant intervals in upper partials |
-| EQUAL | Rounds each partial to nearest 12-TET semitone | More "chromatic cluster" sound, less acoustic resonance |
-| MICRO | Adds deterministic spectral microtonality per partial | Most dissonant, quasi-noise in upper register |
-
----
-
-## Partial → interval reference
-
-Starting from root **C4** (PITCH = 0V):
-
-| PARTIAL | Exact V/OCT | Note (root C) | Cents deviation from 12-TET | Musical character |
-|---|---|---|---|---|
-| 1 | 0.000 | C4 | 0¢ | Root — maximum gravity |
-| 2 | 1.000 | C5 | 0¢ | Octave — still root character |
-| 3 | 1.585 | G5 | +2¢ | Perfect 5th — open, powerful |
-| 4 | 2.000 | C6 | 0¢ | 2nd octave |
-| 5 | 2.322 | E6 | −14¢ | Major 3rd — warm, slightly flat |
-| 6 | 2.585 | G6 | +2¢ | Perfect 5th again |
-| 7 | 2.807 | Bb6 | −31¢ | Septimal minor 7th — "flat Bb", tense |
-| 8 | 3.000 | C7 | 0¢ | 3rd octave |
-| 9 | 3.170 | D7 | +4¢ | Major 2nd — bright |
-| 10 | 3.322 | E7 | −14¢ | Major 3rd again |
-| 11 | 3.459 | F#/Gb7 | −49¢ | 11th harmonic — between F and F#, no 12-TET equivalent |
-| 12 | 3.585 | G7 | +2¢ | Perfect 5th |
-| 13 | 3.700 | Ab7 | +41¢ | Between Ab and A — microtonal |
-| 14 | 3.807 | Bb7 | −31¢ | Septimal m7 again |
-| 15 | 3.907 | B7 | −12¢ | Major 7th, slightly flat |
-| 16 | 4.000 | C8 | 0¢ | 4th octave |
-
-> See **[[Music-Theory]]** for deeper explanation of these intervals and why they appear.
-
----
-
-## PARTIAL as a performance control
-
-This is the key insight of Harmonic Pressure: moving PARTIAL while a patch is running changes the *harmonic register* of everything connected downstream.
-
-| PARTIAL setting | Tonal feeling |
+| Mode | What it does |
 |---|---|
-| 1–2 | Root gravity — stable, fundamental |
-| 3 | Skips octave/fundamental, begins on 5th — immediately tense |
-| 5–7 | Upper harmonic territory — major 3rd, flat 7th, septimal tensions |
-| 7–9 | High harmonic tension, microtonal territory begins |
-| 11–13 | No 12-TET equivalent — pure microtonality, dissonant |
-| 14–16 | Extreme upper series — almost noise-like at COUNT 8+ |
-
----
-
-## Useful PARTIAL + COUNT combinations
-
-| PARTIAL | COUNT | Result |
-|---|---|---|
-| 1 | 8 | Fundamental + 7 partials — classic harmonic cluster |
-| 1 | 4 | Sparse low-harmonic presence |
-| 3 | 6 | Skip fundamental, start on 5th — no "root gravity" |
-| 7 | 6 | From septimal 7th up — intense microtonal region |
-| 9 | 4 | High 2nd, 3rd, 4th, 5th — dense upper cluster |
-| 1 | 16 | All 16 partials — maximum density |
+| **JUST** | Exact harmonic-series ratios — pure just intonation. The partials lock and beat against nothing |
+| **EQUAL** | Each partial rounded to the nearest 12-TET semitone. Use when the stack has to sit with equal-tempered material |
+| **MICRO** | Just intonation plus a deterministic per-partial offset, sized by SPREAD. Simulates an ensemble that is nearly, but not quite, in tune |
 
 ---
 
 ## Ports
 
-| Port | Type | Notes |
+| Port | Direction | Notes |
 |---|---|---|
-| VOCT OUT | Output | Polyphonic V/OCT, COUNT channels |
-| CV (×4) | Input | CV for PITCH, PARTIAL, COUNT, SPREAD |
+| V/OCT IN | Input | Root pitch. The series is built above this |
+| PITCH CV | Input | Octave offset, via its attenuverter |
+| SPREAD CV | Input | Ensemble detune amount, via its attenuverter |
+| V/OCT OUT | Output | Polyphonic — one channel per partial, COUNT channels wide |
 
 ---
 
-## Patch tips
+## Patch recipes
 
-- **SPREAD at 0.3**: adds natural ensemble warmth without losing pitch identity.
-- **PITCH CV from Drift** STEP output: stochastic root transpositions. Combine with slow COUNT modulation for evolving harmonic fields.
-- **Feed VOCT OUT → StringMassCore AND DroneCore simultaneously**: DroneCore locks to individual partials while StringMassCore spreads voices within each section.
-- **EQUAL mode** turns the harmonic series into chromatic clusters — more "wrong note" than "natural harmonic". Useful for noise-rock textures.
+**The intended pairing.** COUNT 8, PARTIAL 1, TUNING JUST into [[String-Mass-Core]] at MODE HARM, MASS 8. Eight partials, each carrying eight voices. This is the patch the whole system was designed around.
+
+**Upper-partial shimmer.** PARTIAL 8, COUNT 8, TUNING JUST. Starting high in the series gives closely-spaced intervals — a shimmer band rather than a chord. Feed [[DroneCore]] for a cheap, bright stack.
+
+**Detuned ensemble.** TUNING MICRO, SPREAD 40%, COUNT 6. Each partial sits slightly off its true ratio, and the offsets are deterministic, so the detuning is stable rather than drifting.
+
+**Moving root.** [[Drift]] STEP output → PITCH CV at attenuverter +0.5. The whole harmonic series transposes in steps while keeping its internal tuning intact.
 
 ---
 
@@ -129,12 +89,15 @@ This is the key insight of Harmonic Pressure: moving PARTIAL while a patch is ru
 
 | Module | Routing |
 |---|---|
-| [[String-Mass-Core]] | Primary V/OCT destination |
-| [[DroneCore]] | V/OCT IN for per-partial dual-voice pairs |
-| [[Drift]] | SMOOTH → PITCH CV for slow root transpositions |
+| [[String-Mass-Core]] | V/OCT OUT → V/OCT IN. The primary destination |
+| [[DroneClone]] | V/OCT OUT → V/OCT IN for harmonic-series chord walls |
+| [[DroneCore]] | V/OCT OUT → V/OCT IN; each channel gets its own detuned pair |
+| [[Drift]] | STEP or SMOOTH → PITCH CV to move the root |
 
 ---
 
 ## See also
 
-[[String-Mass-Core]] · [[Music-Theory]] · [[Playbooks]] · [[DroneCore]]
+[[String-Mass-Core]] · [[DroneClone]] · [[DroneCore]] · [[Music-Theory]] · [[Playbooks]]
+
+**Full parameter spec:** [`docs/modules/HarmonicPressure.md`](https://github.com/dboles99/amplified-futures-vcv/blob/master/docs/modules/HarmonicPressure.md)
