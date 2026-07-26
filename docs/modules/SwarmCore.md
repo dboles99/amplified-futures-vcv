@@ -58,10 +58,12 @@ If the sample folder is absent, falls back to a noise-burst so the module is alw
 | DENSITY CV | Input | CV | CV for DENSITY (scaled by DENSITY ATT) |
 | SCATTER CV | Input | CV | CV for SCATTER |
 | DETUNE CV | Input | CV | CV for DETUNE |
+| DECAY CV | Input | CV | Added directly to the DECAY knob (voltage / 10), no attenuverter |
 | OUT L | Output | Audio | Left stereo output |
 | OUT R | Output | Audio | Right stereo output |
+| CV OUT | Output | CV | Summed voice envelope × 1/√8, scaled to 0–10 V — an envelope follower on the module's own output |
 
-No DECAY CV jack — DECAY is a knob-only parameter. No attenuverter for DECAY.
+DECAY **does** have a CV jack, but no attenuverter — its voltage is divided by 10 and added straight to the knob value, then clamped. SPECIMEN and MODE have neither CV nor attenuverter.
 
 ---
 
