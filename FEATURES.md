@@ -8,7 +8,7 @@
 
 ### Modules
 - [ ] **State serialisation** — `dataToJson` / `dataFromJson` for: Pulse step grid, StringMassCore voice phases, WallConductor collapse state.
-- [ ] **Dark panel variants** — all 14 modules.
+- [ ] **Dark panel variants** — all 15 modules.
 
 ### DSP polish
 - [ ] **DroneClone voice LEDs** — confirm they respond correctly to amplitude envelope, not just gate state.
@@ -17,16 +17,19 @@
 ### Distribution
 - [ ] **macOS / Linux release binaries** — cross-building is not set up, so releases are Windows x64 only. Source builds work on all platforms.
 
+### Street Grid Clock (AF-02) follow-up
+- [ ] **Rack-rendered screenshot** — `docs/panels/rack/StreetGridClock.png`. Its wiki page currently shows the flat Inkscape export, which makes it the odd one out; every other module page leads with a Rack render.
+
 ---
 
 ## Completed
 
-- [x] **14 modules built and installed**: DroneCore, DroneClone, Send, Choke, Pulse, Drift, WallConductor, StringMassCore, HarmonicPressure, CollapseSat, FeedbackGovernor, MassDriver, SitarGrid, SwarmCore
+- [x] **15 modules built and installed**: DroneCore, DroneClone, Send, Choke, Pulse, Drift, WallConductor, StringMassCore, HarmonicPressure, CollapseSat, FeedbackGovernor, MassDriver, SitarGrid, SwarmCore, StreetGridClock
 - [x] **Mass Driver C++** (AF-01, 32HP) — `src/MassDriver.cpp`. 16-channel mixer, per-channel GAIN + MUTE, master DENSITY/PRESSURE/WIDTH/MASS/FEEDBACK/COLLAPSE, OUT + AUX + SUM outputs
 - [x] **SVG text-to-paths** — all 14 module SVGs converted to bezier outlines for font-independent nanosvg rendering
-- [x] **Batch Inkscape export** — panel PNGs exported for all 14 modules
+- [x] **Batch Inkscape export** — panel PNGs exported for all 15 modules
 - [x] **Panel repair pass (v2.1.0)** — label collisions resolved across the range; Choke and SwarmCore widened to 18 HP
-- [x] **Rack-rendered screenshots** — `docs/panels/rack/` for all 14 modules, plus a contact sheet
+- [x] **Rack-rendered screenshots** — `docs/panels/rack/` for 14 modules, plus a contact sheet
 - [x] **Per-module manuals** — `docs/modules/<slug>.md` for all 14: controls reference, signal flow, MIDI CC map, patch tips
 - [x] **Playbooks** — `docs/playbooks/`: The Wall, Drone Bed, Feedback Republic, Harmonic Pressure Session, Percussion Slab
 - [x] **Wiki as repo source** — `docs/wiki/` is authoritative, published one-way by `tools/sync_wiki.ps1`; `tools/check_wiki.py` verifies links, HP and module coverage

@@ -1,6 +1,6 @@
 # Module Reference
 
-Fourteen modules. Every module has CV + attenuverter on every knob and V/OCT pass-through.
+Fifteen modules. Every module has CV + attenuverter on every knob and V/OCT pass-through.
 
 ---
 
@@ -53,7 +53,16 @@ Slow random modulation source. RATE (0.01–10 Hz), WANDER (step size), SLEW (sm
 
 ---
 
-## Sequencing
+## Clock & Sequencing
+
+### Street Grid Clock — 12HP (AF-02)
+![Street Grid Clock](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/StreetGridClock.png)
+
+Master clock — the series previously had none. RATE (20–300 BPM, exponential), SWING (delays odd pulses by up to half a period), BROWNOUT (mains-sag metaphor: dips under load and recovers, only ever slowing). CLK, /2, /4, /8 and RESET outputs, plus EXT CLK input for slaving. At BROWNOUT 0 the timing is bit-identical to a clean clock.
+
+→ **[[Street-Grid-Clock]]** for full documentation
+
+---
 
 ### Pulse — 12HP
 ![Pulse](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/Pulse.png)
