@@ -39,11 +39,15 @@ struct ClockCore {
 
     // One sample. `bpm` is quarter-notes per minute.
     Ticks process(float bpm, float swing, float brownout, bool running) {
-        (void)swing; (void)brownout;   // Tasks 2 and 3
+        (void)brownout;   // Task 3
         Ticks t;
         if (!running) return t;
 
-        const float hz = clampf(bpm, 1.f, 1000.f) / 60.f;
+        // Phase is accumulated in double. In float, an increment such as
+        // 2/48000 is not exactly representable and the rounding error makes
+        // the period alternate between 24000 and 23999 samples - a clock that
+        // is audibly steady but not actually steady. A test caught this.
+        const double hz = static_cast<double>(clampf(bpm, 1.f, 1000.f)) / 60.0;
 
         // Fire immediately on the first sample after reset, so a run always
         // begins on a downbeat rather than one period later.
@@ -53,9 +57,17 @@ struct ClockCore {
             return t;
         }
 
-        phase += hz / sampleRate;
-        if (phase >= 1.f) {
-            phase -= 1.f;
+        phase += hz / static_cast<double>(sampleRate);
+
+        // Swing: odd-numbered pulses arrive late by a fraction of the period
+        // and even-numbered ones correspondingly early, so each PAIR still
+        // spans exactly two beats. Without that symmetry a swung clock would
+        // slowly drift away from the tempo it claims to run at.
+        const double sw = static_cast<double>(clampf(swing, 0.f, 0.75f)) * 0.5;
+        const double threshold = ((pulseCount % 2) == 1) ? (1.0 + sw) : (1.0 - sw);
+
+        if (phase >= threshold) {
+            phase -= threshold;
             emit(t);
         }
         return t;
@@ -78,7 +90,7 @@ protected:
     }
 
     float sampleRate = 44100.f;
-    float phase = 0.f;
+    double phase = 0.0;
     uint32_t pulseCount = 0;
     bool firstPulsePending = true;
 };
