@@ -1,81 +1,94 @@
-# Collapse Saturator — 12HP
+# Collapse Saturator — 12 HP
 
-![Collapse Saturator panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/CollapseSat.png)
+![Collapse Saturator in VCV Rack](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/CollapseSat.png)
 
-Stereo drive/saturation with collapse. Three harmonic modes (ODD/EVEN/FULL), COLLAPSE gate that instantly maxes drive, shaped RECOVERY, and a sidechain input for external envelope control. The final shaping stage before output.
+Stereo drive and saturation with a collapse gate. DRIVE sets pre-gain from ×1 to ×10, BUZZ picks the character of the clipping, and COLLAPSE is the performance control — a gate that ramps drive to maximum in a millisecond and then eases back to where you left it over RECOVERY.
+
+COLLAPSE adds distortion rather than removing it. It is an event, not a limiter.
+
+---
+
+## Sound in 60 seconds
+
+1. Add Collapse Saturator at the end of a chain. Patch **IN L**/**IN R** in and **OUT L**/**OUT R** to your interface.
+2. DRIVE starts at 30%, BUZZ on ODD. The signal is already gently driven.
+3. Raise **DRIVE** towards 100%. Pre-gain climbs to ×10 and the tanh takes over.
+4. Switch **BUZZ** to EVEN, then FULL. Odd-harmonic warmth, then asymmetric tape colour, then hard-clipped fuzz.
+5. Send a gate into **COLLAPSE**. Drive slams to maximum, then recovers over the time **RECOVERY** sets — up to about two seconds.
 
 ---
 
 ## Signal flow
 
-```
-IN L / IN R ──► DRIVE (pre-gain 0–4×) ──► BUZZ (saturation mode)
-                                           ├─ ODD:  tanh(x)                 — symmetric, odd harmonics
-                                           ├─ EVEN: tanh(x+0.35)−tanh(0.35) — DC-free asymmetric, tape-like
-                                           └─ FULL: hard clip clamp(x,−1,1)  — brutal clipping
-
-SC IN ──► sidechain boost on DRIVE (+0–50% additive)
-
-COLLAPSE BTN/IN ──► instant collapseEnv → 0 (maxes effective drive, blend to hard clip)
-RECOVERY ──────► envelope rise time 10ms–2s
-
-──► OUT L / OUT R
-V/OCT IN ──────► V/OCT THRU
-```
+~~~text
+SIDECHAIN IN ──► |level| / 5 × 0.5 ──┐
+                                      ├──► effective DRIVE
+DRIVE knob ──────────────────────────┘         │
+                                                │
+COLLAPSE gate ──► env: 1 ms attack,             │
+                  RECOVERY release  ────────────┤
+                  (pushes drive to full)        │
+                                                ▼
+IN L ──►┐                              preGain = 1 + drive × 9   (×1 … ×10)
+IN R ──►┤                                       │
+        └──────────────────────────────► × preGain
+                                                │
+                        BUZZ ──► ODD  : symmetric tanh
+                                 EVEN : asymmetric, tape-like
+                                 FULL : hard clip
+                                                │
+                                        OUT L / OUT R
+V/OCT IN ─────────────────────────────────────► V/OCT THRU
+~~~
 
 ---
 
 ## Controls
 
-| Control | Range | Notes |
-|---|---|---|
-| DRIVE | 0–1 | Pre-gain 1–4×. Higher = more saturation character |
-| BUZZ | ODD / EVEN / FULL | Harmonic character switch (3-way) |
-| RECOVERY | 0–1 | Post-collapse recovery time: 0 = 10ms (snap back), 1 = 2s (slow rise) |
-| COLLAPSE | Button | Momentary performance button — triggers collapse |
+![Collapse Saturator panel](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/CollapseSat.png)
 
-DRIVE has attenuverter + CV. RECOVERY has attenuverter + CV.
-
----
-
-## BUZZ modes
-
-Each mode adds different harmonics to the signal:
-
-| Mode | Algorithm | Harmonics added | Character |
+| Control | Range | Default | What it does |
 |---|---|---|---|
-| ODD | `tanh(x)` | 3rd, 5th, 7th (odd series) | Symmetric drive — classic saturation, "amplifier overdrive" |
-| EVEN | `tanh(x+b) − tanh(b)` (b=0.35) | 2nd harmonic, DC-free | Asymmetric tape-like warmth — adds octave-doubling character |
-| FULL | `clamp(x, −1, 1)` | Hard clip — all harmonics | Brutal — square wave character at high DRIVE |
+| DRIVE | 0–100% | 30% | Pre-gain into the saturator, ×1 at zero to ×10 at full |
+| BUZZ | ODD / EVEN / FULL | ODD | Saturation character. Three-position switch |
+| RECOVERY | 0–100% | 30% | How long drive takes to fall back after COLLAPSE: 10 ms to about 2 s |
 
-During COLLAPSE, ODD and EVEN modes blend toward hard clip as collapseEnv rises — the saturation character automatically shifts to FULL at peak collapse.
+DRIVE and RECOVERY have an attenuverter (−1 to +1) and a CV input. BUZZ is a switch.
 
-**A note on harmonics:** The ODD mode adds odd-order harmonics which are harmonically related to the original pitch (5th, 3rd above). The EVEN mode adds even-order harmonics which produce an octave doubling effect. FULL adds both in unlimited amounts.
+### The three BUZZ characters
+
+| Setting | Curve | Sounds like |
+|---|---|---|
+| **ODD** | Symmetric tanh | Tube-like. Odd harmonics, compresses gracefully |
+| **EVEN** | Asymmetric | Tape-like. Even harmonics, warmer and less symmetrical |
+| **FULL** | Hard clip | Fuzz. The full harmonic spectrum, no politeness |
 
 ---
 
 ## Ports
 
-| Port | Type | Notes |
+| Port | Direction | Notes |
 |---|---|---|
-| IN L / IN R | Input | Stereo audio input |
-| SC IN | Input | Sidechain — adds to DRIVE amount |
-| COLLAPSE IN | Input | Gate: high = collapse engaged |
-| DRIVE CV | Input | CV for DRIVE (with attenuverter) |
-| RECOVERY CV | Input | CV for RECOVERY |
-| OUT L / OUT R | Output | Stereo saturated output |
-| V/OCT IN | Input | Pass-through |
-| V/OCT THRU | Output | Pass-through |
+| IN L / IN R | Input | Stereo audio in |
+| DRIVE CV / RECOVERY CV | Input | Via their attenuverters |
+| COLLAPSE | Input | Gate — 1 V or above ramps drive to maximum in 1 ms |
+| SIDECHAIN | Input | Adds drive in proportion to its own level, up to +50% |
+| OUT L / OUT R | Output | Stereo audio out |
+| V/OCT IN → THRU | In / Out | Pass-through |
+
+The SIDECHAIN input is the least obvious control on the panel and the most useful. It is not a compressor sidechain — it *raises* drive as its input gets louder. Patch [[Pulse]] into it and every percussion hit briefly distorts whatever is passing through.
 
 ---
 
-## Patch tips
+## Patch recipes
 
-- **EVEN mode + DRIVE 0.3**: subtle tape saturation on dense wall mixes without obvious clipping.
-- **ODD mode + DRIVE 0.6–0.8**: canonical heavy drive. Works on DroneClone wall output for added grit.
-- **COLLAPSE → long RECOVERY (0.7)**: press COLLAPSE for a dramatic harmonic explosion that slowly settles — a signature performance gesture.
-- **SC IN from Pulse OUT**: percussion transients briefly boost DRIVE for rhythmic saturation pumping.
-- **Chain after WallConductor**: WALL → CollapseSat → master out. The natural position in the signal chain.
+**Transient colour.** [[Pulse]] OUT → SIDECHAIN while a drone passes through IN L/R. The drone distorts on each hit and cleans up between them, without the percussion itself being audible in the output.
+
+**Collapse as punctuation.** [[Drift]] GATE → COLLAPSE, RECOVERY 60%. Occasional slams into full drive that ease back over a second or so.
+
+**Tape warmth.** BUZZ EVEN, DRIVE 40%, nothing patched to COLLAPSE. Asymmetric saturation as a permanent output stage.
+
+**Parallel fuzz.** [[Mass-Driver]] AUX L/R → IN L/R, BUZZ FULL, DRIVE 90%. The clean pre-PRESSURE mix gets hard-clipped separately and can be blended back against Mass Driver's own OUT.
 
 ---
 
@@ -83,13 +96,16 @@ During COLLAPSE, ODD and EVEN modes blend toward hard clip as collapseEnv rises 
 
 | Module | Routing |
 |---|---|
-| [[Wall-Conductor]] | Primary input source |
-| [[Pulse]] | OUT → SC IN for sidechain drive pumping |
-| [[Feedback-Governor]] | Route output back into feedback chain |
-| [[Drift]] | GATE → COLLAPSE IN for periodic timed collapse events |
+| [[Wall-Conductor]] | L/R OUT → IN for edge past what PRESSURE gives |
+| [[Mass-Driver]] | AUX L/R → IN for a second, differently-shaped distortion path |
+| [[Pulse]] | OUT → SIDECHAIN for rhythmic drive without rhythmic content |
+| [[Drift]] | GATE → COLLAPSE for unpredictable distortion events |
+| [[DroneClone]] | OUT → IN; EVEN mode suits the string wall particularly well |
 
 ---
 
 ## See also
 
-[[Wall-Conductor]] · [[Feedback-Governor]] · [[Drift]] · [[Music-Theory]]
+[[Feedback-Governor]] · [[Wall-Conductor]] · [[Mass-Driver]] · [[Playbooks]]
+
+**Full parameter spec:** [`docs/modules/CollapseSat.md`](https://github.com/dboles99/amplified-futures-vcv/blob/master/docs/modules/CollapseSat.md)
