@@ -61,11 +61,11 @@
      d="M 0,0 H 630 V 22 H 0 Z" />
   <!-- Screw shadows in header -->
   <path
-     id="circle4"
+ transform="translate(7.500,0.000)"     id="circle4"
      style="opacity:0.35;fill:#0c100a"
      d="m 18,7.5 a 3,3 0 0 1 -3,3 3,3 0 0 1 -3,-3 3,3 0 0 1 3,-3 3,3 0 0 1 3,3 z" />
   <path
-     id="circle5"
+ transform="translate(-7.500,0.000)"     id="circle5"
      style="opacity:0.35;fill:#0c100a"
      d="m 618,7.5 a 3,3 0 0 1 -3,3 3,3 0 0 1 -3,-3 3,3 0 0 1 3,-3 3,3 0 0 1 3,3 z" />
   <!-- META STRIP -->
@@ -493,11 +493,11 @@
      aria-label="RES" transform="translate(0,23)"/>
   <!-- Bottom screw shadows -->
   <path
-     id="circle79"
+ transform="translate(7.500,0.000)"     id="circle79"
      style="opacity:0.35;fill:#0c100a"
      d="m 18,372.5 a 3,3 0 0 1 -3,3 3,3 0 0 1 -3,-3 3,3 0 0 1 3,-3 3,3 0 0 1 3,3 z" />
   <path
-     id="circle80"
+ transform="translate(-7.500,0.000)"     id="circle80"
      style="opacity:0.35;fill:#0c100a"
      d="m 618,372.5 a 3,3 0 0 1 -3,3 3,3 0 0 1 -3,-3 3,3 0 0 1 3,-3 3,3 0 0 1 3,3 z" />
 </svg>

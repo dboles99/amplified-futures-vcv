@@ -20,7 +20,7 @@ Rack renders SVG at **SVG_DPI = 75**.
 panel = 128.5 mm tall    = 379.43 px  →  viewBox height 380
 ```
 
-> **Correction to CLAUDE.md.** The workspace notes say `1 mm = 3 px`. That is
+> **Correction to the workspace build notes.** They say `1 mm = 3 px`. That is
 > wrong by 1.5%. Across a full 128.5 mm panel it accumulates to **5.5 px** of
 > drift. This is not academic: it is why MassDriver's V/OCT output was placed at
 > y = 126 mm on a 128.5 mm panel and physically hung off the bottom edge. Use
