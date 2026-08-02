@@ -11,7 +11,6 @@
   "manualUrl": "https://github.com/dboles99/amplified-futures-vcv/tree/master/docs/modules",
   "sourceUrl": "https://github.com/dboles99/amplified-futures-vcv",
   "donateUrl": "https://paypal.me/DBoles648",
-  "changelogUrl": "",
   "modules": [
     {
       "slug": "DroneCore",
@@ -67,8 +66,9 @@
       "name": "Drift",
       "description": "Slow random modulation source. RATE/WANDER/SLEW with CV. SMOOTH, STEP, and GATE outputs. SYNC trigger. V/OCT thru.",
       "tags": [
-        "Modulation",
-        "Random"
+        "Low-frequency oscillator",
+        "Random",
+        "Utility"
       ],
       "keywords": "wander slew smooth step gate sync random"
     },
@@ -177,9 +177,10 @@
       "name": "Quad VCA",
       "description": "Four-channel VCA and mixer with normalled inputs and output saturation",
       "tags": [
-        "VCA",
+        "Voltage-controlled amplifier",
         "Mixer",
-        "Utility"
+        "Utility",
+        "Polyphonic"
       ]
     },
     {

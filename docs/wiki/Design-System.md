@@ -83,7 +83,7 @@ Every main parameter knob that accepts CV has a **Trimpot** (attenuverter, radiu
   in.svg
 ```
 
-For batch export of all panels, use the `/export-panels` skill in Claude Code.
+For batch export of all panels, run `scripts/graphics/export-panels.ps1`.
 
 ---
 
