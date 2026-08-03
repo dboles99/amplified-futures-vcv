@@ -1,0 +1,43 @@
+{
+  "_comment": [
+    "Panel layout declarations. Geometry authority is",
+    "docs/design/commiecore-rack-geometry.md — every number is validated",
+    "against it by tools/make_panel.py before an SVG is written.",
+    "",
+    "Zones (mm): masthead 0-11, display 13.5-39.5, control 44-97,",
+    "ports 102-122. Side margin 5mm. Labels sit above their widget.",
+    "",
+    "Labels follow the ladder in spec §10: full word, then conventional",
+    "abbreviation, then devowelled, then initialism, then glyph. Every one",
+    "of them also has a full name in configParam/configInput/configOutput,",
+    "so the tooltip always resolves what the panel compresses."
+  ],
+
+  "Drift": {
+    "hp": 16,
+    "sections": [
+      { "x": 40.64, "y": 48.5, "text": "MODULATION", "anchor": "middle" },
+      { "x": 40.64, "y": 100.8, "text": "IN", "anchor": "middle" }
+    ],
+    "widgets": [
+      { "kind": "knob", "x": 20.32, "y": 58.0, "zone": "control", "label": "RATE" },
+      { "kind": "knob", "x": 40.64, "y": 58.0, "zone": "control", "label": "WANDER" },
+      { "kind": "knob", "x": 60.96, "y": 58.0, "zone": "control", "label": "SLEW" },
+
+      { "kind": "trimpot", "x": 20.32, "y": 80.0, "zone": "control", "label": "AV" },
+      { "kind": "trimpot", "x": 40.64, "y": 80.0, "zone": "control", "label": "AV" },
+      { "kind": "trimpot", "x": 60.96, "y": 80.0, "zone": "control", "label": "AV" },
+
+      { "kind": "jack", "x": 12.13, "y": 107.0, "zone": "ports", "signal": "cv",    "label": "RATE" },
+      { "kind": "jack", "x": 26.38, "y": 107.0, "zone": "ports", "signal": "cv",    "label": "WNDR" },
+      { "kind": "jack", "x": 40.64, "y": 107.0, "zone": "ports", "signal": "cv",    "label": "SLEW" },
+      { "kind": "jack", "x": 54.90, "y": 107.0, "zone": "ports", "signal": "trig",  "label": "SYNC" },
+      { "kind": "jack", "x": 69.15, "y": 107.0, "zone": "ports", "signal": "pitch", "label": "V/OCT" },
+
+      { "kind": "jack", "x": 13.91, "y": 117.0, "zone": "ports", "signal": "cv",    "label": "SMTH" },
+      { "kind": "jack", "x": 31.73, "y": 117.0, "zone": "ports", "signal": "cv",    "label": "STEP" },
+      { "kind": "jack", "x": 49.55, "y": 117.0, "zone": "ports", "signal": "gate",  "label": "GATE" },
+      { "kind": "jack", "x": 67.37, "y": 117.0, "zone": "ports", "signal": "pitch", "label": "V/OCT" }
+    ]
+  }
+}

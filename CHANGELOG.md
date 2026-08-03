@@ -35,8 +35,40 @@ since 2026-07-26 and have never been released.
 
 ### Fixed
 
-- Panel artwork no longer runs under the mounting screws.
-- Swarm Core: widen the WAV sample count before allocating.
+- **Panel artwork no longer runs under the mounting screws.** Rack draws the
+  four corner screws over the panel, and six panels had put artwork there.
+  DroneCore's own title lost its leading `D` and trailing `E`; `AMPL. FUTURES`
+  read `AM_ FUTURES` on Drift, Pulse, Send and DroneClone. Five panels also
+  drew their counter-holes at the screw's *position* rather than its *centre*,
+  half a screw width out, showing as a dark dot beside every screw.
+- **DroneCore's panel title is now `DRNCR`.** `DRONECORE` needed 75.7 px of the
+  60 px that an 8 HP panel leaves clear between its screws, so it never fitted.
+  Devowelling freed enough width to set it at 16 px rather than 13 px. The
+  module name in the browser is unchanged.
+- **39 captions lifted out from under the widgets drawn over them.** This is the
+  defect that lost the July submission — label paths at the same y as a widget
+  centre — and eight panels still had it. Feedback Governor hid `KILL`
+  completely; Pulse hid all four `ATN` captions; DroneCore hid six; Send hid the
+  `ATN` row and clipped `V/OCT THRU`.
+- Swarm Core: widen the WAV sample count before allocating. `nFrames * numCh`
+  was computed in `uint32_t` and only widened afterwards, so a large enough
+  frame count wrapped before reaching the vector constructor and `fread`.
+
+### Known remaining
+
+Recorded rather than quietly carried. Full detail in
+`docs/qa/panel-audit-2026-08-03.md`.
+
+- **SitarGrid** — the six JHALA knobs render above their own
+  `JHALA BREAKDOWN` header, inside the neighbouring `GLOBAL` section.
+- **SwarmCore** — four unlabelled trimpots; `V/OCT` sits diagonally below-right
+  of its jack instead of above it.
+- **MassDriver** — `MUTE` and `IN` captions at the foot of both channel columns
+  with no widgets under them.
+- **WallConductor, StringMassCore, HarmonicPressure** — attenuverters carry no
+  caption, main labels sit beside their knobs rather than above, and roughly the
+  top fifth of each panel is empty.
+- **Send** — `FEEDBACK` is clipped at the right panel edge.
 
 ### Notes
 
