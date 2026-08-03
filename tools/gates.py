@@ -237,6 +237,11 @@ def widget_positions(text: str) -> list[tuple[str, float, float]]:
         m = MM2PX_RE.search(line)
         if not m:
             continue
+        # Screws are mounting hardware, not controls. They sit at y=124mm by
+        # design, outside the port rail, and flagging them reports every panel
+        # that places them with mm2px as broken.
+        if "createWidget<Screw" in line or "Screw" in line:
+            continue
         x, y = num(m.group(1)), num(m.group(2))
         if x is None or y is None:
             continue

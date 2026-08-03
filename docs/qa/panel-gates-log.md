@@ -176,6 +176,66 @@ Negative space frames something dense. It cannot frame more negative space.
 
 ---
 
+## G-13 · A checker is wrong until it has been proven wrong four times
+
+**Cost:** most of the 2026-08-03 session. Every checker written that day gave a
+confidently false answer first:
+
+- `check_corners` reported **19 of 19** panels broken, because it counted the
+  header band that is *meant* to pass under the screws. Then it reported its
+  own fix as still broken, because it ignored `transform`. Then it missed the
+  counter-hole defect entirely, because five panels store them as `<circle>`
+  and it only read `<path>`.
+- `check_labels` reported **11 modules** with unnamed params. All eleven were
+  false: `configParam` hides inside literal-bound loops, enum-bounded loops and
+  braceless one-liners, `configSwitch`/`configButton` also name a param, and
+  SitarGrid ends its enums `NUM_INPUTS` where the AF modules use `INPUTS_LEN`.
+- `check_overlap` reported **97** overlaps using guessed widget radii. Trimpot
+  is 3.02 mm, not the 4.5 mm assumed — a 50% error. Reading the real sizes out
+  of Rack's own component SVGs cut it to 44.
+- `gates.py` G3 failed a panel over its **mounting screws**, which sit at
+  y = 124 mm by design.
+
+Before believing a checker, run it against something known-good and something
+known-broken. A checker that cries wolf gets ignored, and an ignored checker is
+worse than none.
+
+---
+
+## G-14 · Decoration is concentric; text is not
+
+**Cost:** a caption on Pulse was moved *underneath* the CRACK knob by an
+automated fix, and the checker then called the panel clean.
+
+Panels draw sockets, knob faces and button bezels in the artwork beneath the
+real widget. That ink is meant to be covered and must be excluded. But the
+exclusion has to be tight: real decoration is drawn **exactly** concentric with
+its widget — within about 0.05 mm — whereas a caption that merely happens to
+land near a widget centre is off by around 1 mm. Testing concentricity within
+0.5 mm separates them cleanly; testing within 1 mm hides real defects.
+
+Aspect ratio alone does not work: button bezels are 2:1, and so are short
+captions.
+
+---
+
+## G-15 · Moving a label needs a clear-gap search, not a direction
+
+**Cost:** the first automated caption lift moved labels out from under a
+trimpot and straight into the jack above it. Pulse stacks a trimpot, a jack and
+another trimpot inside 20 mm; there is no room to simply "move it up".
+
+Search outward from the current position and take the smallest offset that
+clears **every** widget, not just the one the label started under. Also respect
+direction: a range caption below a knob — `82-1319 Hz` — belongs there and
+needs to clear the knob's bottom edge, not be hoisted over the top of it into
+the main label.
+
+If no offset clears everything, say so and stop. That is a layout change, not
+a nudge.
+
+---
+
 ## G-12 · Check the whole set, not the ones you changed
 
 **Cost:** the July repair pass fixed the modules it touched and left seven
