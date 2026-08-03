@@ -33,4 +33,4 @@
 - [x] Mass Driver SVG panel designed (32HP) + coordinate JSON + PNG/PDF exported via Inkscape
 - [x] `amplified-futures/vcv-modules/design/panels/style/amplified-futures-panel-style.md` — full design system doc
 - [x] `amplified-futures/vcv-modules/scripts/graphics/export-panels.ps1` — batch Inkscape export script
-- [x] CLAUDE.md, AGENTS.md, `.github/copilot-instructions.md` created (2026-05-19)
+- [x] Contributor and toolchain notes written (2026-05-19)
