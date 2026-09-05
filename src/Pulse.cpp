@@ -94,6 +94,28 @@ struct Pulse : Module {
 		return clamp(v, lo, hi);
 	}
 
+	// The 16-step pattern is not a parameter, so Rack does not serialise it.
+	// Without this the pattern is lost every time the patch is saved.
+	json_t* dataToJson() override {
+		json_t* root = json_object();
+		json_t* arr = json_array();
+		for (int i = 0; i < 16; i++)
+			json_array_append_new(arr, json_boolean(steps[i]));
+		json_object_set_new(root, "steps", arr);
+		return root;
+	}
+
+	void dataFromJson(json_t* root) override {
+		json_t* arr = json_object_get(root, "steps");
+		if (!arr)
+			return;
+		for (int i = 0; i < 16; i++) {
+			json_t* v = json_array_get(arr, i);
+			if (v)
+				steps[i] = json_boolean_value(v);
+		}
+	}
+
 	void process(const ProcessArgs& args) override {
 		for (int i = 0; i < 16; i++) {
 			if (stepTrig[i].process(params[STEP_PARAM + i].getValue() > 0.5f))
