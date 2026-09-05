@@ -226,6 +226,7 @@ struct SwarmCore : Module {
 
     // Trigger edge detection
     dsp::SchmittTrigger trigIn;
+    float eventPhase = 0.f;   // internal DENSITY clock, used when TRIG is unpatched
     // Scatter delay accumulators (samples)
     float  scatterAcc[NUM_VOICES] = {};
     float  scatterDelay[NUM_VOICES] = {};
@@ -242,7 +243,7 @@ struct SwarmCore : Module {
         configParam(DENSITY_ATT_PARAM, -1.f, 1.f, 0.f, "Density CV atten");
         configParam(SCATTER_ATT_PARAM, -1.f, 1.f, 0.f, "Scatter CV atten");
         configParam(DETUNE_ATT_PARAM,  -1.f, 1.f, 0.f, "Detune CV atten");
-        configButton(MODE_PARAM, "Mode (Specimen / Swarm)");
+        configSwitch(MODE_PARAM, 0.f, 1.f, 0.f, "Mode", {"Specimen", "Swarm"});
         configInput(TRIG_INPUT,    "Trigger");
         configInput(VOCT_INPUT,    "V/OCT");
         configInput(DENSITY_INPUT, "Density CV");
@@ -322,8 +323,28 @@ struct SwarmCore : Module {
 
         int numVoices = swarmMode ? std::max(1, (int)(density * NUM_VOICES)) : 1;
 
-        // Trigger
-        if (trigIn.process(inputs[TRIG_INPUT].getVoltage(), 0.1f, 1.f)) {
+        // Trigger.
+        //
+        // With nothing patched into TRIG the module used to be silent no matter
+        // where DENSITY sat, which reads as a broken module rather than as a
+        // module waiting for a clock. DENSITY now drives an internal event
+        // clock so Swarm Core sounds standalone; a patched TRIG takes over
+        // completely and the internal clock stops.
+        bool fire;
+        if (inputs[TRIG_INPUT].isConnected()) {
+            fire = trigIn.process(inputs[TRIG_INPUT].getVoltage(), 0.1f, 1.f);
+            eventPhase = 0.f;
+        } else {
+            // 0.5 Hz at DENSITY 0 through 30 Hz at DENSITY 1 — an occasional
+            // chirp up to a continuous swarm. Squared so the low end has travel.
+            const float rate = 0.5f + density * density * 29.5f;
+            eventPhase += args.sampleTime * rate;
+            fire = (eventPhase >= 1.f);
+            if (fire)
+                eventPhase -= 1.f;
+        }
+
+        if (fire) {
             for (int v = 0; v < numVoices; v++) {
                 // Scatter delay in samples
                 scatterDelay[v] = scatter * args.sampleRate * 0.25f * ((float)v / numVoices);
@@ -366,7 +387,6 @@ struct SwarmCore : Module {
             if (!voices[v].active) continue;
             anyActive = true;
             envSum += voices[v].env;
-            const auto& data = noSamples ? std::vector<float>() : bank[voices[v].sampleIdx].data;
             float s;
             if (noSamples) {
                 // Noise burst fallback
@@ -374,7 +394,12 @@ struct SwarmCore : Module {
                 voices[v].env *= decayCoef;
                 if (voices[v].env < 1e-5f) voices[v].active = false;
             } else {
-                s = voices[v].tick(data);
+                // Index the bank directly. Binding this through a ternary with
+                // an empty vector on the other arm made the conditional a
+                // prvalue, so the whole sample buffer was copy-constructed on
+                // the heap once per active voice per sample - an unbounded
+                // allocation on the audio thread.
+                s = voices[v].tick(bank[voices[v].sampleIdx].data);
             }
             float pan = voicePan[v];
             float gainL = std::cos((pan + 1.f) * 0.25f * M_PI);
@@ -443,7 +468,7 @@ struct SwarmCoreWidget : ModuleWidget {
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x2, ky3)), module, SwarmCore::DECAY_PARAM));
 
         // Mode button between the row-2 knobs; ACTIVE light below it
-        addParam(createParamCentered<LEDButton>(mm2px(Vec(xMid, ky2)), module, SwarmCore::MODE_PARAM));
+        addParam(createParamCentered<VCVLatch>(mm2px(Vec(xMid, ky2)), module, SwarmCore::MODE_PARAM));
         addChild(createLightCentered<SmallLight<AFOrangeLightSC>>(mm2px(Vec(xMid, ky2)), module, SwarmCore::SWARM_LIGHT));
         addChild(createLightCentered<SmallLight<AFOrangeLightSC>>(mm2px(Vec(xMid, ky2 + cvDy)), module, SwarmCore::ACTIVE_LIGHT));
 
