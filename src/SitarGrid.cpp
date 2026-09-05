@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/SitarStringCore.hpp"
 
 // ============================================================
 // SITAR GRID — Modal string-resonance sequencer
@@ -102,19 +103,15 @@ struct SitarGrid : Module {
         NUM_LIGHTS
     };
 
-    // ── Karplus-Strong main string ──
-    static const int KS_MAX = 4096;
-    float ksBuf[KS_MAX] = {};
-    int   ksWptr = 0;
-
-    // ── Chikari drone string ──
-    float chiBuf[KS_MAX] = {};
-    int   chiWptr = 0;
-
-    // ── Sympathetic resonator bank (8 comb filters) ──
-    static const int SYMP_MAX = 2048;
-    float sympBuf[8][SYMP_MAX] = {};
-    int   sympWptr[8] = {};
+    // ── String model ──
+    // Delay lines live in SitarStringCore so they can be driven without a
+    // plugin host. They were inline until a pluck that wrote its burst
+    // where the read head could never see it made this module silent in
+    // every build it ever had; tests/test_sitar_string.cpp now guards it.
+    SitarStringCore::Rng             rng;
+    SitarStringCore::PluckedString   mainString;
+    SitarStringCore::DroneString     chikari;
+    SitarStringCore::SympatheticBank sympathetic;
 
     // ── Pitch/meend state ──
     float currentPitch  = 0.f;
@@ -147,6 +144,11 @@ struct SitarGrid : Module {
 
     SitarGrid() {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+
+        // Per-instance seed. The core owns its RNG so it can be tested
+        // deterministically, but two Sitar Grids in one patch must not
+        // pluck bit-identical noise - that sums coherently.
+        rng = SitarStringCore::Rng(random::u32());
 
         const char* artNames[8] = {"Strike","Bend","Roll","Mute","Drone","Rest","Ornament","Return"};
 
@@ -213,55 +215,27 @@ struct SitarGrid : Module {
         configLight(BD_LIGHT, "Breakdown active");
     }
 
-    // ── Karplus-Strong pluck ──────────────────────────────────
-    // Fills delay line with filtered noise burst.
+    // ── String model ─────────────────────────────────────
+    // Thin wrappers over the core, kept so the articulation switch below
+    // still reads as musical instructions rather than buffer arithmetic.
     void ksPluck(float freq, float vel, float brightness, float sr) {
-        int len = clamp((int)(sr / std::max(20.f, freq)), 2, KS_MAX - 1);
-        float lp = 0.f;
-        float alpha = clamp(0.15f + brightness * 0.82f, 0.01f, 1.f);
-        for (int i = 0; i < len; i++) {
-            float n = random::uniform() * 2.f - 1.f;
-            lp += alpha * (n - lp);
-            ksBuf[(ksWptr + i) % KS_MAX] = lp * vel;
-        }
+        mainString.pluck(freq, vel, brightness, sr, rng);
     }
 
     float ksTick(float freq, float damping, float sr) {
-        int len = clamp((int)(sr / std::max(20.f, freq)), 2, KS_MAX - 1);
-        int r1  = ((ksWptr - len) % KS_MAX + KS_MAX) % KS_MAX;
-        int r2  = (r1 + 1) % KS_MAX;
-        float out = ksBuf[r1];
-        // Two-point averaging filter = built-in string damping
-        ksBuf[ksWptr] = (out + ksBuf[r2]) * 0.5f * (0.997f - damping * 0.28f);
-        ksWptr = (ksWptr + 1) % KS_MAX;
-        return out;
+        return mainString.tick(freq, damping, sr);
     }
 
-    // ── Chikari (high drone string) ───────────────────────────
     void chiPluck(float freq, float vel, float sr) {
-        int len = clamp((int)(sr / std::max(20.f, freq)), 2, KS_MAX - 1);
-        for (int i = 0; i < len; i++)
-            chiBuf[(chiWptr + i) % KS_MAX] = (random::uniform() * 2.f - 1.f) * vel;
+        chikari.pluck(freq, vel, sr, rng);
     }
 
     float chiTick(float freq, float sr) {
-        int len = clamp((int)(sr / std::max(20.f, freq)), 2, KS_MAX - 1);
-        int r1  = ((chiWptr - len) % KS_MAX + KS_MAX) % KS_MAX;
-        int r2  = (r1 + 1) % KS_MAX;
-        float out = chiBuf[r1];
-        chiBuf[chiWptr] = (out + chiBuf[r2]) * 0.5f * 0.992f;
-        chiWptr = (chiWptr + 1) % KS_MAX;
-        return out;
+        return chikari.tick(freq, sr);
     }
 
-    // ── Sympathetic comb filter (one of 8) ───────────────────
     float sympTick(int s, float freq, float fbAmt, float input, float sr) {
-        int len = clamp((int)(sr / std::max(20.f, freq)), 2, SYMP_MAX - 1);
-        int r   = ((sympWptr[s] - len) % SYMP_MAX + SYMP_MAX) % SYMP_MAX;
-        float out = sympBuf[s][r];
-        sympBuf[s][sympWptr[s]] = input * 0.04f + out * fbAmt;
-        sympWptr[s] = (sympWptr[s] + 1) % SYMP_MAX;
-        return out;
+        return sympathetic.tick(s, freq, fbAmt, input, sr);
     }
 
     // ── Raga quantise (V/oct → nearest scale tone) ───────────
@@ -278,6 +252,19 @@ struct SitarGrid : Module {
             if (d < bestDist) { bestDist = d; best = SG_RAGA_SCALES[raga][i]; }
         }
         return root + (oct * 12.f + best) / 12.f;
+    }
+
+    // LOCK is latched by a gate, not held in a parameter.
+    json_t* dataToJson() override {
+        json_t* root = json_object();
+        json_object_set_new(root, "locked", json_boolean(locked));
+        return root;
+    }
+
+    void dataFromJson(json_t* root) override {
+        json_t* v = json_object_get(root, "locked");
+        if (v)
+            locked = json_boolean_value(v);
     }
 
     void process(const ProcessArgs& args) override {
