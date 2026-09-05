@@ -168,43 +168,43 @@ struct WallConductorWidget : ModuleWidget {
 		// x cols for knobs: 20, 56, 92 mm
 		// x cols for satellites: 28, 64, 100 mm (knob + 8mm)
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(20.f, 45.f)), module, WallConductor::DENSITY_PARAM));
-		addParam(createParamCentered<Trimpot>(            mm2px(Vec(28.f, 38.f)), module, WallConductor::DENSITY_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(28.f, 52.f)), module, WallConductor::DENSITY_CV_INPUT));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(20.f,28.5f)), module, WallConductor::DENSITY_PARAM));
+		addParam(createParamCentered<Trimpot>(            mm2px(Vec(28.f,19.96f)), module, WallConductor::DENSITY_ATTEN_PARAM));
+		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(28.f,37.04f)), module, WallConductor::DENSITY_CV_INPUT));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(56.f, 45.f)), module, WallConductor::PRESSURE_PARAM));
-		addParam(createParamCentered<Trimpot>(            mm2px(Vec(64.f, 38.f)), module, WallConductor::PRESSURE_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(64.f, 52.f)), module, WallConductor::PRESSURE_CV_INPUT));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(56.f,28.5f)), module, WallConductor::PRESSURE_PARAM));
+		addParam(createParamCentered<Trimpot>(            mm2px(Vec(64.f,19.96f)), module, WallConductor::PRESSURE_ATTEN_PARAM));
+		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(64.f,37.04f)), module, WallConductor::PRESSURE_CV_INPUT));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(92.f, 45.f)), module, WallConductor::WIDTH_PARAM));
-		addParam(createParamCentered<Trimpot>(            mm2px(Vec(100.f, 38.f)), module, WallConductor::WIDTH_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(100.f, 52.f)), module, WallConductor::WIDTH_CV_INPUT));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(92.f,28.5f)), module, WallConductor::WIDTH_PARAM));
+		addParam(createParamCentered<Trimpot>(            mm2px(Vec(100.f,19.96f)), module, WallConductor::WIDTH_ATTEN_PARAM));
+		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(100.f,37.04f)), module, WallConductor::WIDTH_CV_INPUT));
 
 		// ── Row 2: FEEDBACK | RECOVERY | COLLAPSE ─────────────────
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(20.f, 72.f)), module, WallConductor::FEEDBACK_PARAM));
-		addParam(createParamCentered<Trimpot>(            mm2px(Vec(28.f, 65.f)), module, WallConductor::FEEDBACK_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(28.f, 79.f)), module, WallConductor::FEEDBACK_CV_INPUT));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(20.f,61.44f)), module, WallConductor::FEEDBACK_PARAM));
+		addParam(createParamCentered<Trimpot>(            mm2px(Vec(28.f,52.9f)), module, WallConductor::FEEDBACK_ATTEN_PARAM));
+		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(28.f,69.98f)), module, WallConductor::FEEDBACK_CV_INPUT));
 
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(56.f, 72.f)), module, WallConductor::RECOVERY_PARAM));
-		addParam(createParamCentered<Trimpot>(            mm2px(Vec(64.f, 65.f)), module, WallConductor::RECOVERY_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(64.f, 79.f)), module, WallConductor::RECOVERY_CV_INPUT));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(56.f,61.44f)), module, WallConductor::RECOVERY_PARAM));
+		addParam(createParamCentered<Trimpot>(            mm2px(Vec(64.f,52.9f)), module, WallConductor::RECOVERY_ATTEN_PARAM));
+		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(64.f,69.98f)), module, WallConductor::RECOVERY_CV_INPUT));
 
 		// COLLAPSE: button stacked above gate input
-		addParam(createParamCentered<TL1105>(    mm2px(Vec(92.f, 66.f)), module, WallConductor::COLLAPSE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(92.f, 79.f)), module, WallConductor::COLLAPSE_INPUT));
+		addParam(createParamCentered<TL1105>(    mm2px(Vec(92.f,54.12f)), module, WallConductor::COLLAPSE_PARAM));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(92.f,69.98f)), module, WallConductor::COLLAPSE_INPUT));
 
 		// ── Row 3: Channel inputs ──────────────────────────────────
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(15.f,  108.f)), module, WallConductor::CH1_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.f,  108.f)), module, WallConductor::CH2_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(61.f,  108.f)), module, WallConductor::CH3_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(84.f,  108.f)), module, WallConductor::CH4_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(15.f,105.4f)), module, WallConductor::CH1_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(38.f,105.4f)), module, WallConductor::CH2_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(61.f,105.4f)), module, WallConductor::CH3_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(84.f,105.4f)), module, WallConductor::CH4_INPUT));
 
 		// ── Row 4: V/OCT thru + stereo out ────────────────────────
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(15.f,  120.f)), module, WallConductor::VOCT_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.f,  120.f)), module, WallConductor::VOCT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(75.f,  120.f)), module, WallConductor::OUT_L_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(97.f,  120.f)), module, WallConductor::OUT_R_OUTPUT));
+		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(15.f,120.f)), module, WallConductor::VOCT_INPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(38.f,120.f)), module, WallConductor::VOCT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(75.f,120.f)), module, WallConductor::OUT_L_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(97.f,120.f)), module, WallConductor::OUT_R_OUTPUT));
 	}
 
 };

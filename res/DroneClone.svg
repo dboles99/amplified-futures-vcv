@@ -75,28 +75,28 @@
      aria-label="STRING WALL · 8 VOICES" />
   <!-- Mounting screws (decorative; ScrewSilver widgets render on top) -->
   <circle
-     cx="22.5"
+     cx="26.5909"
      cy="7.5"
      r="3.5"
      fill="#0C100A"
      opacity="0.4"
      id="circle5" />
   <circle
-     cx="307.5"
+     cx="363.409"
      cy="7.5"
      r="3.5"
      fill="#0C100A"
      opacity="0.4"
      id="circle6" />
   <circle
-     cx="22.5"
+     cx="26.5909"
      cy="372.5"
      r="3.5"
      fill="#0C100A"
      opacity="0.4"
      id="circle7" />
   <circle
-     cx="307.5"
+     cx="363.409"
      cy="372.5"
      r="3.5"
      fill="#0C100A"
@@ -116,49 +116,49 @@
      id="rect8" />
   <!-- 8 LED bays (actual LED widgets sit on top) -->
   <circle
-     cx="37"
+     cx="43.7273"
      cy="43"
      r="3"
      fill="#2A1508"
      id="circle9" />
   <circle
-     cx="73"
+     cx="86.2727"
      cy="43"
      r="3"
      fill="#2A1508"
      id="circle10" />
   <circle
-     cx="109"
+     cx="128.818"
      cy="43"
      r="3"
      fill="#2A1508"
      id="circle11" />
   <circle
-     cx="146"
+     cx="172.545"
      cy="43"
      r="3"
      fill="#2A1508"
      id="circle12" />
   <circle
-     cx="182"
+     cx="215.091"
      cy="43"
      r="3"
      fill="#2A1508"
      id="circle13" />
   <circle
-     cx="218"
+     cx="257.636"
      cy="43"
      r="3"
      fill="#2A1508"
      id="circle14" />
   <circle
-     cx="255"
+     cx="301.364"
      cy="43"
      r="3"
      fill="#2A1508"
      id="circle15" />
   <circle
-     cx="291"
+     cx="343.909"
      cy="43"
      r="3"
      fill="#2A1508"
@@ -305,7 +305,7 @@
      style="font-weight:700;font-size:7.5px;font-family:Oswald, 'Arial Narrow', Arial, sans-serif;letter-spacing:1.5;text-anchor:middle;fill:#e8e2d4"
      aria-label="CHOKE"/>  <!-- CHOKE LED bay (LED at mm(55.9,77) = px(165,227)) -->
   <circle
-     cx="165"
+     cx="195"
      cy="227"
      r="3"
      fill="#2A0808"
@@ -350,7 +350,7 @@
   <!-- Signal-type dots + labels (above jacks at y=298) -->
   <!-- V/OCT IN at px(41, 298) -->
   <circle
-     cx="41"
+     cx="48.4545"
      cy="285"
      r="3"
      fill="#E8C547"
@@ -367,7 +367,7 @@
      aria-label="IN" />
   <!-- V/OCT THRU OUT at px(109, 298) -->
   <circle
-     cx="109"
+     cx="128.818"
      cy="285"
      r="3"
      fill="#5A7350"
@@ -384,7 +384,7 @@
      aria-label="OUT" />
   <!-- CHOKE GATE at px(288, 298): red gate -->
   <circle
-     cx="288"
+     cx="340.364"
      cy="285"
      r="3"
      fill="#D6201A"
@@ -530,7 +530,7 @@
      aria-label="LVL" />
   <!-- OUT jack signal dot + label (jack at px(222, 343)) -->
   <circle
-     cx="222"
+     cx="262.364"
      cy="332"
      r="3"
      fill="#FF4A0E"
@@ -542,7 +542,7 @@
      aria-label="OUT" />
   <!-- RTN jack signal dot + label (jack at px(281, 343)) -->
   <circle
-     cx="281"
+     cx="332.091"
      cy="332"
      r="3"
      fill="#1E5BD8"
