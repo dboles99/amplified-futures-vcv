@@ -230,6 +230,13 @@ struct SwarmCore : Module {
     bool noSamples = false;
     std::thread loadThread;
 
+    // Selectable banks: one directory under res/insects/banks per bank, each a
+    // curated 32. Only the chosen one is ever resident.
+    std::vector<std::string> bankNames;
+    std::string banksRoot;
+    std::string legacyRoot;
+    int bankIndex = 0;
+
     // Voices
     Voice  voices[NUM_VOICES];
     // Pan spread for stereo swarm (fixed cosine-law)
@@ -267,24 +274,90 @@ struct SwarmCore : Module {
         configOutput(OUT_R_OUTPUT, "Out R");
         configOutput(CV_OUTPUT,    "Swarm envelope CV");
 
-        // Load samples on a background thread so the audio thread is never blocked.
-        // bankReady (acquire/release) acts as the publication fence: once set,
-        // `bank` and `noSamples` are safe to read from process() without a lock.
-        std::string base = asset::plugin(pluginInstance, "res/insects/insectset32");
-        loadThread = std::thread([this, base]() {
-            std::vector<SampleEntry> loaded;
-            for (const char* sub : {"cicadidae", "orthoptera"}) {
-                auto partial = loadBankFromDir(base + "/" + sub);
-                for (auto& e : partial) loaded.push_back(std::move(e));
+        banksRoot  = asset::plugin(pluginInstance, "res/insects/banks");
+        legacyRoot = asset::plugin(pluginInstance, "res/insects/insectset32");
+
+        if (rack::system::isDirectory(banksRoot)) {
+            for (const auto& e : rack::system::getEntries(banksRoot)) {
+                if (rack::system::isDirectory(e))
+                    bankNames.push_back(rack::system::getFilename(e));
             }
-            bank     = std::move(loaded);
+            std::sort(bankNames.begin(), bankNames.end());
+        }
+        startLoad(0);
+    }
+
+    ~SwarmCore() {
+        // Join, never detach. A detached loader outlives the module and writes
+        // `bank` and `voices` through a dangling this.
+        if (loadThread.joinable())
+            loadThread.join();
+    }
+
+    /// Load a bank on a background thread. bankReady (acquire/release) is the
+    /// publication fence: while it is false, process() returns early and
+    /// touches neither `bank` nor `voices`, so the loader owns both.
+    void startLoad(int idx) {
+        if (loadThread.joinable())
+            loadThread.join();
+        bankReady.store(false, std::memory_order_release);
+        bankIndex = idx;
+
+        std::string dir;
+        bool legacy = bankNames.empty();
+        if (!legacy && idx >= 0 && idx < (int) bankNames.size())
+            dir = banksRoot + "/" + bankNames[idx];
+
+        const std::string base = legacyRoot;
+        loadThread = std::thread([this, dir, legacy, base]() {
+            std::vector<SampleEntry> loaded;
+            if (legacy) {
+                // No banks shipped: fall back to the full tree if it is present.
+                for (const char* sub : {"cicadidae", "orthoptera"}) {
+                    auto partial = loadBankFromDir(base + "/" + sub);
+                    for (auto& e : partial) loaded.push_back(std::move(e));
+                }
+            }
+            else if (!dir.empty()) {
+                loaded = loadBankFromDir(dir);
+            }
+            bank      = std::move(loaded);
             noSamples = bank.empty();
+            for (int v = 0; v < NUM_VOICES; v++)
+                voices[v].active = false;      // indices refer to the old bank
             bankReady.store(true, std::memory_order_release);
         });
     }
 
-    ~SwarmCore() {
-        if (loadThread.joinable()) loadThread.detach();
+    void selectBank(int idx) {
+        if (idx == bankIndex || idx < 0 || idx >= (int) bankNames.size())
+            return;
+        startLoad(idx);
+    }
+
+    json_t* dataToJson() override {
+        json_t* root = json_object();
+        if (bankIndex >= 0 && bankIndex < (int) bankNames.size())
+            json_object_set_new(root, "bank", json_string(bankNames[bankIndex].c_str()));
+        return root;
+    }
+
+    void dataFromJson(json_t* root) override {
+        json_t* b = json_object_get(root, "bank");
+        if (!b)
+            return;
+        const std::string want = json_string_value(b);
+        for (size_t i = 0; i < bankNames.size(); i++) {
+            if (bankNames[i] == want) {
+                // A patch naming a bank that is still loading must not race the
+                // constructor's load; startLoad joins before it restarts.
+                if ((int) i != bankIndex)
+                    startLoad((int) i);
+                return;
+            }
+        }
+        // Bank named in the patch is not installed. Keep whatever loaded rather
+        // than silently substituting a different insect.
     }
 
     void process(const ProcessArgs& args) override {
@@ -496,6 +569,20 @@ struct SwarmCoreWidget : ModuleWidget {
         addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(jx[3], jy)), module, SwarmCore::OUT_L_OUTPUT));
         addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(jx[4], jy)), module, SwarmCore::OUT_R_OUTPUT));
         addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(jx[5], jy)), module, SwarmCore::CV_OUTPUT));
+    }
+
+    void appendContextMenu(Menu* menu) override {
+        SwarmCore* m = dynamic_cast<SwarmCore*>(module);
+        if (!m || m->bankNames.empty())
+            return;
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createMenuLabel("Sample bank"));
+        for (size_t i = 0; i < m->bankNames.size(); i++) {
+            menu->addChild(createCheckMenuItem(
+                m->bankNames[i], "",
+                [=]() { return m->bankIndex == (int) i; },
+                [=]() { m->selectBank((int) i); }));
+        }
     }
 
     void draw(const DrawArgs& args) override {
