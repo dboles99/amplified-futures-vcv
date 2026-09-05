@@ -121,13 +121,21 @@ static std::vector<SampleEntry> loadBankFromDir(const std::string& dir) {
     collectWavs(dir, paths, 4); // up to 4 levels deep
     std::sort(paths.begin(), paths.end());
 
+    // Stride across the sorted list rather than taking its first 64.
+    //
+    // Sorted alphabetically, cicadidae precedes orthoptera, so taking the
+    // first 64 took 64 cicadas and made all 294 orthoptera recordings
+    // unreachable - on a module whose whole purpose is browsing the bank, and
+    // whose own description names both families. Striding also spreads the
+    // selection across species instead of stopping partway through the letter A.
+    const size_t want = std::min(paths.size(), size_t(64));
     std::vector<SampleEntry> bank;
-    bank.reserve(std::min(paths.size(), size_t(64)));
-    for (const auto& p : paths) {
-        if (bank.size() >= 64) break;
+    bank.reserve(want);
+    for (size_t k = 0; k < want; k++) {
+        const size_t idx = (paths.size() <= want) ? k : (k * paths.size()) / want;
         SampleEntry e;
-        e.name = rack::system::getFilename(p);
-        if (loadWavMono(p, e.data, e.sr)) bank.push_back(std::move(e));
+        e.name = rack::system::getFilename(paths[idx]);
+        if (loadWavMono(paths[idx], e.data, e.sr)) bank.push_back(std::move(e));
     }
     return bank;
 }
