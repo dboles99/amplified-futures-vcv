@@ -38,7 +38,7 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢), TIMBRE (sine to ha
 ### Harmonic Pressure — 14HP
 ![HarmonicPressure](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/HarmonicPressure.png)
 
-Harmonic series pitch CV generator. PITCH root, PARTIAL (starting harmonic), COUNT (output channels). JUST / EQUAL / MICRO tuning modes. Polyphonic V/OCT output.
+Harmonic series pitch CV generator. PITCH root, PARTIAL (starting harmonic), COUNT (output channels). JUST / EQUAL / DRIFT tuning modes. Polyphonic V/OCT output.
 
 → **[[Harmonic-Pressure]]** for full documentation
 

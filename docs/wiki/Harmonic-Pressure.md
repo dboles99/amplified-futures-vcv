@@ -27,8 +27,8 @@ V/OCT IN (root) ──► + PITCH offset (±2 Oct)
                           ├─ TUNING JUST:  exact ratios, untouched
                           ├─ TUNING EQUAL: each partial rounded to
                           │                 the nearest 12-TET semitone
-                          └─ TUNING MICRO: JI plus a deterministic
-                                            per-partial offset
+                          └─ TUNING DRIFT: exact ratios, moving —
+                                            SPREAD/RATE/COHERENCE
                           │
                      + SPREAD ensemble detune
                           │
@@ -45,10 +45,12 @@ V/OCT IN (root) ──► + PITCH offset (±2 Oct)
 | Control | Range | Default | What it does |
 |---|---|---|---|
 | PITCH | −2 to +2 Oct | 0 | Octave offset applied to the root before the series is built |
-| SPREAD | 0–100% | 0 | Per-partial ensemble detuning. In MICRO it sets the offset magnitude |
+| SPREAD | 0–100% | 0 | Per-partial detuning. In JUST and EQUAL a static offset; in DRIFT the depth, in cents, of the movement |
 | PARTIAL | 1–16 | 1 | Which harmonic the series starts on. Snaps |
 | COUNT | 1–16 | 8 | How many partials, and therefore how many output channels. Snaps |
-| TUNING | JUST / EQUAL / MICRO | JUST | How the partials are tuned. Snaps |
+| TUNING | JUST / EQUAL / DRIFT | JUST | How the partials are tuned. Snaps |
+| DRIFT RATE | 0–4 Hz | 0 | How fast the drift moves. **DRIFT mode only** |
+| DRIFT COH | 0–1 | 1 | 0 = the whole stack transposes together; 1 = partials drift independently. **DRIFT mode only** |
 
 PITCH and SPREAD have an attenuverter (−1 to +1) and a CV input. PARTIAL, COUNT and TUNING are knob-only.
 
@@ -58,7 +60,14 @@ PITCH and SPREAD have an attenuverter (−1 to +1) and a CV input. PARTIAL, COUN
 |---|---|
 | **JUST** | Exact harmonic-series ratios — pure just intonation. The partials lock and beat against nothing |
 | **EQUAL** | Each partial rounded to the nearest 12-TET semitone. Use when the stack has to sit with equal-tempered material |
-| **MICRO** | Just intonation plus a deterministic per-partial offset, sized by SPREAD. Simulates an ensemble that is nearly, but not quite, in tune |
+| **DRIFT** | Exact ratios, but the partials move. SPREAD sets the depth in cents, DRIFT RATE how fast, and DRIFT COHERENCE whether the movement is shared — a slow collective transposition at 0, an independent per-partial chorus at 1 |
+
+> **Changed in 2.3.0.** Mode 2 used to be MICRO: just intonation plus a *static*
+> deterministic offset. It is now DRIFT, and the offset moves. The parameter
+> keeps its range and position, so patches saved before 2.3.0 still load and
+> every other control behaves identically — but a patch that used MICRO will
+> now drift where it used to sit still. JUST and EQUAL are untouched, and
+> DRIFT RATE and DRIFT COHERENCE have no effect in either.
 
 ---
 
@@ -79,7 +88,9 @@ PITCH and SPREAD have an attenuverter (−1 to +1) and a CV input. PARTIAL, COUN
 
 **Upper-partial shimmer.** PARTIAL 8, COUNT 8, TUNING JUST. Starting high in the series gives closely-spaced intervals — a shimmer band rather than a chord. Feed [[DroneCore]] for a cheap, bright stack.
 
-**Detuned ensemble.** TUNING MICRO, SPREAD 40%, COUNT 6. Each partial sits slightly off its true ratio, and the offsets are deterministic, so the detuning is stable rather than drifting.
+**Detuned ensemble.** TUNING DRIFT, SPREAD 40%, COUNT 6, RATE 0.2 Hz, COHERENCE 1. Each partial wanders independently around its true ratio — the slow, never-quite-settling beating of an ensemble tuning up.
+
+**Collective glide.** TUNING DRIFT, COHERENCE 0, RATE 0.1 Hz, SPREAD 20%. The whole stack transposes together, keeping its internal tuning exact while the root breathes.
 
 **Moving root.** [[Drift]] STEP output → PITCH CV at attenuverter +0.5. The whole harmonic series transposes in steps while keeping its internal tuning intact.
 

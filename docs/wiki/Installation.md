@@ -9,7 +9,7 @@ Amplified Futures is a VCV Rack 2 plugin. There are three ways to get it.
 | Route | Status |
 |---|---|
 | **VCV Library** | Not yet listed. [library.vcvrack.com](https://library.vcvrack.com/?brand=Amplified+Futures) currently returns no results |
-| **GitHub Release** | [Latest release](https://github.com/dboles99/amplified-futures-vcv/releases/latest) — **Windows x64 only**, about 248 MB because Swarm Core ships the InsectSet32 bank |
+| **GitHub Release** | [Latest release](https://github.com/dboles99/amplified-futures-vcv/releases/latest) — **Windows x64 only**, about 18 MB — Swarm Core ships two curated 32-sample banks |
 | **Build from source** | All platforms — see [[Building-from-Source]] |
 
 macOS and Linux users need the source route. Cross-building is not set up, so there is no download for those platforms rather than a broken one.

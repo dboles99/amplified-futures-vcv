@@ -6,7 +6,7 @@ Versions follow `MAJOR.MINOR.REVISION`, and MAJOR tracks the Rack major version
 it is built for — so every release here is `2.x.y`.
 See <https://vcvrack.com/manual/Manifest>.
 
-## 2.3.0 — unreleased
+## 2.3.0 — 2026-09-05
 
 Adds the four AF utility modules that have been on `master` since 2026-07-26 but
 were never released, and fixes a module that has never made a sound.

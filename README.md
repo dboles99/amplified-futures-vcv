@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![VCV Rack 2](https://img.shields.io/badge/VCV%20Rack-2-orange)](https://vcvrack.com)
 
-Nineteen VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, bio-acoustic sampling, and a master clock. No-wave/noise-rock genealogy; built for live performance. The Windows x64 release is about 248 MB because Swarm Core ships the InsectSet32 bank.
+Nineteen VCV Rack 2 modules for dense experimental sound. Massed oscillators, controlled feedback, no-wave rhythmics, microtonal pressure, modal string sequencing, bio-acoustic sampling, and a master clock. No-wave/noise-rock genealogy; built for live performance. The Windows x64 release is about 18 MB. Swarm Core ships two curated 32-sample insect banks (InsectSet32, CC BY 4.0) rather than the whole 670-file source tree.
 
 ![Amplified Futures modules in VCV Rack](docs/panels/rack/contact-sheet.png)
 
