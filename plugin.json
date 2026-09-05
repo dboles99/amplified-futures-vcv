@@ -7,11 +7,10 @@
   "description": "Experimental Rack instruments for drone, feedback, physical modeling, no-wave sequencing, and massed-signal composition.",
   "author": "Daniel Boles",
   "authorEmail": "daniel.boles@gmail.com",
-  "pluginUrl": "https://github.com/dboles99/amplified-futures-vcv",
   "manualUrl": "https://github.com/dboles99/amplified-futures-vcv/tree/master/docs/modules",
+  "changelogUrl": "",
   "sourceUrl": "https://github.com/dboles99/amplified-futures-vcv",
   "donateUrl": "https://paypal.me/DBoles648",
-  "changelogUrl": "",
   "modules": [
     {
       "slug": "DroneCore",
