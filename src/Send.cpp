@@ -124,10 +124,6 @@ struct SendWidget : ModuleWidget {
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Send.svg")));
 
 		// 12HP screws
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		// Left col x=15.24mm   Right col x=45.72mm
 		// Satellites at +7mm to the right of each knob

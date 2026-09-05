@@ -125,10 +125,6 @@ struct SignalBlocWidget : ModuleWidget {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/SignalBloc.svg")));
 
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		// 10 HP = 50.8 mm. Clearances were computed before the panel was drawn
 		// - the full arithmetic is in res/SignalBloc.svg. Tightest pair is the

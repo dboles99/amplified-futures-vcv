@@ -135,10 +135,6 @@ struct FeedbackGovernorWidget : ModuleWidget {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/FeedbackGovernor.svg")));
 
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		// ── Row 1: AMOUNT (L) | TONE (R) ──────────────────────────
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f, 38.f)), module, FeedbackGovernor::AMOUNT_PARAM));

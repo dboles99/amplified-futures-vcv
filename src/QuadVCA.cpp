@@ -98,10 +98,6 @@ struct QuadVCAWidget : ModuleWidget {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/QuadVCA.svg")));
 
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		// 12 HP = 60.96 mm. Four channel rows, one column header, then the
 		// master section. Clearances were computed before the panel was drawn
