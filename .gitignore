@@ -15,6 +15,10 @@
 # The full InsectSet32 tree (670 files, 324 MB) stays out of the repo. The
 # curated banks under it do not - git cannot re-include a path inside an
 # excluded DIRECTORY, so the contents are excluded and banks/ re-added.
+# Only the curated banks ship. The full InsectSet32 tree is source
+# material and now lives outside res/ entirely: DISTRIBUTABLES copies
+# res wholesale, so 324 MB of unread samples went into the release.
+/assets/
 /res/insects/*
 !/res/insects/banks/
 
