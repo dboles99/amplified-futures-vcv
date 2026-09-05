@@ -5,6 +5,7 @@
 // They are not round because the physics is not round. Do not "tidy" them.
 
 #include "../src/dsp/AfTuning.hpp"
+#include "../src/dsp/AfTables.hpp"
 
 #include <cmath>
 #include <cstdlib>
@@ -99,6 +100,56 @@ void testGuards()
     require(std::isfinite(vinylWowRateHz(0.f)), "zero rpm stays finite");
     require(std::isfinite(partialCents(0)), "partial 0 stays finite");
 }
+
+void testTables()
+{
+    using namespace af::tuning;
+
+    // Every shipped table must say where it came from. Two of them are
+    // contested reconstructions and the UI has to be able to admit that.
+    for (auto id : {TableId::Equal12, TableId::HarmonicSeries,
+                    TableId::ChathamNoWave, TableId::Shruti5Limit,
+                    TableId::ShrutiEqual22}) {
+        const Table& t = table(id);
+        require(t.name != nullptr && t.name[0] != '\0', "table has a name");
+        require(t.provenance != nullptr && t.provenance[0] != '\0',
+                "table has a provenance");
+        require(t.count > 0, "table is not empty");
+    }
+
+    // 12-TET.
+    const Table& eq = table(TableId::Equal12);
+    require(eq.count == 12, "12-TET has 12 degrees");
+    near(eq.cents[0], 0.f, 1e-4f, "12-TET root");
+    near(eq.cents[7], 700.f, 1e-4f, "12-TET fifth is exactly 700c");
+
+    // Chatham: D A D A (7/4) D. The flat C is the whole point.
+    const Table& ch = table(TableId::ChathamNoWave);
+    require(ch.count == 6, "Chatham tuning has six strings");
+    near(ch.cents[1], 701.955f, 1e-2f, "Chatham A is a just fifth");
+    near(ch.cents[4], 2400.f + 968.826f, 1e-2f, "Chatham flat C is 7/4");
+
+    // The 5-limit shruti reconstruction must sum to exactly an octave. If it
+    // does not, the ratio list has a typo, and this catches it.
+    const Table& sh = table(TableId::Shruti5Limit);
+    require(sh.count == 22, "22 shrutis");
+    near(sh.cents[0], 0.f, 1e-3f, "shruti 1 is the root");
+    near(sh.cents[21], 1109.775f, 1e-2f, "shruti 22 is 243/128");
+    for (int i = 1; i < sh.count; ++i)
+        require(sh.cents[i] > sh.cents[i - 1], "shrutis ascend");
+
+    // The equal-shruti reading: 22-EDO.
+    const Table& se = table(TableId::ShrutiEqual22);
+    require(se.count == 22, "22 equal shrutis");
+    near(se.cents[1], 54.5455f, 1e-3f, "22-EDO step");
+
+    // 7/4 has no place in the shruti set — nearest members are 27c away. The
+    // tables must stay separate; this documents why.
+    float nearest = 1e9f;
+    for (int i = 0; i < sh.count; ++i)
+        nearest = std::fmin(nearest, std::fabs(sh.cents[i] - 968.826f));
+    require(nearest > 25.f, "7/4 is not in the shruti set");
+}
 } // namespace
 
 int main()
@@ -109,6 +160,7 @@ int main()
     testRoundTrip();
     testVinylWow();
     testGuards();
+    testTables();
 
     if (failures > 0) {
         std::cerr << failures << " AfTuning check(s) failed\n";
