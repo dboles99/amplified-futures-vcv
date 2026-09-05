@@ -186,6 +186,8 @@ struct SwarmCore : Module {
         DETUNE_ATT_PARAM,
         // mode button
         MODE_PARAM,
+        // appended - never insert above this line (Rack serialises by position)
+        SPECIMEN_ATT_PARAM,
         PARAMS_LEN
     };
     enum InputId {
@@ -196,6 +198,7 @@ struct SwarmCore : Module {
         DETUNE_INPUT,
         // appended - never insert above this line (Rack serialises by position)
         CV_INPUT,
+        SPECIMEN_CV_INPUT,
         INPUTS_LEN
     };
     enum OutputId {
@@ -244,6 +247,8 @@ struct SwarmCore : Module {
         configParam(SCATTER_ATT_PARAM, -1.f, 1.f, 0.f, "Scatter CV atten");
         configParam(DETUNE_ATT_PARAM,  -1.f, 1.f, 0.f, "Detune CV atten");
         configSwitch(MODE_PARAM, 0.f, 1.f, 0.f, "Mode", {"Specimen", "Swarm"});
+        configParam(SPECIMEN_ATT_PARAM, -1.f, 1.f, 0.f, "Specimen attenuverter");
+        configInput(SPECIMEN_CV_INPUT, "Specimen select CV");
         configInput(TRIG_INPUT,    "Trigger");
         configInput(VOCT_INPUT,    "V/OCT");
         configInput(DENSITY_INPUT, "Density CV");
@@ -295,7 +300,10 @@ struct SwarmCore : Module {
         int numSamples = (int)bank.size();
         int sampleIdx = 0;
         if (numSamples > 0) {
-            float sel = clamp(params[SPECIMEN_PARAM].getValue(), 0.f, 1.f);
+            float sel = clamp(params[SPECIMEN_PARAM].getValue()
+                            + params[SPECIMEN_ATT_PARAM].getValue()
+                              * inputs[SPECIMEN_CV_INPUT].getVoltage() / 10.f,
+                              0.f, 1.f);
             sampleIdx = (int)(sel * (numSamples - 1));
         }
         int nativesr = (numSamples > 0) ? bank[sampleIdx].sr : 44100;
@@ -444,10 +452,15 @@ struct SwarmCoreWidget : ModuleWidget {
 
         // Row 1 — SPECIMEN, PITCH
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x1, ky1)), module, SwarmCore::SPECIMEN_PARAM));
-        addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky1 + attenDy)), module, SwarmCore::PITCH_ATT_PARAM));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky1 + cvDy)), module, SwarmCore::VOCT_INPUT));
+        addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky1 + attenDy)), module, SwarmCore::SPECIMEN_ATT_PARAM));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky1 + cvDy)), module, SwarmCore::SPECIMEN_CV_INPUT));
 
+        // PITCH keeps its own satellites. They used to sit under SPECIMEN,
+        // which left this column empty and attached the attenuverter to the
+        // wrong knob.
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x2, ky1)), module, SwarmCore::PITCH_PARAM));
+        addParam(createParamCentered<Trimpot>(mm2px(Vec(x2, ky1 + attenDy)), module, SwarmCore::PITCH_ATT_PARAM));
+        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x2, ky1 + cvDy)), module, SwarmCore::VOCT_INPUT));
 
         // Row 2 — DENSITY, SCATTER
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x1, ky2)), module, SwarmCore::DENSITY_PARAM));
