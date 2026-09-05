@@ -1,4 +1,4 @@
-# DroneClone — 22 HP
+# DroneClone — 26 HP
 
 ![DroneClone in VCV Rack](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/DroneClone.png)
 

@@ -6,6 +6,8 @@ Modal string-resonance sequencer, and the largest module in the plugin. Three in
 
 The three sequencers run on their own lengths and, for the resonance brain, its own clock division. Set them to different lengths and the module stops repeating in any obvious period.
 
+> **Fixed in 2.3.0.** Sitar Grid produced no sound at all in every earlier release. The Karplus-Strong excitation was written to a part of the delay line the read head never reached, so every audio output sat at 0 V. Patch a clock into **CLOCK** — the sequencers, and therefore the string, only advance on a clock edge.
+
 ---
 
 ## Sound in 60 seconds
