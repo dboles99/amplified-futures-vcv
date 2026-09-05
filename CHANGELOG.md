@@ -36,6 +36,28 @@ were never released, and fixes a module that has never made a sound.
 
 ### Changed
 
+- **DroneClone 22 -> 26 HP** and **Collapse Saturator 12 -> 16 HP.** Both were
+  crowded past the point where labels could clear their neighbours. Widening
+  changes a module's footprint, so adjacent modules in an existing patch shift
+  right; parameters serialise by index, not position, so nothing is lost.
+- **Collapse Saturator gains LEVEL, MIX and SC AMT.** Pre-gain reaches x10 with
+  no output trim, saturation was fully wet with no parallel blend, and the
+  sidechain depth was fixed at 0.5. Every default reproduces the previous
+  behaviour, so an earlier patch sounds identical.
+- **Swarm Core**: DENSITY drives an internal event clock when TRIG is unpatched,
+  so the module sounds standalone; SPECIMEN gains an attenuverter and CV input;
+  MODE latches instead of being momentary.
+- **Panel titles.** Collapse Saturator and Collapse EG both printed `COLLAPSE`
+  and were indistinguishable in the browser. Now `COLLAPSE SAT` and
+  `COLLAPSE EG`. Slugs are unchanged - they are permanent.
+- **Mounting bolts removed** from all 19 panels. Rack does not require them and
+  they occupied the corners the footer and serial mark need.
+- **Port labels follow the signal grammar**: Thru Green for inputs, Signal
+  Yellow for outputs. 69 were wrong.
+- Panels reflowed to use their full height (Send, Wall Conductor, Collapse
+  Saturator), and every label/widget and label/label overlap on the set cleared.
+
+
 - The Sitar Grid string model moved to `src/dsp/SitarStringCore.hpp` with no Rack
   dependency, covered by `tests/test_sitar_string.cpp` (19 assertions). Its RNG
   is seeded per instance, so two Sitar Grids no longer pluck identical noise.
