@@ -6,6 +6,7 @@
 
 #include "../src/dsp/AfTuning.hpp"
 #include "../src/dsp/AfTables.hpp"
+#include "../src/dsp/AfDrift.hpp"
 
 #include <cmath>
 #include <cstdlib>
@@ -150,6 +151,73 @@ void testTables()
         nearest = std::fmin(nearest, std::fabs(sh.cents[i] - 968.826f));
     require(nearest > 25.f, "7/4 is not in the shruti set");
 }
+
+void testDrift()
+{
+    using namespace af::tuning;
+
+    // Coherence 0: every voice shares one drift signal. Ratios are preserved
+    // exactly and the whole stack transposes — a tape machine, not a chorus.
+    {
+        Drift d;
+        d.reset(8, 1234u);
+        d.setRate(1.f); d.setDepth(20.f); d.setCoherence(0.f);
+        for (int i = 0; i < 500; ++i) d.process(1.f / 48000.f);
+        const float v0 = d.centsFor(0);
+        for (int v = 1; v < 8; ++v)
+            near(d.centsFor(v), v0, 1e-4f, "coherent drift moves every voice alike");
+    }
+
+    // Coherence 1: independent per voice. This is the mechanism behind twenty
+    // violins, a hundred guitars, and a Moog that will not stay in tune.
+    {
+        Drift d;
+        d.reset(8, 1234u);
+        d.setRate(1.f); d.setDepth(20.f); d.setCoherence(1.f);
+        for (int i = 0; i < 500; ++i) d.process(1.f / 48000.f);
+        bool differs = false;
+        for (int v = 1; v < 8; ++v)
+            differs = differs || std::fabs(d.centsFor(v) - d.centsFor(0)) > 0.5f;
+        require(differs, "incoherent drift separates the voices");
+    }
+
+    // Depth is a bound, not a suggestion: an unbounded excursion detunes a
+    // drone into a different note.
+    {
+        Drift d;
+        d.reset(4, 99u);
+        d.setRate(3.f); d.setDepth(10.f); d.setCoherence(1.f);
+        for (int i = 0; i < 200000; ++i) {
+            d.process(1.f / 48000.f);
+            for (int v = 0; v < 4; ++v) {
+                require(std::isfinite(d.centsFor(v)), "drift stays finite");
+                require(std::fabs(d.centsFor(v)) <= 10.f + 1e-3f,
+                        "drift stays within depth");
+            }
+        }
+    }
+
+    // Zero depth must be exactly silent, so a preset can turn it off.
+    {
+        Drift d;
+        d.reset(4, 7u);
+        d.setRate(2.f); d.setDepth(0.f); d.setCoherence(1.f);
+        for (int i = 0; i < 1000; ++i) d.process(1.f / 48000.f);
+        for (int v = 0; v < 4; ++v)
+            near(d.centsFor(v), 0.f, 1e-6f, "zero depth is no drift");
+    }
+
+    // Same seed, same output — presets must recall identically.
+    {
+        Drift a, b;
+        a.reset(4, 42u); b.reset(4, 42u);
+        a.setRate(2.f); a.setDepth(15.f); a.setCoherence(1.f);
+        b.setRate(2.f); b.setDepth(15.f); b.setCoherence(1.f);
+        for (int i = 0; i < 1000; ++i) { a.process(1.f/48000.f); b.process(1.f/48000.f); }
+        for (int v = 0; v < 4; ++v)
+            near(a.centsFor(v), b.centsFor(v), 1e-6f, "drift is deterministic");
+    }
+}
 } // namespace
 
 int main()
@@ -161,6 +229,7 @@ int main()
     testVinylWow();
     testGuards();
     testTables();
+    testDrift();
 
     if (failures > 0) {
         std::cerr << failures << " AfTuning check(s) failed\n";
