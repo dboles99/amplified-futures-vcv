@@ -11,6 +11,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <string>
 
 namespace {
@@ -207,15 +208,110 @@ void testDrift()
             near(d.centsFor(v), 0.f, 1e-6f, "zero depth is no drift");
     }
 
-    // Same seed, same output — presets must recall identically.
+    // Determinism with reset: one instance, reset twice with same seed, must
+    // reproduce. This catches if reset() forgets to reinitialise sharedPhase_.
     {
-        Drift a, b;
-        a.reset(4, 42u); b.reset(4, 42u);
+        Drift a;
+        a.reset(4, 42u);
         a.setRate(2.f); a.setDepth(15.f); a.setCoherence(1.f);
-        b.setRate(2.f); b.setDepth(15.f); b.setCoherence(1.f);
-        for (int i = 0; i < 1000; ++i) { a.process(1.f/48000.f); b.process(1.f/48000.f); }
+        for (int i = 0; i < 1000; ++i) a.process(1.f/48000.f);
+        float first_run[4] = {a.centsFor(0), a.centsFor(1), a.centsFor(2), a.centsFor(3)};
+
+        a.reset(4, 42u);
+        a.setRate(2.f); a.setDepth(15.f); a.setCoherence(1.f);
+        for (int i = 0; i < 1000; ++i) a.process(1.f/48000.f);
         for (int v = 0; v < 4; ++v)
-            near(a.centsFor(v), b.centsFor(v), 1e-6f, "drift is deterministic");
+            near(a.centsFor(v), first_run[v], 1e-6f,
+                 "drift recalls after reset with same seed");
+    }
+
+    // NaN/Infinity rejection: setters must not accept non-finite input, and
+    // process() must never produce NaN or Infinity in output.
+    {
+        const float nan = std::numeric_limits<float>::quiet_NaN();
+        const float inf = std::numeric_limits<float>::infinity();
+
+        // setRate(NaN) must be rejected.
+        Drift d;
+        d.reset(4, 99u);
+        d.setRate(1.f);  // set a known-good value first
+        d.setRate(nan);  // try to corrupt it
+        d.setDepth(10.f); d.setCoherence(1.f);
+        for (int i = 0; i < 500; ++i) {
+            d.process(1.f / 48000.f);
+            for (int v = 0; v < 4; ++v) {
+                require(std::isfinite(d.centsFor(v)), "rate=NaN rejected, output stays finite");
+            }
+        }
+
+        // setRate(Infinity) must be rejected.
+        d.reset(4, 99u);
+        d.setRate(inf);
+        d.setDepth(10.f); d.setCoherence(1.f);
+        for (int i = 0; i < 500; ++i) {
+            d.process(1.f / 48000.f);
+            for (int v = 0; v < 4; ++v) {
+                require(std::isfinite(d.centsFor(v)), "+Inf rate rejected, output stays finite");
+            }
+        }
+
+        // setDepth(NaN) must be rejected.
+        d.reset(4, 99u);
+        d.setRate(1.f);
+        d.setDepth(nan);
+        d.setCoherence(1.f);
+        for (int i = 0; i < 500; ++i) {
+            d.process(1.f / 48000.f);
+            for (int v = 0; v < 4; ++v) {
+                require(std::isfinite(d.centsFor(v)), "depth=NaN rejected, output stays finite");
+            }
+        }
+
+        // setDepth(Infinity) must be rejected.
+        d.reset(4, 99u);
+        d.setRate(1.f);
+        d.setDepth(inf);
+        d.setCoherence(1.f);
+        for (int i = 0; i < 500; ++i) {
+            d.process(1.f / 48000.f);
+            for (int v = 0; v < 4; ++v) {
+                require(std::isfinite(d.centsFor(v)), "+Inf depth rejected, output stays finite");
+            }
+        }
+
+        // setCoherence(NaN) must be rejected.
+        d.reset(4, 99u);
+        d.setRate(1.f); d.setDepth(10.f);
+        d.setCoherence(nan);
+        for (int i = 0; i < 500; ++i) {
+            d.process(1.f / 48000.f);
+            for (int v = 0; v < 4; ++v) {
+                require(std::isfinite(d.centsFor(v)), "coherence=NaN rejected, output stays finite");
+            }
+        }
+
+        // setCoherence(Infinity) must be rejected.
+        d.reset(4, 99u);
+        d.setRate(1.f); d.setDepth(10.f);
+        d.setCoherence(inf);
+        for (int i = 0; i < 500; ++i) {
+            d.process(1.f / 48000.f);
+            for (int v = 0; v < 4; ++v) {
+                require(std::isfinite(d.centsFor(v)), "+Inf coherence rejected, output stays finite");
+            }
+        }
+
+        // Negative values are rejected (setRate, setDepth).
+        d.reset(4, 99u);
+        d.setRate(-5.f);
+        d.setDepth(-10.f);
+        d.setCoherence(1.f);
+        for (int i = 0; i < 500; ++i) {
+            d.process(1.f / 48000.f);
+            for (int v = 0; v < 4; ++v) {
+                require(std::isfinite(d.centsFor(v)), "negative rate/depth rejected, output stays finite");
+            }
+        }
     }
 }
 } // namespace

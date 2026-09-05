@@ -46,13 +46,22 @@ public:
             out_[v] = 0.f;
         }
         shared_ = 0.f;
+        sharedPhase_ = 0.f;
     }
 
-    void setRate(float hz) noexcept        { rate_ = hz < 0.f ? 0.f : hz; }
-    void setDepth(float cents) noexcept    { depth_ = cents < 0.f ? 0.f : cents; }
+    void setRate(float hz) noexcept
+    {
+        if (std::isfinite(hz) && hz >= 0.f) rate_ = hz;
+    }
+    void setDepth(float cents) noexcept
+    {
+        if (std::isfinite(cents) && cents >= 0.f) depth_ = cents;
+    }
     void setCoherence(float c) noexcept
     {
-        coherence_ = c < 0.f ? 0.f : (c > 1.f ? 1.f : c);
+        if (std::isfinite(c)) {
+            coherence_ = c < 0.f ? 0.f : (c > 1.f ? 1.f : c);
+        }
     }
 
     void process(float sampleTime) noexcept
