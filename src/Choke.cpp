@@ -172,10 +172,6 @@ struct ChokeWidget : ModuleWidget {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Choke.svg")));
 
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		// Channel x-centers (mm)
 		// 18 HP = 91.44 mm. At 14 HP the channels sat 17.78 mm apart with

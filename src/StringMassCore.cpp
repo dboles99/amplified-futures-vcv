@@ -220,10 +220,6 @@ struct StringMassCoreWidget : ModuleWidget {
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/StringMassCore.svg")));
 
 		// 16HP screws
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		// ── Row 1: MASS (L) | SPREAD (R) ──────────────────────────
 		// L=15mm, satellite at L+8=23mm
