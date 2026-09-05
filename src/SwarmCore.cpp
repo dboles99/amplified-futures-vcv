@@ -4,6 +4,7 @@
 
 #include "plugin.hpp"
 #include <atomic>
+#include <deque>
 #include <cstdio>
 #include <cstring>
 #include <thread>
@@ -222,16 +223,25 @@ struct SwarmCore : Module {
         LIGHTS_LEN
     };
 
-    // Sample bank — populated by a background thread spawned in the constructor.
-    // bankReady uses acquire/release semantics: once true, bank is safe to read
-    // from the audio thread without a lock (no further writes ever occur).
-    std::vector<SampleEntry> bank;
-    std::atomic<bool> bankReady{false};
-    bool noSamples = false;
+    // Sample banks, loaded on a background thread and published to the audio
+    // thread through one atomic pointer.
+    //
+    // A loaded bank is never freed while the module lives. Switching banks by
+    // overwriting the vector would deallocate sample buffers that process()
+    // may be reading that instant, and there is no point at which the GUI
+    // thread can prove the audio thread has let go. Caching costs the size of
+    // the banks actually visited - 14 MB each, 28 MB for both shipped ones -
+    // and it also lets the current bank keep playing until the new one lands.
+    //
+    // std::deque, not vector: appending must not move the banks already
+    // published, or livePtr dangles.
+    std::deque<std::vector<SampleEntry>> loadedBanks;
+    std::vector<int> loadedFor;                              // GUI thread only
+    std::atomic<const std::vector<SampleEntry>*> livePtr{nullptr};
+    const std::vector<SampleEntry>* seenPtr = nullptr;     // audio thread only
     std::thread loadThread;
 
-    // Selectable banks: one directory under res/insects/banks per bank, each a
-    // curated 32. Only the chosen one is ever resident.
+    // One directory under res/insects/banks per bank, each a curated 32.
     std::vector<std::string> bankNames;
     std::string banksRoot;
     std::string legacyRoot;
@@ -289,19 +299,28 @@ struct SwarmCore : Module {
 
     ~SwarmCore() {
         // Join, never detach. A detached loader outlives the module and writes
-        // `bank` and `voices` through a dangling this.
+        // through a dangling this. Joining here is also what makes freeing the
+        // cached banks safe: the engine has stopped stepping this module, and
+        // no loader is still appending to the deque.
         if (loadThread.joinable())
             loadThread.join();
     }
 
-    /// Load a bank on a background thread. bankReady (acquire/release) is the
-    /// publication fence: while it is false, process() returns early and
-    /// touches neither `bank` nor `voices`, so the loader owns both.
+    /// Load a bank on a background thread and publish it. The release store to
+    /// livePtr is the fence: everything the loader wrote to the bank is visible
+    /// to whichever process() call first reads the new pointer.
     void startLoad(int idx) {
         if (loadThread.joinable())
             loadThread.join();
-        bankReady.store(false, std::memory_order_release);
         bankIndex = idx;
+
+        // Already resident - republish it. No I/O, no thread, no reload.
+        for (size_t i = 0; i < loadedFor.size(); i++) {
+            if (loadedFor[i] == idx) {
+                livePtr.store(&loadedBanks[i], std::memory_order_release);
+                return;
+            }
+        }
 
         std::string dir;
         bool legacy = bankNames.empty();
@@ -309,7 +328,7 @@ struct SwarmCore : Module {
             dir = banksRoot + "/" + bankNames[idx];
 
         const std::string base = legacyRoot;
-        loadThread = std::thread([this, dir, legacy, base]() {
+        loadThread = std::thread([this, dir, legacy, base, idx]() {
             std::vector<SampleEntry> loaded;
             if (legacy) {
                 // No banks shipped: fall back to the full tree if it is present.
@@ -321,11 +340,12 @@ struct SwarmCore : Module {
             else if (!dir.empty()) {
                 loaded = loadBankFromDir(dir);
             }
-            bank      = std::move(loaded);
-            noSamples = bank.empty();
-            for (int v = 0; v < NUM_VOICES; v++)
-                voices[v].active = false;      // indices refer to the old bank
-            bankReady.store(true, std::memory_order_release);
+            // Append, then publish. The audio thread reads only through
+            // livePtr, so it cannot see a half-built bank, and voices are
+            // retired by process() when it notices the pointer changed.
+            loadedBanks.push_back(std::move(loaded));
+            loadedFor.push_back(idx);
+            livePtr.store(&loadedBanks.back(), std::memory_order_release);
         });
     }
 
@@ -361,12 +381,21 @@ struct SwarmCore : Module {
     }
 
     void process(const ProcessArgs& args) override {
-        // Output silence while the background load thread is running.
-        if (!bankReady.load(std::memory_order_acquire)) {
+        // Silent only before the first bank exists; a bank switch keeps the
+        // outgoing bank playing until the incoming one is published.
+        const std::vector<SampleEntry>* bank = livePtr.load(std::memory_order_acquire);
+        if (!bank) {
             outputs[OUT_L_OUTPUT].setVoltage(0.f);
             outputs[OUT_R_OUTPUT].setVoltage(0.f);
             return;
         }
+        if (bank != seenPtr) {
+            // Voice sample indices refer to the bank they were triggered from.
+            for (int v = 0; v < NUM_VOICES; v++)
+                voices[v].active = false;
+            seenPtr = bank;
+        }
+        const bool noSamples = bank->empty();
 
         bool swarmMode = params[MODE_PARAM].getValue() > 0.5f;
         lights[SWARM_LIGHT].setBrightness(swarmMode ? 1.f : 0.f);
@@ -378,7 +407,7 @@ struct SwarmCore : Module {
         float baseSpeed = std::pow(2.f, (voctBase + pitchSt / 12.f));
 
         // Select specimen
-        int numSamples = (int)bank.size();
+        int numSamples = (int)bank->size();
         int sampleIdx = 0;
         if (numSamples > 0) {
             float sel = clamp(params[SPECIMEN_PARAM].getValue()
@@ -387,7 +416,7 @@ struct SwarmCore : Module {
                               0.f, 1.f);
             sampleIdx = (int)(sel * (numSamples - 1));
         }
-        int nativesr = (numSamples > 0) ? bank[sampleIdx].sr : 44100;
+        int nativesr = (numSamples > 0) ? (*bank)[sampleIdx].sr : 44100;
         float srRatio = (float)nativesr / args.sampleRate;
 
         // Density + scatter + detune
@@ -488,7 +517,7 @@ struct SwarmCore : Module {
                 // prvalue, so the whole sample buffer was copy-constructed on
                 // the heap once per active voice per sample - an unbounded
                 // allocation on the audio thread.
-                s = voices[v].tick(bank[voices[v].sampleIdx].data);
+                s = voices[v].tick((*bank)[voices[v].sampleIdx].data);
             }
             float pan = voicePan[v];
             float gainL = std::cos((pan + 1.f) * 0.25f * M_PI);
