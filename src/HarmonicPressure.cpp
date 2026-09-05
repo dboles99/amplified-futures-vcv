@@ -3,26 +3,39 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/AfDrift.hpp"
 
 // ============================================================
 // HARMONIC PRESSURE — harmonic series pitch CV generator
 //
 // Design: Amplified Futures (steel finish, 14 HP)
-//   PITCH:   root pitch offset (-2 to +2 oct)  [CV + atten]
-//   SPREAD:  per-partial ensemble detuning      [CV + atten]
-//   PARTIAL: first partial index (1–16)         [snap]
-//   COUNT:   number of partials to output (1–16)[snap]
-//   TUNING:  JUST / EQUAL / MICRO               [snap 3-pos]
+//   PITCH:      root pitch offset (-2 to +2 oct)  [CV + atten]
+//   SPREAD:     per-partial drift depth            [CV + atten]
+//   PARTIAL:    first partial index (1–16)         [snap]
+//   COUNT:      number of partials to output (1–16)[snap]
+//   TUNING:     JUST / EQUAL / DRIFT               [snap 3-pos]
+//   DRIFT RATE: drift oscillator speed (0–4 Hz)
+//   DRIFT COH:  0 = whole stack transposes together,
+//               1 = partials drift independently (chorus)
 //
 // Outputs polyphonic V/OCT — COUNT channels, each a harmonic
 // partial of the root:  partial n  →  root + log2(n) octaves
 //
 // JUST:  exact harmonic series ratios (pure JI)
 // EQUAL: each partial rounded to nearest 12-TET semitone
-// MICRO: JI + deterministic per-partial intonation offset
-//        (SPREAD controls magnitude — simulates ensemble tuning
-//        variation the way 100 massed voices each tune
-//        the same pitch slightly differently)
+//
+// Every mode now carries a live per-partial drift on top of its
+// base tuning (af::tuning::Drift, see dsp/AfDrift.hpp). SPREAD sets
+// the depth in cents, RATE sets how fast it moves, and COHERENCE
+// decides whether that movement is shared (transposition) or
+// independent per partial (chorus/ensemble spread). At RATE 0 the
+// drift oscillator's phase is frozen wherever reset() staggered it,
+// so with SPREAD at 0 (the factory default) it contributes exactly
+// 0 cents — existing patches with no SPREAD are unaffected. A patch
+// that already used a nonzero SPREAD will hear a different (but
+// similarly small, static) per-partial colour once DRIFT RATE/
+// COHERENCE take their new-param defaults, because the offset is no
+// longer the old sin(n * golden angle) formula.
 // ============================================================
 
 struct HarmonicPressure : Module {
@@ -34,6 +47,11 @@ struct HarmonicPressure : Module {
 		PARTIAL_PARAM,
 		COUNT_PARAM,
 		TUNING_PARAM,
+		// Appended 2026-09-05 (Task 4, pitch precision work). VCV Rack
+		// serialises params by position — never insert above this line,
+		// it would silently corrupt every saved patch.
+		DRIFT_RATE_PARAM,
+		DRIFT_COHERENCE_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -50,6 +68,8 @@ struct HarmonicPressure : Module {
 		LIGHTS_LEN
 	};
 
+	af::tuning::Drift drift_;
+
 	HarmonicPressure() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configParam(PITCH_PARAM,        -2.f,  2.f,  0.f,  "Pitch",   " Oct");
@@ -59,6 +79,10 @@ struct HarmonicPressure : Module {
 		configParam(PARTIAL_PARAM,       1.f,  16.f, 1.f,  "First partial");
 		configParam(COUNT_PARAM,         1.f,  16.f, 8.f,  "Partial count");
 		configParam(TUNING_PARAM,        0.f,  2.f,  0.f,  "Tuning mode");
+		configParam(DRIFT_RATE_PARAM,    0.f,  4.f,  0.f,  "Drift rate", " Hz");
+		// 0 = the whole stack transposes together; 1 = independent per partial.
+		configParam(DRIFT_COHERENCE_PARAM, 0.f, 1.f, 1.f, "Drift coherence");
+		drift_.reset(16, 0x5EEDu);
 
 		getParamQuantity(PARTIAL_PARAM)->snapEnabled = true;
 		getParamQuantity(COUNT_PARAM)->snapEnabled   = true;
@@ -66,7 +90,10 @@ struct HarmonicPressure : Module {
 
 		getParamQuantity(PARTIAL_PARAM)->description = "Starting harmonic partial (1 = fundamental)";
 		getParamQuantity(COUNT_PARAM)->description   = "Number of partials to output as poly channels";
-		getParamQuantity(TUNING_PARAM)->description  = "0=JUST (pure JI)  1=EQUAL (12-TET)  2=MICRO (JI + ensemble spread)";
+		// Drift (SPREAD/RATE/COHERENCE) now applies in every mode, not only
+		// this switch's third position — DRIFT and JUST share the same
+		// harmonic maths and differ only in name; only EQUAL is distinct.
+		getParamQuantity(TUNING_PARAM)->description  = "0=JUST (pure JI)  1=EQUAL (12-TET)  2=DRIFT (same maths as JUST)";
 
 		configInput(VOCT_INPUT,      "Root V/oct");
 		configInput(PITCH_CV_INPUT,  "Pitch offset CV");
@@ -100,6 +127,11 @@ struct HarmonicPressure : Module {
 
 		int tuning = clamp((int)std::round(params[TUNING_PARAM].getValue()), 0, 2);
 
+		drift_.setRate(params[DRIFT_RATE_PARAM].getValue());
+		drift_.setDepth(spreadCents);
+		drift_.setCoherence(params[DRIFT_COHERENCE_PARAM].getValue());
+		drift_.process(args.sampleTime);
+
 		outputs[VOCT_OUTPUT].setChannels(count);
 
 		for (int i = 0; i < count; i++) {
@@ -111,22 +143,12 @@ struct HarmonicPressure : Module {
 			if (tuning == 1) {
 				// EQUAL: quantise to nearest 12-TET semitone
 				voct = std::round(voct * 12.f) / 12.f;
-
-			} else if (tuning == 2) {
-				// MICRO: JI + per-partial deterministic offset
-				// sin(n × golden_angle) gives a quasi-random but fixed offset
-				// per partial — same every time, like a musician with a
-				// characteristic sharp or flat tendency on that note
-				float microOct = std::sin(float(n) * 2.39996f) * spreadCents / 1200.f;
-				voct += microOct;
 			}
 
-			// JUST and EQUAL modes: SPREAD adds a consistent per-partial
-			// offset that scales with SPREAD (0 = pure, >0 = ensemble colour)
-			if (tuning != 2) {
-				float colour = std::sin(float(n) * 1.61803f) * spreadCents / 1200.f;
-				voct += colour;
-			}
+			// Was a static sin(n * golden angle) offset - an ensemble colour
+			// frozen in time. Drift makes it move, and coherence decides
+			// whether the stack transposes or spreads.
+			voct += drift_.centsFor(n - first) / 1200.f;
 
 			outputs[VOCT_OUTPUT].setVoltage(voct, i);
 		}
@@ -160,9 +182,16 @@ struct HarmonicPressureWidget : ModuleWidget {
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.f, 72.f)), module, HarmonicPressure::PARTIAL_PARAM));
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(55.f, 72.f)), module, HarmonicPressure::COUNT_PARAM));
 
-		// ── Row 3: TUNING (centre) — discrete snap ────────────────
+		// ── Row 3: RATE (L) | TUNING (centre, discrete snap) | COH (R) ──
+		// Row 2→3 leaves only ~11mm of clear panel above the TUNING
+		// label (divider at y=77.2mm, TUNING's own label starts ~88.4mm)
+		// — not enough room for the atten+CV satellite pattern used in
+		// Row 1 without colliding with the tuning-mode arc labels or the
+		// Row 4 I/O jacks below. Bare knobs only; no CV input added here.
 
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.f, 96.f)), module, HarmonicPressure::DRIFT_RATE_PARAM));
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(35.f, 96.f)), module, HarmonicPressure::TUNING_PARAM));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(55.f, 96.f)), module, HarmonicPressure::DRIFT_COHERENCE_PARAM));
 
 		// ── Row 4: IO ──────────────────────────────────────────────
 		addInput(createInputCentered<AFPortIn>( mm2px(Vec(15.f, 114.f)), module, HarmonicPressure::VOCT_INPUT));
