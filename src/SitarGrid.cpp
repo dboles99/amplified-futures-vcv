@@ -581,7 +581,8 @@ struct SitarGridWidget : ModuleWidget {
             mm2px(Vec(rX[5] + 8.f, 85.f)), module, SitarGrid::BD_LIGHT));
 
         // ── I/O rows ──────────────────────────────────────────
-        const float ioX[10] = {8.f,21.f,34.f,47.f,60.f,73.f,86.f,99.f,113.f,126.f};
+        // Coordinates are written out rather than stepped from a table: the
+        // two rows hold 7 and 8 jacks, not 10, and are spread independently.
 
         // Inputs (y=106mm)
         addInput(createInputCentered<AFPortIn>(mm2px(Vec(12.00f, 106.f)), module, SitarGrid::VOCT_INPUT));
