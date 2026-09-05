@@ -88,7 +88,7 @@ static const float kShrutiEq[22] = {
         { "Shruti (5-limit)",
           "5-limit RECONSTRUCTION - ratios are not attested in Bharata",
           detail::kShruti5, 22 },
-        { "Shruti (equal)", "22-EDO - the equal-shruti reading",
+        { "Shruti (equal)", "22-EDO READING - equal shrutis are disputed, not attested in Bharata",
           detail::kShrutiEq, 22 },
     };
     return kTables[static_cast<int>(id)];

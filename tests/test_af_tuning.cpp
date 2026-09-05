@@ -143,8 +143,8 @@ void testTables()
     require(se.count == 22, "22 equal shrutis");
     near(se.cents[1], 54.5455f, 1e-3f, "22-EDO step");
 
-    // 7/4 has no place in the shruti set — nearest members are 27c away. The
-    // tables must stay separate; this documents why.
+    // 7/4 has no place in the shruti set — nearest members are 27c away.
+    // This verifies data integrity; a collision would indicate a data-entry error.
     float nearest = 1e9f;
     for (int i = 0; i < sh.count; ++i)
         nearest = std::fmin(nearest, std::fabs(sh.cents[i] - 968.826f));
