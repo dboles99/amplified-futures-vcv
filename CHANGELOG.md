@@ -13,6 +13,19 @@ were never released, and fixes a module that has never made a sound.
 
 ### Added
 
+- **Swarm Core sample banks.** Two curated banks of 32 recordings ship in the
+  repository — Cicadidae (23 species) and Orthoptera (9) — picked round-robin
+  across species and stored as the mono 16-bit 44.1 kHz, 5-second form the
+  loader always reduced them to. **27 MB in place of 324 MB**, and a build from
+  source now has samples for the first time. The bank is chosen from the module
+  context menu and stored in the patch by name, so adding or reordering banks
+  cannot repoint an existing patch. InsectSet32 is CC BY 4.0; `ATTRIBUTION.md`
+  ships beside the audio.
+- **Harmonic Pressure drift.** DRIFT RATE and DRIFT COHERENCE, driving a real
+  drift engine — coherence 0 transposes the whole stack together, 1 lets
+  partials drift independently.
+
+
 - **Ratchet** (AF-03, 8 HP) — trigger burst generator. COUNT/SPREAD/PROB,
   subdividing the measured input interval.
 - **Collapse EG** (AF-04, 8 HP) — attack/decay envelope with CURVE, MISFIRE and
@@ -23,6 +36,22 @@ were never released, and fixes a module that has never made a sound.
   precision 3-input adder and a buffered 1→3 mult. All polyphonic.
 
 ### Fixed
+
+- **Swarm Core's WAV reader rejected or silently misdecoded most formats.**
+  `WAVE_FORMAT_EXTENSIBLE` was refused outright — 60 of the 670 source
+  recordings use it. 24-bit and 8-bit PCM fell through to the 16-bit branch, so
+  they loaded, reported success and produced noise. **Zero channels divided by
+  zero and took the process down**, so a malformed WAV in a user folder crashed
+  Rack. Odd-sized RIFF chunks were skipped without their pad byte, leaving the
+  reader a byte out of step so it never found the data. Now handles PCM
+  8/16/24/32 and float 32/64, plain or extensible, under 26 assertions.
+- **Swarm Core loaded 64 cicadas and nothing else.** The loader sorted paths and
+  took the first 64; `cicadidae` sorts before `orthoptera`, so 294 orthoptera
+  recordings were unreachable on a module whose only job is browsing a bank.
+- **Bank switching freed samples the audio thread was reading** — a
+  use-after-free, not a race you could hear. Loaded banks are now never freed
+  while the module lives and are published through one atomic pointer.
+
 
 - **Sitar Grid produced no sound at all.** `ksPluck` wrote its excitation burst
   to the delay-line span *ahead* of the write head without advancing it, so the
@@ -35,6 +64,17 @@ were never released, and fixes a module that has never made a sound.
   See <https://github.com/VCVRack/Rack/blob/v2/src/tag.cpp>.
 
 ### Changed
+
+- **Ports carry direction by shape.** Inputs are square, outputs hexagonal.
+  AF-IDS §10 forbids signalling direction by colour alone and every panel did
+  exactly that; colour is now free to keep meaning signal *type*. Both graphics
+  are drawn in PJ301M's 23.7 px box, so no panel coordinate moved.
+- **BREAKING for saved patches: Harmonic Pressure tuning mode 2 was MICRO and
+  is now DRIFT.** The parameter keeps its range and position, so patches load
+  and every other control is unaffected — but a v2.2.0 patch set to mode 2 gets
+  a time-varying drift where it used to get a static per-partial offset. Modes
+  0 (JUST) and 1 (EQUAL) are unchanged.
+
 
 - **DroneClone 22 -> 26 HP** and **Collapse Saturator 12 -> 16 HP.** Both were
   crowded past the point where labels could clear their neighbours. Widening
