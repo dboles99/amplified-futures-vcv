@@ -97,6 +97,19 @@ struct StreetGridClock : Module {
 		core.setSampleRate(APP->engine->getSampleRate());
 	}
 
+	// Run/stop is latched by the RUN trigger rather than held in a parameter.
+	json_t* dataToJson() override {
+		json_t* root = json_object();
+		json_object_set_new(root, "running", json_boolean(running));
+		return root;
+	}
+
+	void dataFromJson(json_t* root) override {
+		json_t* v = json_object_get(root, "running");
+		if (v)
+			running = json_boolean_value(v);
+	}
+
 	void process(const ProcessArgs& args) override {
 		if (runTrig.process(params[RUN_PARAM].getValue() > 0.5f))
 			running = !running;

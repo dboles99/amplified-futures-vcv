@@ -95,6 +95,28 @@ struct Choke : Module {
 		return clamp(v, lo, hi);
 	}
 
+	// Mute states are toggled by trigger, not held in a parameter, so they need
+	// saving explicitly or every mute resets on patch load.
+	json_t* dataToJson() override {
+		json_t* root = json_object();
+		json_t* arr = json_array();
+		for (int i = 0; i < 4; i++)
+			json_array_append_new(arr, json_boolean(muted[i]));
+		json_object_set_new(root, "muted", arr);
+		return root;
+	}
+
+	void dataFromJson(json_t* root) override {
+		json_t* arr = json_object_get(root, "muted");
+		if (!arr)
+			return;
+		for (int i = 0; i < 4; i++) {
+			json_t* v = json_array_get(arr, i);
+			if (v)
+				muted[i] = json_boolean_value(v);
+		}
+	}
+
 	void process(const ProcessArgs& args) override {
 		float main = modp(MAIN_PARAM, MAIN_ATTEN_PARAM, MAIN_CV_INPUT, 0.f, 1.5f);
 
