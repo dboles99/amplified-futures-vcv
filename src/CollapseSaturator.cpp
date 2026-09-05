@@ -144,28 +144,28 @@ struct CollapseSaturatorWidget : ModuleWidget {
 
 
 		// ── Row 1: DRIVE (L) | BUZZ switch (R) ───────────────────
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f, 38.f)), module, CollapseSaturator::DRIVE_PARAM));
-		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 9.24f, 50.f)), module, CollapseSaturator::DRIVE_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(21.24f, 50.f)), module, CollapseSaturator::DRIVE_CV_INPUT));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(20.32f,24.45f)), module, CollapseSaturator::DRIVE_PARAM));
+		addParam(createParamCentered<Trimpot>(            mm2px(Vec(12.32f,36.45f)), module, CollapseSaturator::DRIVE_ATTEN_PARAM));
+		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(28.32f,36.45f)), module, CollapseSaturator::DRIVE_CV_INPUT));
 
-		addParam(createParamCentered<CKSSThree>(          mm2px(Vec(45.72f, 42.f)), module, CollapseSaturator::BUZZ_PARAM));
+		addParam(createParamCentered<CKSSThree>(          mm2px(Vec(60.96f,28.45f)), module, CollapseSaturator::BUZZ_PARAM));
 
 		// ── Row 2: RECOVERY (L) | COLLAPSE + SIDECHAIN (R) ───────
-		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f, 70.f)), module, CollapseSaturator::RECOVERY_PARAM));
-		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 9.24f, 82.f)), module, CollapseSaturator::RECOVERY_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(21.24f, 82.f)), module, CollapseSaturator::RECOVERY_CV_INPUT));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(20.32f,56.45f)), module, CollapseSaturator::RECOVERY_PARAM));
+		addParam(createParamCentered<Trimpot>(            mm2px(Vec(12.32f,68.45f)), module, CollapseSaturator::RECOVERY_ATTEN_PARAM));
+		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(28.32f,68.45f)), module, CollapseSaturator::RECOVERY_CV_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(45.72f, 68.f)), module, CollapseSaturator::COLLAPSE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(45.72f, 84.f)), module, CollapseSaturator::SIDECHAIN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(60.96f,54.45f)), module, CollapseSaturator::COLLAPSE_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(60.96f,70.45f)), module, CollapseSaturator::SIDECHAIN_INPUT));
 
 		// ── Row 3+4: Stereo IO + V/OCT thru ──────────────────────
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(15.24f, 104.f)), module, CollapseSaturator::IN_L_INPUT));
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(30.48f, 104.f)), module, CollapseSaturator::IN_R_INPUT));
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(45.72f, 104.f)), module, CollapseSaturator::VOCT_INPUT));
+		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(20.32f,90.45f)), module, CollapseSaturator::IN_L_INPUT));
+		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(40.64f,90.45f)), module, CollapseSaturator::IN_R_INPUT));
+		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(60.96f,90.45f)), module, CollapseSaturator::VOCT_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(15.24f, 116.f)), module, CollapseSaturator::OUT_L_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.48f, 116.f)), module, CollapseSaturator::OUT_R_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.72f, 116.f)), module, CollapseSaturator::VOCT_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.32f,102.5f)), module, CollapseSaturator::OUT_L_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.64f,102.5f)), module, CollapseSaturator::OUT_R_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(60.96f,102.5f)), module, CollapseSaturator::VOCT_OUTPUT));
 	}
 };
 
