@@ -76,16 +76,18 @@ static bool loadWavMono(const std::string& path,
     if (audioFmt == 3 && bitsPerSample == 32) {
         uint32_t nFrames = std::min(dataSize / (numCh * 4), maxFrames);
         out.resize(nFrames);
-        std::vector<float> buf(nFrames * numCh);
-        fread(buf.data(), 4, nFrames * numCh, f);
-        for (uint32_t i = 0; i < nFrames; i++) out[i] = buf[i * numCh];
+        const size_t sampleCount = static_cast<size_t>(nFrames) * static_cast<size_t>(numCh);
+        std::vector<float> buf(sampleCount);
+        fread(buf.data(), 4, sampleCount, f);
+        for (uint32_t i = 0; i < nFrames; i++) out[i] = buf[static_cast<size_t>(i) * numCh];
     } else {
         uint32_t nFrames = std::min(dataSize / (numCh * 2), maxFrames);
         out.resize(nFrames);
-        std::vector<int16_t> buf(nFrames * numCh);
-        fread(buf.data(), 2, nFrames * numCh, f);
+        const size_t sampleCount = static_cast<size_t>(nFrames) * static_cast<size_t>(numCh);
+        std::vector<int16_t> buf(sampleCount);
+        fread(buf.data(), 2, sampleCount, f);
         const float inv = 1.f / 32768.f;
-        for (uint32_t i = 0; i < nFrames; i++) out[i] = buf[i * numCh] * inv;
+        for (uint32_t i = 0; i < nFrames; i++) out[i] = buf[static_cast<size_t>(i) * numCh] * inv;
     }
     fclose(f);
     return !out.empty();
