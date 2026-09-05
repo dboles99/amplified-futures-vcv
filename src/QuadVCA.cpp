@@ -121,14 +121,14 @@ struct QuadVCAWidget : ModuleWidget {
 
 		for (int i = 0; i < 4; i++) {
 			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xLevel, rowY[i])), module, QuadVCA::LEVEL1_PARAM + i));
-			addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(xCv,    rowY[i])), module, QuadVCA::CV1_INPUT + i));
-			addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(xIn,    rowY[i])), module, QuadVCA::IN1_INPUT + i));
-			addOutput(createOutputCentered<PJ301MPort>(       mm2px(Vec(xOut,   rowY[i])), module, QuadVCA::OUT1_OUTPUT + i));
+			addInput(createInputCentered<AFPortIn>(         mm2px(Vec(xCv,    rowY[i])), module, QuadVCA::CV1_INPUT + i));
+			addInput(createInputCentered<AFPortIn>(         mm2px(Vec(xIn,    rowY[i])), module, QuadVCA::IN1_INPUT + i));
+			addOutput(createOutputCentered<AFPortOut>(       mm2px(Vec(xOut,   rowY[i])), module, QuadVCA::OUT1_OUTPUT + i));
 		}
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f, 101.60f)), module, QuadVCA::PRESSURE_PARAM));
 		addParam(createParamCentered<CKSS>(               mm2px(Vec(45.72f, 101.60f)), module, QuadVCA::CURVE_PARAM));
-		addOutput(createOutputCentered<PJ301MPort>(       mm2px(Vec(30.48f, 118.53f)), module, QuadVCA::MIX_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(       mm2px(Vec(30.48f, 118.53f)), module, QuadVCA::MIX_OUTPUT));
 	}
 };
 

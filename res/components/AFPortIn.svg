@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Amplified Futures input port. Original artwork, MIT with the plugin.
+     23.7 x 23.7 to match PJ301M exactly, so swapping it changes no layout.
+     AF-IDS section 10: direction is carried by SHAPE. Inputs are square. -->
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="23.7px" height="23.7px" viewBox="0 0 23.7 23.7">
+  <rect x="1.25" y="1.25" width="21.2" height="21.2" rx="1.6" ry="1.6"
+        fill="#2A362A" stroke="#887860" stroke-width="0.9"/>
+  <rect x="4.05" y="4.05" width="15.6" height="15.6" rx="0.8" ry="0.8"
+        fill="none" stroke="#1A231A" stroke-width="0.8"/>
+  <circle cx="11.85" cy="11.85" r="6.9" fill="#151C15"/>
+  <circle cx="11.85" cy="11.85" r="5.3" fill="#0B0D0B"
+          stroke="#887860" stroke-width="0.7"/>
+  <circle cx="11.85" cy="11.85" r="2.4" fill="#000000"/>
+</svg>

@@ -175,17 +175,17 @@ struct CollapseSaturatorWidget : ModuleWidget {
 		// ── Row 1: DRIVE (L) | BUZZ switch (R) ───────────────────
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(20.32f,24.45f)), module, CollapseSaturator::DRIVE_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(12.32f,36.45f)), module, CollapseSaturator::DRIVE_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(28.32f,36.45f)), module, CollapseSaturator::DRIVE_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(28.32f,36.45f)), module, CollapseSaturator::DRIVE_CV_INPUT));
 
 		addParam(createParamCentered<CKSSThree>(          mm2px(Vec(60.96f,28.45f)), module, CollapseSaturator::BUZZ_PARAM));
 
 		// ── Row 2: RECOVERY (L) | COLLAPSE + SIDECHAIN (R) ───────
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(20.32f,56.45f)), module, CollapseSaturator::RECOVERY_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(12.32f,68.45f)), module, CollapseSaturator::RECOVERY_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(28.32f,68.45f)), module, CollapseSaturator::RECOVERY_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(28.32f,68.45f)), module, CollapseSaturator::RECOVERY_CV_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(60.96f,54.45f)), module, CollapseSaturator::COLLAPSE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(60.96f,70.45f)), module, CollapseSaturator::SIDECHAIN_INPUT));
+		addInput(createInputCentered<AFPortIn>(mm2px(Vec(60.96f,54.45f)), module, CollapseSaturator::COLLAPSE_INPUT));
+		addInput(createInputCentered<AFPortIn>(mm2px(Vec(60.96f,70.45f)), module, CollapseSaturator::SIDECHAIN_INPUT));
 
 		// Middle column: the 16 HP widening left it empty, and these three are
 		// the controls the module was actually missing rather than filler.
@@ -194,13 +194,13 @@ struct CollapseSaturatorWidget : ModuleWidget {
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(49.50f, 70.45f)), module, CollapseSaturator::SC_AMT_PARAM));
 
 		// ── Row 3+4: Stereo IO + V/OCT thru ──────────────────────
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(20.32f,90.45f)), module, CollapseSaturator::IN_L_INPUT));
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(40.64f,90.45f)), module, CollapseSaturator::IN_R_INPUT));
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(60.96f,90.45f)), module, CollapseSaturator::VOCT_INPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(20.32f,90.45f)), module, CollapseSaturator::IN_L_INPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(40.64f,90.45f)), module, CollapseSaturator::IN_R_INPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(60.96f,90.45f)), module, CollapseSaturator::VOCT_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.32f,102.5f)), module, CollapseSaturator::OUT_L_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.64f,102.5f)), module, CollapseSaturator::OUT_R_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(60.96f,102.5f)), module, CollapseSaturator::VOCT_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(20.32f,102.5f)), module, CollapseSaturator::OUT_L_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(40.64f,102.5f)), module, CollapseSaturator::OUT_R_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(60.96f,102.5f)), module, CollapseSaturator::VOCT_OUTPUT));
 	}
 };
 

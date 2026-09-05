@@ -314,58 +314,58 @@ struct DroneCloneWidget : ModuleWidget {
 		// TUNING row (y=28mm) — main knobs + satellites to upper-right
 		addParam(createParamCentered<RoundBigBlackKnob>(mm2px(Vec(32.97f, 28.f)), module, DroneClone::FUNDAMENTAL_PARAM));
 		addParam(createParamCentered<Trimpot>(          mm2px(Vec(47.27f,  21.f)), module, DroneClone::FUNDAMENTAL_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(       mm2px(Vec(47.27f,  35.f)), module, DroneClone::FUNDAMENTAL_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(       mm2px(Vec(47.27f,  35.f)), module, DroneClone::FUNDAMENTAL_CV_INPUT));
 
 		addParam(createParamCentered<RoundBigBlackKnob>(mm2px(Vec(99.04f, 28.f)), module, DroneClone::SPREAD_PARAM));
 		addParam(createParamCentered<Trimpot>(          mm2px(Vec(113.5f,  21.f)), module, DroneClone::SPREAD_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(       mm2px(Vec(113.5f,  35.f)), module, DroneClone::SPREAD_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(       mm2px(Vec(113.5f,  35.f)), module, DroneClone::SPREAD_CV_INPUT));
 
 		// MASS/TENSION/WEIGHT row (y=52mm) — satellites to right
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(21.98f, 52.f)), module, DroneClone::MASS_PARAM));
 		addParam(createParamCentered<Trimpot>(       mm2px(Vec(31.91f,  44.f)), module, DroneClone::MASS_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(    mm2px(Vec(31.91f,  60.f)), module, DroneClone::MASS_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(    mm2px(Vec(31.91f,  60.f)), module, DroneClone::MASS_CV_INPUT));
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(66.06f, 52.f)), module, DroneClone::TENSION_PARAM));
 		addParam(createParamCentered<Trimpot>(       mm2px(Vec(76.82f,  44.f)), module, DroneClone::TENSION_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(    mm2px(Vec(76.82f,  60.f)), module, DroneClone::TENS_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(    mm2px(Vec(76.82f,  60.f)), module, DroneClone::TENS_CV_INPUT));
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(110.f, 52.f)), module, DroneClone::WEIGHT_PARAM));
 		addParam(createParamCentered<Trimpot>(       mm2px(Vec(120.f,44.f)), module, DroneClone::WEIGHT_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(    mm2px(Vec(120.f,60.f)), module, DroneClone::WEIGHT_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(    mm2px(Vec(120.f,60.f)), module, DroneClone::WEIGHT_CV_INPUT));
 
 		// SHIMMER/JAWARI/DRIFT row (y=66mm) — satellites to LEFT (avoids row-above conflict)
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(21.98f, 66.f)), module, DroneClone::SHIMMER_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(11.82f,  59.f)), module, DroneClone::SHIMMER_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(11.82f,  73.f)), module, DroneClone::SHIMMER_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(11.82f,  73.f)), module, DroneClone::SHIMMER_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(66.06f, 66.f)), module, DroneClone::JAWARI_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(54.36f,  59.f)), module, DroneClone::JAWARI_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(54.36f,  73.f)), module, DroneClone::JAWARI_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(54.36f,  73.f)), module, DroneClone::JAWARI_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(110.f, 66.f)), module, DroneClone::DRIFT_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(98.09f,  59.f)), module, DroneClone::DRIFT_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(98.09f,  73.f)), module, DroneClone::DRIFT_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(98.09f,  73.f)), module, DroneClone::DRIFT_CV_INPUT));
 
 		// COLLAPSE row (y=85mm)
 		addParam(createParamCentered<RoundBigBlackKnob>(mm2px(Vec(32.97f, 85.f)), module, DroneClone::DECAY_PARAM));
 		addParam(createParamCentered<Trimpot>(          mm2px(Vec(47.27f,  78.f)), module, DroneClone::DECAY_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(       mm2px(Vec(47.27f,  92.f)), module, DroneClone::DECAY_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(       mm2px(Vec(47.27f,  92.f)), module, DroneClone::DECAY_CV_INPUT));
 
 		addParam(createParamCentered<TL1105>(  mm2px(Vec(66.06f, 85.f)), module, DroneClone::CHOKE_PARAM));
 		addChild(createLightCentered<SmallLight<RedLight>>(mm2px(Vec(66.06f, 77.f)), module, DroneClone::CHOKE_LIGHT));
 
 		addParam(createParamCentered<RoundBigBlackKnob>(mm2px(Vec(99.04f, 85.f)), module, DroneClone::CHOKE_AMT_PARAM));
 		addParam(createParamCentered<Trimpot>(          mm2px(Vec(113.5f,  78.f)), module, DroneClone::CHOKE_AMT_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(       mm2px(Vec(113.5f,  92.f)), module, DroneClone::CHOKE_AMT_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(       mm2px(Vec(113.5f,  92.f)), module, DroneClone::CHOKE_AMT_CV_INPUT));
 
 		// CV / IO row (y=101mm)
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(16.55f,  101.f)), module, DroneClone::VOCT_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(43.73f,  101.f)), module, DroneClone::VOCT_OUTPUT));
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(115.2f, 101.f)), module, DroneClone::CHOKE_INPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(16.55f,  101.f)), module, DroneClone::VOCT_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(43.73f,  101.f)), module, DroneClone::VOCT_OUTPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(115.2f, 101.f)), module, DroneClone::CHOKE_INPUT));
 
 		// OUT / RTN row (y=116mm)
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(88.64f, 116.f)), module, DroneClone::OUT_OUTPUT));
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(112.3f, 116.f)), module, DroneClone::RTN_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(88.64f, 116.f)), module, DroneClone::OUT_OUTPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(112.3f, 116.f)), module, DroneClone::RTN_INPUT));
 	}
 };
 

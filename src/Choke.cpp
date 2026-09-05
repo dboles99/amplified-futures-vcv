@@ -211,7 +211,7 @@ struct ChokeWidget : ModuleWidget {
 				mm2px(Vec(xc[i], 34.f)), module, Choke::GAIN_1_PARAM + i));
 			addParam(createParamCentered<Trimpot>(
 				mm2px(Vec(sx, 27.f)), module, Choke::GAIN_1_ATTEN_PARAM + i));
-			addInput(createInputCentered<PJ301MPort>(
+			addInput(createInputCentered<AFPortIn>(
 				mm2px(Vec(sx, 41.f)), module, Choke::GAIN_1_CV_INPUT + i));
 
 			// TONE
@@ -219,7 +219,7 @@ struct ChokeWidget : ModuleWidget {
 				mm2px(Vec(xc[i], 55.f)), module, Choke::TONE_1_PARAM + i));
 			addParam(createParamCentered<Trimpot>(
 				mm2px(Vec(sx, 48.f)), module, Choke::TONE_1_ATTEN_PARAM + i));
-			addInput(createInputCentered<PJ301MPort>(
+			addInput(createInputCentered<AFPortIn>(
 				mm2px(Vec(sx, 62.f)), module, Choke::TONE_1_CV_INPUT + i));
 
 			// MUTE LED + button
@@ -229,7 +229,7 @@ struct ChokeWidget : ModuleWidget {
 				mm2px(Vec(xc[i], 76.f)), module, Choke::MUTE_1_PARAM + i));
 
 			// IN jack
-			addInput(createInputCentered<PJ301MPort>(
+			addInput(createInputCentered<AFPortIn>(
 				mm2px(Vec(xc[i], 88.f)), module, Choke::IN_1_INPUT + i));
 		}
 
@@ -238,15 +238,15 @@ struct ChokeWidget : ModuleWidget {
 			mm2px(Vec(20.f, 100.f)), module, Choke::MAIN_PARAM));
 		addParam(createParamCentered<Trimpot>(
 			mm2px(Vec(28.f, 93.f)), module, Choke::MAIN_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(
+		addInput(createInputCentered<AFPortIn>(
 			mm2px(Vec(28.f, 109.f)), module, Choke::MAIN_CV_INPUT));
 
 		// Bottom row: V/OCT IN · V/OCT OUT · OUT L · OUT R
 		// y=118 keeps the port bottoms at 123.35 mm, just clear of the screws.
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(20.f, 118.f)), module, Choke::VOCT_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.f, 118.f)), module, Choke::VOCT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(60.f, 118.f)), module, Choke::OUT_L_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(80.f, 118.f)), module, Choke::OUT_R_OUTPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(20.f, 118.f)), module, Choke::VOCT_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(40.f, 118.f)), module, Choke::VOCT_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(60.f, 118.f)), module, Choke::OUT_L_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(80.f, 118.f)), module, Choke::OUT_R_OUTPUT));
 	}
 };
 

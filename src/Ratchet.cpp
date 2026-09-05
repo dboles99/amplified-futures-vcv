@@ -116,16 +116,16 @@ struct RatchetWidget : ModuleWidget {
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xc,     24.384f)), module, Ratchet::COUNT_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 8.467f, 40.640f)), module, Ratchet::COUNT_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(32.173f, 40.640f)), module, Ratchet::COUNT_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(32.173f, 40.640f)), module, Ratchet::COUNT_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xc,     58.928f)), module, Ratchet::SPREAD_PARAM));
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xc,     75.862f)), module, Ratchet::PROB_PARAM));
 
 		addChild(createLightCentered<SmallLight<AFOrangeLightRatchet>>(mm2px(Vec(32.850f, 24.384f)), module, Ratchet::BURST_LIGHT));
 
-		addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(xc,      98.891f)), module, Ratchet::TRIG_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(13.547f, 116.501f)), module, Ratchet::TRIG_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(27.093f, 116.501f)), module, Ratchet::END_OUTPUT));
+		addInput(createInputCentered<AFPortIn>(  mm2px(Vec(xc,      98.891f)), module, Ratchet::TRIG_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(13.547f, 116.501f)), module, Ratchet::TRIG_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(27.093f, 116.501f)), module, Ratchet::END_OUTPUT));
 	}
 };
 

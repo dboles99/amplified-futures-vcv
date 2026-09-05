@@ -266,7 +266,7 @@ struct MassDriverWidget : ModuleWidget {
                 mm2px(Vec(28.67f, y)), module, MassDriver::MUTE_PARAM + i));
             addChild(createLightCentered<SmallLight<RedLight>>(
                 mm2px(Vec(28.67f, y - 4.f)), module, MassDriver::MUTE_LIGHT + i));
-            addInput(createInputCentered<PJ301MPort>(
+            addInput(createInputCentered<AFPortIn>(
                 mm2px(Vec(34.67f, y)), module, MassDriver::CH_INPUT + i));
         }
 
@@ -276,7 +276,7 @@ struct MassDriverWidget : ModuleWidget {
         for (int i = 0; i < 8; i++) {
             float y = rightY[i] / 3.f;
             int ch = i + 8;
-            addInput(createInputCentered<PJ301MPort>(
+            addInput(createInputCentered<AFPortIn>(
                 mm2px(Vec(125.33f, y)), module, MassDriver::CH_INPUT + ch));
             addParam(createParamCentered<TL1105>(
                 mm2px(Vec(131.33f, y)), module, MassDriver::MUTE_PARAM + ch));
@@ -292,7 +292,7 @@ struct MassDriverWidget : ModuleWidget {
             mm2px(Vec(70.f, 24.f)), module, MassDriver::DENSITY_PARAM));
         addParam(createParamCentered<Trimpot>(
             mm2px(Vec(64.1f, 33.33f)), module, MassDriver::DENSITY_ATTEN_PARAM));
-        addInput(createInputCentered<PJ301MPort>(
+        addInput(createInputCentered<AFPortIn>(
             mm2px(Vec(75.9f, 33.33f)), module, MassDriver::DENSITY_CV_INPUT));
 
         // PRESSURE: knob (90, 24) atten (84.1, 33.33) cv (95.9, 33.33)
@@ -300,7 +300,7 @@ struct MassDriverWidget : ModuleWidget {
             mm2px(Vec(90.f, 24.f)), module, MassDriver::PRESSURE_PARAM));
         addParam(createParamCentered<Trimpot>(
             mm2px(Vec(84.1f, 33.33f)), module, MassDriver::PRESSURE_ATTEN_PARAM));
-        addInput(createInputCentered<PJ301MPort>(
+        addInput(createInputCentered<AFPortIn>(
             mm2px(Vec(95.9f, 33.33f)), module, MassDriver::PRESSURE_CV_INPUT));
 
         // WIDTH: knob (70, 49.33) atten (64.1, 58.67) cv (75.9, 58.67)
@@ -308,7 +308,7 @@ struct MassDriverWidget : ModuleWidget {
             mm2px(Vec(70.f, 49.33f)), module, MassDriver::WIDTH_PARAM));
         addParam(createParamCentered<Trimpot>(
             mm2px(Vec(64.1f, 58.67f)), module, MassDriver::WIDTH_ATTEN_PARAM));
-        addInput(createInputCentered<PJ301MPort>(
+        addInput(createInputCentered<AFPortIn>(
             mm2px(Vec(75.9f, 58.67f)), module, MassDriver::WIDTH_CV_INPUT));
 
         // MASS: knob (90, 49.33) atten (84.1, 58.67) cv (95.9, 58.67)
@@ -316,7 +316,7 @@ struct MassDriverWidget : ModuleWidget {
             mm2px(Vec(90.f, 49.33f)), module, MassDriver::MASS_PARAM));
         addParam(createParamCentered<Trimpot>(
             mm2px(Vec(84.1f, 58.67f)), module, MassDriver::MASS_ATTEN_PARAM));
-        addInput(createInputCentered<PJ301MPort>(
+        addInput(createInputCentered<AFPortIn>(
             mm2px(Vec(95.9f, 58.67f)), module, MassDriver::MASS_CV_INPUT));
 
         // FEEDBACK: knob (70, 76) atten (64.1, 85.33) cv (75.9, 85.33)
@@ -324,31 +324,31 @@ struct MassDriverWidget : ModuleWidget {
             mm2px(Vec(70.f, 76.f)), module, MassDriver::FEEDBACK_PARAM));
         addParam(createParamCentered<Trimpot>(
             mm2px(Vec(64.1f, 85.33f)), module, MassDriver::FEEDBACK_ATTEN_PARAM));
-        addInput(createInputCentered<PJ301MPort>(
+        addInput(createInputCentered<AFPortIn>(
             mm2px(Vec(75.9f, 85.33f)), module, MassDriver::FEEDBACK_CV_INPUT));
 
         // COLLAPSE: button (90, 74) gate (90, 85.33)
         addParam(createParamCentered<TL1105>(
             mm2px(Vec(90.f, 74.f)), module, MassDriver::COLLAPSE_PARAM));
-        addInput(createInputCentered<PJ301MPort>(
+        addInput(createInputCentered<AFPortIn>(
             mm2px(Vec(90.f, 85.33f)), module, MassDriver::COLLAPSE_INPUT));
 
         // V/OCT IN (80, 99.33)
-        addInput(createInputCentered<PJ301MPort>(
+        addInput(createInputCentered<AFPortIn>(
             mm2px(Vec(80.f, 99.33f)), module, MassDriver::VOCT_INPUT));
 
         // ── Outputs (y = 342px = 114mm) ──────────────────────────────
-        addOutput(createOutputCentered<PJ301MPort>(
+        addOutput(createOutputCentered<AFPortOut>(
             mm2px(Vec(60.f, 114.f)), module, MassDriver::OUT_L_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(
+        addOutput(createOutputCentered<AFPortOut>(
             mm2px(Vec(70.f, 114.f)), module, MassDriver::AUX_L_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(
+        addOutput(createOutputCentered<AFPortOut>(
             mm2px(Vec(80.f, 114.f)), module, MassDriver::SUM_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(
+        addOutput(createOutputCentered<AFPortOut>(
             mm2px(Vec(90.f, 114.f)), module, MassDriver::AUX_R_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(
+        addOutput(createOutputCentered<AFPortOut>(
             mm2px(Vec(100.f, 114.f)), module, MassDriver::OUT_R_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(
+        addOutput(createOutputCentered<AFPortOut>(
             mm2px(Vec(110.f, 114.f)), module, MassDriver::VOCT_OUTPUT));
     }
 };

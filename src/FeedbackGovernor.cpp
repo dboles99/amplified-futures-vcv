@@ -139,26 +139,26 @@ struct FeedbackGovernorWidget : ModuleWidget {
 		// ── Row 1: AMOUNT (L) | TONE (R) ──────────────────────────
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f, 38.f)), module, FeedbackGovernor::AMOUNT_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 9.24f, 50.f)), module, FeedbackGovernor::AMOUNT_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(21.24f, 50.f)), module, FeedbackGovernor::AMOUNT_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(21.24f, 50.f)), module, FeedbackGovernor::AMOUNT_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(45.72f, 38.f)), module, FeedbackGovernor::TONE_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(39.72f, 50.f)), module, FeedbackGovernor::TONE_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(51.72f, 50.f)), module, FeedbackGovernor::TONE_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(51.72f, 50.f)), module, FeedbackGovernor::TONE_CV_INPUT));
 
 		// ── Row 2: DECAY (L) | KILL button + gate (R) ────────────
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f, 70.f)), module, FeedbackGovernor::DECAY_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 9.24f, 82.f)), module, FeedbackGovernor::DECAY_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(21.24f, 82.f)), module, FeedbackGovernor::DECAY_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(21.24f, 82.f)), module, FeedbackGovernor::DECAY_CV_INPUT));
 
 		addParam(createParamCentered<TL1105>(    mm2px(Vec(45.72f, 68.f)), module, FeedbackGovernor::KILL_PARAM));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(45.72f, 82.f)), module, FeedbackGovernor::KILL_INPUT));
+		addInput(createInputCentered<AFPortIn>(mm2px(Vec(45.72f, 82.f)), module, FeedbackGovernor::KILL_INPUT));
 
 		// ── IO ─────────────────────────────────────────────────────
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(15.24f, 104.f)), module, FeedbackGovernor::SEND_INPUT));
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(30.48f, 104.f)), module, FeedbackGovernor::VOCT_INPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(15.24f, 104.f)), module, FeedbackGovernor::SEND_INPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(30.48f, 104.f)), module, FeedbackGovernor::VOCT_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(15.24f, 116.f)), module, FeedbackGovernor::RETURN_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.48f, 116.f)), module, FeedbackGovernor::VOCT_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(15.24f, 116.f)), module, FeedbackGovernor::RETURN_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(30.48f, 116.f)), module, FeedbackGovernor::VOCT_OUTPUT));
 	}
 
 };

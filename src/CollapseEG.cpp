@@ -128,12 +128,12 @@ struct CollapseEGWidget : ModuleWidget {
 		addChild(createLightCentered<SmallLight<AFOrangeLightEG>>(mm2px(Vec(32.f, 26.f)), module, CollapseEG::ENV_LIGHT));
 		addParam(createParamCentered<CKSS>(mm2px(Vec(32.f, 66.f)), module, CollapseEG::LOOP_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(10.16f, 102.f)), module, CollapseEG::GATE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(30.48f, 102.f)), module, CollapseEG::TRIG_INPUT));
+		addInput(createInputCentered<AFPortIn>(  mm2px(Vec(10.16f, 102.f)), module, CollapseEG::GATE_INPUT));
+		addInput(createInputCentered<AFPortIn>(  mm2px(Vec(30.48f, 102.f)), module, CollapseEG::TRIG_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec( 7.5f, 117.f)), module, CollapseEG::ENV_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.32f, 117.f)), module, CollapseEG::INV_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(33.14f, 117.f)), module, CollapseEG::EOC_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec( 7.5f, 117.f)), module, CollapseEG::ENV_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(20.32f, 117.f)), module, CollapseEG::INV_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(33.14f, 117.f)), module, CollapseEG::EOC_OUTPUT));
 	}
 };
 

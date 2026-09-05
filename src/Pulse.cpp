@@ -184,11 +184,11 @@ struct PulseWidget : ModuleWidget {
 		// Params + satellites (right of each knob)
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(12.f, 76.f)), module, Pulse::HIT_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(19.f, 69.f)), module, Pulse::HIT_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(19.f, 83.f)), module, Pulse::HIT_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(19.f, 83.f)), module, Pulse::HIT_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(42.f, 76.f)), module, Pulse::DECAY_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(49.f, 69.f)), module, Pulse::DECAY_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(49.f, 83.f)), module, Pulse::DECAY_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(49.f, 83.f)), module, Pulse::DECAY_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(12.f, 96.f)), module, Pulse::METAL_PARAM));
 		// Row 2's attenuverters sit LEFT of their knobs. Stacked under the row-1
@@ -197,17 +197,17 @@ struct PulseWidget : ModuleWidget {
 		// 8.93px trimpot; moving them sideways buys the clearance without
 		// widening the panel.
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 5.f, 89.f)), module, Pulse::METAL_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(19.f, 103.f)), module, Pulse::METAL_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(19.f, 103.f)), module, Pulse::METAL_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(42.f, 96.f)), module, Pulse::CRACK_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(35.f, 89.f)), module, Pulse::CRACK_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(49.f, 103.f)), module, Pulse::CRACK_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(49.f, 103.f)), module, Pulse::CRACK_CV_INPUT));
 
 		// IO row: TRG · V/OCT IN · V/OCT OUT · OUT
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(12.f, 115.f)), module, Pulse::TRG_INPUT));
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(24.f, 115.f)), module, Pulse::VOCT_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.f, 115.f)), module, Pulse::VOCT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(48.f, 115.f)), module, Pulse::OUT_OUTPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(12.f, 115.f)), module, Pulse::TRG_INPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(24.f, 115.f)), module, Pulse::VOCT_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(36.f, 115.f)), module, Pulse::VOCT_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(48.f, 115.f)), module, Pulse::OUT_OUTPUT));
 	}
 };
 

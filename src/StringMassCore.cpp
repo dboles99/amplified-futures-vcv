@@ -239,17 +239,17 @@ struct StringMassCoreWidget : ModuleWidget {
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.f, 38.f)), module, StringMassCore::MASS_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(23.f, 31.f)), module, StringMassCore::MASS_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(23.f, 45.f)), module, StringMassCore::MASS_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(23.f, 45.f)), module, StringMassCore::MASS_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(62.f, 38.f)), module, StringMassCore::SPREAD_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(70.f, 31.f)), module, StringMassCore::SPREAD_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(70.f, 45.f)), module, StringMassCore::SPREAD_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(70.f, 45.f)), module, StringMassCore::SPREAD_CV_INPUT));
 
 		// ── Row 2: TIMBRE (L) | MODE (R, discrete) ────────────────
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.f, 68.f)), module, StringMassCore::TIMBRE_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(23.f, 61.f)), module, StringMassCore::TIMBRE_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(23.f, 75.f)), module, StringMassCore::TIMBRE_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(23.f, 75.f)), module, StringMassCore::TIMBRE_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(62.f, 68.f)), module, StringMassCore::MODE_PARAM));
 
@@ -258,9 +258,9 @@ struct StringMassCoreWidget : ModuleWidget {
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(40.f, 92.f)), module, StringMassCore::SECTION_PARAM));
 
 		// ── Row 4: IO ──────────────────────────────────────────────
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(15.f, 110.f)), module, StringMassCore::VOCT_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.f, 110.f)), module, StringMassCore::VOCT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(65.f, 110.f)), module, StringMassCore::AUDIO_OUTPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(15.f, 110.f)), module, StringMassCore::VOCT_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(40.f, 110.f)), module, StringMassCore::VOCT_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(65.f, 110.f)), module, StringMassCore::AUDIO_OUTPUT));
 	}
 };
 

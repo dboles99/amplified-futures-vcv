@@ -149,11 +149,11 @@ struct HarmonicPressureWidget : ModuleWidget {
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.f, 40.f)), module, HarmonicPressure::PITCH_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(23.f, 33.f)), module, HarmonicPressure::PITCH_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(23.f, 47.f)), module, HarmonicPressure::PITCH_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(23.f, 47.f)), module, HarmonicPressure::PITCH_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(55.f, 40.f)), module, HarmonicPressure::SPREAD_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(63.f, 33.f)), module, HarmonicPressure::SPREAD_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(63.f, 47.f)), module, HarmonicPressure::SPREAD_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(63.f, 47.f)), module, HarmonicPressure::SPREAD_CV_INPUT));
 
 		// ── Row 2: PARTIAL (L) | COUNT (R) — discrete snap ────────
 
@@ -165,8 +165,8 @@ struct HarmonicPressureWidget : ModuleWidget {
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(35.f, 96.f)), module, HarmonicPressure::TUNING_PARAM));
 
 		// ── Row 4: IO ──────────────────────────────────────────────
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(15.f, 114.f)), module, HarmonicPressure::VOCT_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(55.f, 114.f)), module, HarmonicPressure::VOCT_OUTPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(15.f, 114.f)), module, HarmonicPressure::VOCT_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(55.f, 114.f)), module, HarmonicPressure::VOCT_OUTPUT));
 	}
 };
 

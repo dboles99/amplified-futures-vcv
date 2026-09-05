@@ -32,3 +32,26 @@ extern Model* modelCollapseEG;
 extern Model* modelQuadVCA;
 extern Model* modelRatchet;
 extern Model* modelSignalBloc;
+
+// ─── Port morphology (AF-IDS §10) ────────────────────────────
+// "Audio in / out — two distinct port morphologies. Direction never signalled
+// by colour alone."
+//
+// v2.2.0 signalled direction by stroke colour only, on every panel. These two
+// carry it by shape instead — square collar in, hexagonal collar out — leaving
+// the panel colour system free to keep meaning signal *type*.
+//
+// Both graphics are 23.7 × 23.7, exactly PJ301M's box, so swapping them in
+// changes no layout arithmetic on any of the 19 panels. They are original
+// artwork: Rack's own component SVGs are not MIT and cannot be copied here.
+struct AFPortIn : app::SvgPort {
+    AFPortIn() {
+        setSvg(Svg::load(asset::plugin(pluginInstance, "res/components/AFPortIn.svg")));
+    }
+};
+
+struct AFPortOut : app::SvgPort {
+    AFPortOut() {
+        setSvg(Svg::load(asset::plugin(pluginInstance, "res/components/AFPortOut.svg")));
+    }
+};

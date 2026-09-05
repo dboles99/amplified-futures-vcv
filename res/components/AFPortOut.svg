@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Amplified Futures output port. Original artwork, MIT with the plugin.
+     23.7 x 23.7 to match PJ301M exactly, so swapping it changes no layout.
+     AF-IDS section 10: direction is carried by SHAPE. Outputs are hexagonal,
+     circumradius 10.6 about the same centre, so the two read apart at a glance
+     without either one growing past the square. -->
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+     width="23.7px" height="23.7px" viewBox="0 0 23.7 23.7">
+  <polygon points="11.85,1.25 21.03,6.55 21.03,17.15 11.85,22.45 2.67,17.15 2.67,6.55"
+           fill="#2A362A" stroke="#887860" stroke-width="0.9"/>
+  <polygon points="11.85,4.55 18.17,8.20 18.17,15.50 11.85,19.15 5.53,15.50 5.53,8.20"
+           fill="none" stroke="#1A231A" stroke-width="0.8"/>
+  <circle cx="11.85" cy="11.85" r="6.9" fill="#151C15"/>
+  <circle cx="11.85" cy="11.85" r="5.3" fill="#0B0D0B"
+          stroke="#FF4A0E" stroke-width="0.7"/>
+  <circle cx="11.85" cy="11.85" r="2.4" fill="#000000"/>
+</svg>

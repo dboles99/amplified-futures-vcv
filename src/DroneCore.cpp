@@ -128,23 +128,23 @@ struct DroneCoreWidget : ModuleWidget {
 
 		// PITCH section
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(10.16f, 38.f)), module, DroneCore::PITCH_PARAM));
-		addInput(createInputCentered<PJ301MPort>(    mm2px(Vec(30.48f, 28.f)), module, DroneCore::PITCH_MOD_INPUT));
+		addInput(createInputCentered<AFPortIn>(    mm2px(Vec(30.48f, 28.f)), module, DroneCore::PITCH_MOD_INPUT));
 		addParam(createParamCentered<Trimpot>(       mm2px(Vec(30.48f, 48.f)), module, DroneCore::PITCH_ATTN_PARAM));
 
 		// DETUNE section
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(10.16f, 65.f)), module, DroneCore::DETUNE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(30.48f, 58.f)), module, DroneCore::DETUNE_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(30.48f, 58.f)), module, DroneCore::DETUNE_CV_INPUT));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(30.48f, 74.f)), module, DroneCore::DETUNE_ATTN_PARAM));
 
 		// TIMBRE section
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(10.16f, 91.f)), module, DroneCore::TIMBRE_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(30.48f, 84.f)), module, DroneCore::TIMBRE_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(30.48f, 84.f)), module, DroneCore::TIMBRE_CV_INPUT));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(30.48f, 100.f)), module, DroneCore::TIMBRE_ATTN_PARAM));
 
 		// I/O row
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(10.16f, 113.f)), module, DroneCore::PITCH_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.32f, 113.f)), module, DroneCore::VOCT_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.48f, 113.f)), module, DroneCore::SINE_OUTPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(10.16f, 113.f)), module, DroneCore::PITCH_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(20.32f, 113.f)), module, DroneCore::VOCT_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(30.48f, 113.f)), module, DroneCore::SINE_OUTPUT));
 	}
 };
 

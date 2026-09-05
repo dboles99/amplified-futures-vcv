@@ -131,30 +131,30 @@ struct SendWidget : ModuleWidget {
 		// A→B and B→A (top pair)
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f,30.8f)), module, Send::A_TO_B_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(22.24f,22.03f)), module, Send::A_TO_B_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(22.24f,39.57f)), module, Send::A_TO_B_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(22.24f,39.57f)), module, Send::A_TO_B_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(45.72f,30.8f)), module, Send::B_TO_A_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(52.72f,22.03f)), module, Send::B_TO_A_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(52.72f,39.57f)), module, Send::B_TO_A_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(52.72f,39.57f)), module, Send::B_TO_A_CV_INPUT));
 
 		// A→C and C→A (bottom pair)
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f,58.36f)), module, Send::A_TO_C_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(22.24f,49.59f)), module, Send::A_TO_C_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(22.24f,67.13f)), module, Send::A_TO_C_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(22.24f,67.13f)), module, Send::A_TO_C_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(45.72f,58.36f)), module, Send::C_TO_A_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(52.72f,49.59f)), module, Send::C_TO_A_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(52.72f,67.13f)), module, Send::C_TO_A_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(52.72f,67.13f)), module, Send::C_TO_A_CV_INPUT));
 
 		// Audio I/O
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(15.24f,83.42f)), module, Send::IN_A_INPUT));
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(45.72f,83.42f)), module, Send::IN_B_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(15.24f,101.f)), module, Send::OUT_A_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.72f,101.f)), module, Send::OUT_B_OUTPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(15.24f,83.42f)), module, Send::IN_A_INPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(45.72f,83.42f)), module, Send::IN_B_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(15.24f,101.f)), module, Send::OUT_A_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(45.72f,101.f)), module, Send::OUT_B_OUTPUT));
 
 		// V/OCT thru
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(15.24f,116.f)), module, Send::VOCT_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.72f,116.f)), module, Send::VOCT_OUTPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(15.24f,116.f)), module, Send::VOCT_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(45.72f,116.f)), module, Send::VOCT_OUTPUT));
 	}
 };
 

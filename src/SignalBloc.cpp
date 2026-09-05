@@ -137,21 +137,21 @@ struct SignalBlocWidget : ModuleWidget {
 		for (int ch = 0; ch < 2; ch++) {
 			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xAtt, rowY[ch])), module, SignalBloc::ATT1_PARAM + ch * 2));
 			addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(xOff, rowY[ch])), module, SignalBloc::OFF1_PARAM + ch * 2));
-			addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(xIn,  rowY[ch])), module, SignalBloc::IN1_INPUT + ch));
-			addOutput(createOutputCentered<PJ301MPort>(       mm2px(Vec(xOut, rowY[ch])), module, SignalBloc::OUT1_OUTPUT + ch));
+			addInput(createInputCentered<AFPortIn>(         mm2px(Vec(xIn,  rowY[ch])), module, SignalBloc::IN1_INPUT + ch));
+			addOutput(createOutputCentered<AFPortOut>(       mm2px(Vec(xOut, rowY[ch])), module, SignalBloc::OUT1_OUTPUT + ch));
 		}
 
 		// Three-across rows: 10.161 / 25.400 / 40.640 mm.
-		addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(10.161f, 66.377f)), module, SignalBloc::SUM_A_INPUT));
-		addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(25.400f, 66.377f)), module, SignalBloc::SUM_B_INPUT));
-		addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(40.640f, 66.377f)), module, SignalBloc::SUM_C_INPUT));
+		addInput(createInputCentered<AFPortIn>(  mm2px(Vec(10.161f, 66.377f)), module, SignalBloc::SUM_A_INPUT));
+		addInput(createInputCentered<AFPortIn>(  mm2px(Vec(25.400f, 66.377f)), module, SignalBloc::SUM_B_INPUT));
+		addInput(createInputCentered<AFPortIn>(  mm2px(Vec(40.640f, 66.377f)), module, SignalBloc::SUM_C_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(15.240f, 90.762f)), module, SignalBloc::SUM_OUTPUT));
-		addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(35.560f, 90.762f)), module, SignalBloc::MULT_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(15.240f, 90.762f)), module, SignalBloc::SUM_OUTPUT));
+		addInput(createInputCentered<AFPortIn>(  mm2px(Vec(35.560f, 90.762f)), module, SignalBloc::MULT_INPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(10.161f, 115.147f)), module, SignalBloc::MULT1_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(25.400f, 115.147f)), module, SignalBloc::MULT2_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(40.640f, 115.147f)), module, SignalBloc::MULT3_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(10.161f, 115.147f)), module, SignalBloc::MULT1_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(25.400f, 115.147f)), module, SignalBloc::MULT2_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(40.640f, 115.147f)), module, SignalBloc::MULT3_OUTPUT));
 	}
 };
 

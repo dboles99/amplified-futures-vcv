@@ -584,24 +584,24 @@ struct SitarGridWidget : ModuleWidget {
         const float ioX[10] = {8.f,21.f,34.f,47.f,60.f,73.f,86.f,99.f,113.f,126.f};
 
         // Inputs (y=106mm)
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(12.00f, 106.f)), module, SitarGrid::VOCT_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.50f, 106.f)), module, SitarGrid::CLOCK_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(75.00f, 106.f)), module, SitarGrid::RESET_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(106.50f, 106.f)), module, SitarGrid::BD_GATE_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(138.00f, 106.f)), module, SitarGrid::LOCK_GATE_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(169.50f, 106.f)), module, SitarGrid::ROOT_CV_INPUT));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(201.00f, 106.f)), module, SitarGrid::JAWARI_CV_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(12.00f, 106.f)), module, SitarGrid::VOCT_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(43.50f, 106.f)), module, SitarGrid::CLOCK_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(75.00f, 106.f)), module, SitarGrid::RESET_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(106.50f, 106.f)), module, SitarGrid::BD_GATE_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(138.00f, 106.f)), module, SitarGrid::LOCK_GATE_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(169.50f, 106.f)), module, SitarGrid::ROOT_CV_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(201.00f, 106.f)), module, SitarGrid::JAWARI_CV_INPUT));
 
 
         // Outputs (y=120mm)
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(12.00f, 120.f)), module, SitarGrid::MAIN_L_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(39.00f, 120.f)), module, SitarGrid::MAIN_R_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(66.00f, 120.f)), module, SitarGrid::DRONE_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(93.00f, 120.f)), module, SitarGrid::SYMP_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(120.00f, 120.f)), module, SitarGrid::PITCH_CV_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(147.00f, 120.f)), module, SitarGrid::GATE_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(174.00f, 120.f)), module, SitarGrid::RIFF_TRIG_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(201.00f, 120.f)), module, SitarGrid::RES_CV_OUTPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(12.00f, 120.f)), module, SitarGrid::MAIN_L_OUTPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(39.00f, 120.f)), module, SitarGrid::MAIN_R_OUTPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(66.00f, 120.f)), module, SitarGrid::DRONE_OUTPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(93.00f, 120.f)), module, SitarGrid::SYMP_OUTPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(120.00f, 120.f)), module, SitarGrid::PITCH_CV_OUTPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(147.00f, 120.f)), module, SitarGrid::GATE_OUTPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(174.00f, 120.f)), module, SitarGrid::RIFF_TRIG_OUTPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(201.00f, 120.f)), module, SitarGrid::RES_CV_OUTPUT));
     }
 
     void draw(const DrawArgs& args) override {

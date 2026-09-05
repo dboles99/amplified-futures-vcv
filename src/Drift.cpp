@@ -134,25 +134,25 @@ struct DriftWidget : ModuleWidget {
 		// Left col params: RATE and WANDER
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f, 38.f)), module, Drift::RATE_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 9.24f, 50.f)), module, Drift::RATE_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(21.24f, 50.f)), module, Drift::RATE_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(21.24f, 50.f)), module, Drift::RATE_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f, 68.f)), module, Drift::WANDER_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 9.24f, 80.f)), module, Drift::WANDER_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(21.24f, 80.f)), module, Drift::WANDER_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(21.24f, 80.f)), module, Drift::WANDER_CV_INPUT));
 
 		// Right col: SLEW + utility I/O
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(45.72f, 38.f)), module, Drift::SLEW_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(39.72f, 50.f)), module, Drift::SLEW_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(51.72f, 50.f)), module, Drift::SLEW_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(51.72f, 50.f)), module, Drift::SLEW_CV_INPUT));
 
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(45.72f, 68.f)), module, Drift::SYNC_INPUT));
-		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(45.72f, 85.f)), module, Drift::VOCT_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.72f, 100.f)), module, Drift::VOCT_OUTPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(45.72f, 68.f)), module, Drift::SYNC_INPUT));
+		addInput(createInputCentered<AFPortIn>( mm2px(Vec(45.72f, 85.f)), module, Drift::VOCT_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(45.72f, 100.f)), module, Drift::VOCT_OUTPUT));
 
 		// Bottom outputs: SMOOTH, STEP, GATE
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(15.24f, 114.f)), module, Drift::SMOOTH_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.48f, 114.f)), module, Drift::STEP_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(45.72f, 114.f)), module, Drift::GATE_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(15.24f, 114.f)), module, Drift::SMOOTH_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(30.48f, 114.f)), module, Drift::STEP_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(45.72f, 114.f)), module, Drift::GATE_OUTPUT));
 	}
 };
 

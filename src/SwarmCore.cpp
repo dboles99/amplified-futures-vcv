@@ -502,23 +502,23 @@ struct SwarmCoreWidget : ModuleWidget {
         // Row 1 — SPECIMEN, PITCH
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x1, ky1)), module, SwarmCore::SPECIMEN_PARAM));
         addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky1 + attenDy)), module, SwarmCore::SPECIMEN_ATT_PARAM));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky1 + cvDy)), module, SwarmCore::SPECIMEN_CV_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(x1, ky1 + cvDy)), module, SwarmCore::SPECIMEN_CV_INPUT));
 
         // PITCH keeps its own satellites. They used to sit under SPECIMEN,
         // which left this column empty and attached the attenuverter to the
         // wrong knob.
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x2, ky1)), module, SwarmCore::PITCH_PARAM));
         addParam(createParamCentered<Trimpot>(mm2px(Vec(x2, ky1 + attenDy)), module, SwarmCore::PITCH_ATT_PARAM));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x2, ky1 + cvDy)), module, SwarmCore::VOCT_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(x2, ky1 + cvDy)), module, SwarmCore::VOCT_INPUT));
 
         // Row 2 — DENSITY, SCATTER
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x1, ky2)), module, SwarmCore::DENSITY_PARAM));
         addParam(createParamCentered<Trimpot>(mm2px(Vec(x1, ky2 + attenDy)), module, SwarmCore::DENSITY_ATT_PARAM));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x1, ky2 + cvDy)), module, SwarmCore::DENSITY_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(x1, ky2 + cvDy)), module, SwarmCore::DENSITY_INPUT));
 
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x2, ky2)), module, SwarmCore::SCATTER_PARAM));
         addParam(createParamCentered<Trimpot>(mm2px(Vec(x2, ky2 + attenDy)), module, SwarmCore::SCATTER_ATT_PARAM));
-        addInput(createInputCentered<PJ301MPort>(mm2px(Vec(x2, ky2 + cvDy)), module, SwarmCore::SCATTER_INPUT));
+        addInput(createInputCentered<AFPortIn>(mm2px(Vec(x2, ky2 + cvDy)), module, SwarmCore::SCATTER_INPUT));
 
         // Row 3 — DETUNE, DECAY (attenuverter beside the knob, CV in the input row)
         addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(x1, ky3)), module, SwarmCore::DETUNE_PARAM));
@@ -531,12 +531,12 @@ struct SwarmCoreWidget : ModuleWidget {
         addChild(createLightCentered<SmallLight<AFOrangeLightSC>>(mm2px(Vec(xMid, ky2 + cvDy)), module, SwarmCore::ACTIVE_LIGHT));
 
         // I/O row: TRIG | DETUNE CV | CV IN | OUT L | OUT R | CV OUT
-        addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(jx[0], jy)), module, SwarmCore::TRIG_INPUT));
-        addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(jx[1], jy)), module, SwarmCore::DETUNE_INPUT));
-        addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(jx[2], jy)), module, SwarmCore::CV_INPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(jx[3], jy)), module, SwarmCore::OUT_L_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(jx[4], jy)), module, SwarmCore::OUT_R_OUTPUT));
-        addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(jx[5], jy)), module, SwarmCore::CV_OUTPUT));
+        addInput(createInputCentered<AFPortIn>(  mm2px(Vec(jx[0], jy)), module, SwarmCore::TRIG_INPUT));
+        addInput(createInputCentered<AFPortIn>(  mm2px(Vec(jx[1], jy)), module, SwarmCore::DETUNE_INPUT));
+        addInput(createInputCentered<AFPortIn>(  mm2px(Vec(jx[2], jy)), module, SwarmCore::CV_INPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(jx[3], jy)), module, SwarmCore::OUT_L_OUTPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(jx[4], jy)), module, SwarmCore::OUT_R_OUTPUT));
+        addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(jx[5], jy)), module, SwarmCore::CV_OUTPUT));
     }
 
     void appendContextMenu(Menu* menu) override {

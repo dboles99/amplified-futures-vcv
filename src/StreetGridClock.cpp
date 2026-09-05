@@ -168,28 +168,28 @@ struct StreetGridClockWidget : ModuleWidget {
 		// centre; that mistake is what broke ten panels.
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f, 30.f)), module, StreetGridClock::RATE_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 9.24f, 42.f)), module, StreetGridClock::RATE_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(21.24f, 42.f)), module, StreetGridClock::RATE_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(21.24f, 42.f)), module, StreetGridClock::RATE_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(45.72f, 30.f)), module, StreetGridClock::SWING_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec(39.72f, 42.f)), module, StreetGridClock::SWING_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(51.72f, 42.f)), module, StreetGridClock::SWING_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(51.72f, 42.f)), module, StreetGridClock::SWING_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(15.24f, 60.f)), module, StreetGridClock::BROWNOUT_PARAM));
 		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 9.24f, 72.f)), module, StreetGridClock::BROWNOUT_ATTEN_PARAM));
-		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(21.24f, 72.f)), module, StreetGridClock::BROWNOUT_CV_INPUT));
+		addInput(createInputCentered<AFPortIn>(         mm2px(Vec(21.24f, 72.f)), module, StreetGridClock::BROWNOUT_CV_INPUT));
 
 		addChild(createLightCentered<SmallLight<GreenLight>>(mm2px(Vec(45.72f, 52.f)), module, StreetGridClock::RUN_LIGHT));
 		addParam(createParamCentered<TL1105>(mm2px(Vec(45.72f, 60.f)), module, StreetGridClock::RUN_PARAM));
 		addParam(createParamCentered<TL1105>(mm2px(Vec(45.72f, 72.f)), module, StreetGridClock::RESET_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(12.f, 92.f)), module, StreetGridClock::EXT_CLK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(  mm2px(Vec(30.f, 92.f)), module, StreetGridClock::RESET_INPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(48.f, 92.f)), module, StreetGridClock::RESET_OUTPUT));
+		addInput(createInputCentered<AFPortIn>(  mm2px(Vec(12.f, 92.f)), module, StreetGridClock::EXT_CLK_INPUT));
+		addInput(createInputCentered<AFPortIn>(  mm2px(Vec(30.f, 92.f)), module, StreetGridClock::RESET_INPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(48.f, 92.f)), module, StreetGridClock::RESET_OUTPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec( 9.0f, 112.f)), module, StreetGridClock::CLK_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(22.5f, 112.f)), module, StreetGridClock::DIV2_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(36.0f, 112.f)), module, StreetGridClock::DIV4_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(49.5f, 112.f)), module, StreetGridClock::DIV8_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec( 9.0f, 112.f)), module, StreetGridClock::CLK_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(22.5f, 112.f)), module, StreetGridClock::DIV2_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(36.0f, 112.f)), module, StreetGridClock::DIV4_OUTPUT));
+		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(49.5f, 112.f)), module, StreetGridClock::DIV8_OUTPUT));
 	}
 };
 
