@@ -73,7 +73,7 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢ spread), TIMBRE (sin
 
 ---
 
-### DRONECLONE — 22HP
+### DRONECLONE — 26HP
 
 ![DroneClone panel](docs/panels/DroneClone.png)
 
@@ -145,7 +145,9 @@ Modal string-resonance sequencer. Three independent sequencing brains — PITCH 
 
 Bio-acoustic insect sample engine over the InsectSet32 bank (Zenodo 7072196, CC-BY 4.0). Specimen mode plays a single pitched voice per trigger; Swarm mode fires up to 8 voices, scattered in time by SCATTER, detuned by DETUNE, across a fixed stereo pan spread. SPECIMEN browses the bank, DENSITY sets the voice count, DECAY shapes playback. The bank loads on a background thread — the module is silent for 2–5 seconds on first patch load, and falls back to a noise burst if the sample folder is absent.
 
-**Inputs:** TRIG, V/OCT, DENSITY CV, SCATTER CV, DETUNE CV, DECAY CV (no attenuverter)
+With nothing patched into TRIG, DENSITY drives an internal event clock (0.5–30 Hz) so the module sounds standalone; a patched TRIG takes over and the internal clock stops. MODE latches rather than being momentary.
+
+**Inputs:** TRIG (optional — DENSITY self-clocks without it), V/OCT, DENSITY CV, SCATTER CV, DETUNE CV, DECAY CV (no attenuverter)
 **Outputs:** OUT L/R, CV OUT (swarm envelope, 0–10 V)
 
 ---
@@ -224,6 +226,50 @@ Controlled feedback send/return. AMOUNT level. TONE LP filter (100Hz → 20kHz).
 
 **Inputs:** CH 1–16 audio, COLLAPSE gate, DENSITY/PRESSURE/WIDTH/FEEDBACK/MASS CV + ATT
 **Outputs:** OUT L, OUT R, AUX L, AUX R, SUM (mono)
+
+---
+
+### RATCHET — 8HP (AF-03)
+
+![Ratchet panel](docs/panels/Ratchet.png)
+
+Trigger burst generator. Measures the interval between incoming triggers and subdivides it, so a burst always lands inside one beat rather than running past it. COUNT sets the repeats, SPREAD bends their spacing from even to accelerating or decelerating, PROB thins the burst stochastically. `RatchetCore` is host-independent and unit-tested offline.
+
+**Inputs:** TRIG, REPEATS CV
+**Outputs:** BURST, END OF BURST
+
+---
+
+### COLLAPSE EG — 8HP (AF-04)
+
+![Collapse EG panel](docs/panels/CollapseEG.png)
+
+Attack/decay envelope. CURVE morphs the shape from exponential through linear to logarithmic. MISFIRE gives the envelope a probability of not firing at all — at exactly 0 it is a clean envelope every time. LOOP re-triggers on completion, making it an LFO with a shape control.
+
+**Inputs:** GATE, TRIG
+**Outputs:** ENV, INV (inverted), EOC (end of cycle)
+
+---
+
+### QUAD VCA — 12HP (AF-05)
+
+![Quad VCA panel](docs/panels/QuadVCA.png)
+
+Four channels of VCA, normalled so unpatched inputs cascade and the module doubles as a mixer. Per-channel level and CV. Response switches between linear (right for amplitude modulation) and exponential (right for a fader). PRESSURE saturates the sum; at exactly 0 it is bit-transparent, because a mixer that colours the signal when its character knob is down cannot be used as a clean mixer.
+
+**Inputs:** IN 1–4, CV 1–4
+**Outputs:** OUT 1–4, MIX
+
+---
+
+### SIGNAL BLOC — 10HP (AF-06)
+
+![Signal Bloc panel](docs/panels/SignalBloc.png)
+
+CV glue, all polyphonic. Two attenuvert-and-offset channels, a precision three-input adder, and a buffered 1→3 multiple. 10 HP rather than the 8 it was first specced at: sixteen widgets need 344px of a 329px panel at 8 HP, and building with every clearance at its floor is what caused the AF-04 collision.
+
+**Inputs:** IN 1–2, SUM A/B/C, MULT
+**Outputs:** OUT 1–2, SUM, MULT 1–3
 
 ---
 
