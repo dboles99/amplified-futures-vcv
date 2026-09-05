@@ -10,32 +10,29 @@
 //
 // Design: Amplified Futures (steel finish, 14 HP)
 //   PITCH:      root pitch offset (-2 to +2 oct)  [CV + atten]
-//   SPREAD:     per-partial drift depth            [CV + atten]
+//   SPREAD:     per-partial detune/drift depth     [CV + atten]
 //   PARTIAL:    first partial index (1–16)         [snap]
 //   COUNT:      number of partials to output (1–16)[snap]
 //   TUNING:     JUST / EQUAL / DRIFT               [snap 3-pos]
-//   DRIFT RATE: drift oscillator speed (0–4 Hz)
-//   DRIFT COH:  0 = whole stack transposes together,
+//   DRIFT RATE: drift oscillator speed (0–4 Hz)     — DRIFT mode only
+//   DRIFT COH:  0 = whole stack transposes together, — DRIFT mode only
 //               1 = partials drift independently (chorus)
 //
 // Outputs polyphonic V/OCT — COUNT channels, each a harmonic
 // partial of the root:  partial n  →  root + log2(n) octaves
 //
-// JUST:  exact harmonic series ratios (pure JI)
-// EQUAL: each partial rounded to nearest 12-TET semitone
-//
-// Every mode now carries a live per-partial drift on top of its
-// base tuning (af::tuning::Drift, see dsp/AfDrift.hpp). SPREAD sets
-// the depth in cents, RATE sets how fast it moves, and COHERENCE
-// decides whether that movement is shared (transposition) or
-// independent per partial (chorus/ensemble spread). At RATE 0 the
-// drift oscillator's phase is frozen wherever reset() staggered it,
-// so with SPREAD at 0 (the factory default) it contributes exactly
-// 0 cents — existing patches with no SPREAD are unaffected. A patch
-// that already used a nonzero SPREAD will hear a different (but
-// similarly small, static) per-partial colour once DRIFT RATE/
-// COHERENCE take their new-param defaults, because the offset is no
-// longer the old sin(n * golden angle) formula.
+// JUST:  exact harmonic series ratios (pure JI), SPREAD applies the
+//        original static per-partial offset (sin(n * golden angle))
+// EQUAL: each partial rounded to nearest 12-TET semitone, then the
+//        same static SPREAD offset as JUST
+// DRIFT: exact harmonic series ratios, but SPREAD/RATE/COHERENCE now
+//        drive af::tuning::Drift (dsp/AfDrift.hpp) instead of the
+//        static offset — SPREAD sets depth in cents, RATE sets how
+//        fast it moves, COHERENCE decides whether that movement is
+//        shared (transposition) or independent per partial (chorus).
+//        Only this mode reaches the Drift engine's output, so a JUST
+//        or EQUAL patch is completely unaffected by RATE/COHERENCE
+//        ever having been added — its code path is unchanged.
 // ============================================================
 
 struct HarmonicPressure : Module {
@@ -90,10 +87,9 @@ struct HarmonicPressure : Module {
 
 		getParamQuantity(PARTIAL_PARAM)->description = "Starting harmonic partial (1 = fundamental)";
 		getParamQuantity(COUNT_PARAM)->description   = "Number of partials to output as poly channels";
-		// Drift (SPREAD/RATE/COHERENCE) now applies in every mode, not only
-		// this switch's third position — DRIFT and JUST share the same
-		// harmonic maths and differ only in name; only EQUAL is distinct.
-		getParamQuantity(TUNING_PARAM)->description  = "0=JUST (pure JI)  1=EQUAL (12-TET)  2=DRIFT (same maths as JUST)";
+		getParamQuantity(TUNING_PARAM)->description  = "0=JUST (pure JI)  1=EQUAL (12-TET)  2=DRIFT (live per-partial movement)";
+		getParamQuantity(DRIFT_RATE_PARAM)->description       = "Applies only in DRIFT tuning mode (has no effect in JUST or EQUAL)";
+		getParamQuantity(DRIFT_COHERENCE_PARAM)->description  = "Applies only in DRIFT tuning mode (has no effect in JUST or EQUAL)";
 
 		configInput(VOCT_INPUT,      "Root V/oct");
 		configInput(PITCH_CV_INPUT,  "Pitch offset CV");
@@ -145,10 +141,19 @@ struct HarmonicPressure : Module {
 				voct = std::round(voct * 12.f) / 12.f;
 			}
 
-			// Was a static sin(n * golden angle) offset - an ensemble colour
-			// frozen in time. Drift makes it move, and coherence decides
-			// whether the stack transposes or spreads.
-			voct += drift_.centsFor(n - first) / 1200.f;
+			if (tuning == 2) {
+				// DRIFT: live per-partial movement, RATE/COHERENCE-driven.
+				// Only this mode reaches the Drift engine's output — JUST
+				// and EQUAL keep the original static offset below, so an
+				// existing patch in either of those modes is unaffected by
+				// RATE/COHERENCE ever existing.
+				voct += drift_.centsFor(n - first) / 1200.f;
+			} else {
+				// JUST and EQUAL: SPREAD adds the original static per-partial
+				// offset — unchanged from before this task's drift work.
+				float colour = std::sin(float(n) * 1.61803f) * spreadCents / 1200.f;
+				voct += colour;
+			}
 
 			outputs[VOCT_OUTPUT].setVoltage(voct, i);
 		}
