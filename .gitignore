@@ -21,3 +21,6 @@
 # Python bytecode from tools/
 __pycache__/
 *.pyc
+
+# WAV fixtures the reader suite synthesises at run time
+/tests/t_*.wav

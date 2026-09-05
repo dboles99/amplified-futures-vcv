@@ -11,7 +11,7 @@ CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 # three Linux ELF binaries dropped into this directory once did exactly that,
 # and `make test` skipped three of four suites while still exiting 0.
 EXE     := $(if $(filter Windows_NT,$(OS)),.exe,)
-BINS     = test_clock_core test_env_core test_vca_core test_ratchet_core test_bloc_core test_sitar_string test_param_slew
+BINS     = test_clock_core test_env_core test_vca_core test_ratchet_core test_bloc_core test_sitar_string test_param_slew test_wav_read
 TARGETS  = $(addsuffix $(EXE),$(BINS))
 
 test: $(TARGETS)
@@ -37,6 +37,9 @@ test_sitar_string$(EXE): test_sitar_string.cpp ../src/dsp/SitarStringCore.hpp
 
 test_param_slew$(EXE): test_param_slew.cpp ../src/dsp/ParamSlew.hpp
 	$(CXX) $(CXXFLAGS) -o $@ test_param_slew.cpp
+
+test_wav_read$(EXE): test_wav_read.cpp ../src/dsp/WavRead.hpp
+	$(CXX) $(CXXFLAGS) -o $@ test_wav_read.cpp
 
 clean:
 	rm -f $(BINS) $(addsuffix .exe,$(BINS))

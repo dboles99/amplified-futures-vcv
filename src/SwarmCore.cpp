@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/WavRead.hpp"
 #include <atomic>
 #include <deque>
 #include <cstdio>
@@ -16,9 +17,9 @@
 // SWARM CORE — Bio-Acoustic Insect Sample Engine
 // 18 HP | Amplified Futures
 //
-// Sample bank: loads mono 44.1 kHz PCM WAV files from
-//   res/insects/insectset32/cicadidae/
-//   res/insects/insectset32/orthoptera/
+// Sample banks: one directory of 32 recordings per bank under
+//   res/insects/banks/
+// chosen from the module context menu, one resident at a time.
 // (InsectSet32, CC-BY 4.0 / Zenodo 7072196)
 //
 // When the sample folder is absent, falls back to a noise-burst
@@ -29,68 +30,6 @@
 //   SWARM    — up to 8 concurrent voices, detuned + time-scattered
 // ============================================================
 
-// ─── Minimal PCM WAV loader ──────────────────────────────────
-// Handles 16-bit and float32 mono/stereo PCM only.
-// Clips to maxFrames so loading many long recordings stays memory-safe.
-static bool loadWavMono(const std::string& path,
-                         std::vector<float>& out, int& sampleRate,
-                         uint32_t maxFrames = 220500) { // 5 s @ 44.1 kHz
-    FILE* f = fopen(path.c_str(), "rb");
-    if (!f) return false;
-    auto readU32 = [&]() -> uint32_t {
-        uint8_t b[4]; fread(b, 1, 4, f);
-        return b[0] | (b[1]<<8) | (b[2]<<16) | (b[3]<<24);
-    };
-    auto readU16 = [&]() -> uint16_t {
-        uint8_t b[2]; fread(b, 1, 2, f);
-        return b[0] | (b[1]<<8);
-    };
-    char hdr[4];
-    fread(hdr, 1, 4, f);
-    if (memcmp(hdr, "RIFF", 4) != 0) { fclose(f); return false; }
-    readU32(); // chunk size
-    fread(hdr, 1, 4, f);
-    if (memcmp(hdr, "WAVE", 4) != 0) { fclose(f); return false; }
-    uint16_t audioFmt = 0, numCh = 1, bitsPerSample = 16;
-    uint32_t rateHz = 44100, dataSize = 0;
-    while (!feof(f)) {
-        char id[4]; if (fread(id, 1, 4, f) != 4) break;
-        uint32_t sz = readU32();
-        if (memcmp(id, "fmt ", 4) == 0) {
-            audioFmt     = readU16();
-            numCh        = readU16();
-            rateHz       = readU32();
-            readU32(); readU16(); // byte-rate, block align
-            bitsPerSample = readU16();
-            if (sz > 16) fseek(f, sz - 16, SEEK_CUR);
-        } else if (memcmp(id, "data", 4) == 0) {
-            dataSize = sz;
-            break;
-        } else {
-            fseek(f, sz, SEEK_CUR);
-        }
-    }
-    if (dataSize == 0 || (audioFmt != 1 && audioFmt != 3)) {
-        fclose(f); return false;
-    }
-    sampleRate = (int)rateHz;
-    if (audioFmt == 3 && bitsPerSample == 32) {
-        uint32_t nFrames = std::min(dataSize / (numCh * 4), maxFrames);
-        out.resize(nFrames);
-        std::vector<float> buf(nFrames * numCh);
-        fread(buf.data(), 4, nFrames * numCh, f);
-        for (uint32_t i = 0; i < nFrames; i++) out[i] = buf[i * numCh];
-    } else {
-        uint32_t nFrames = std::min(dataSize / (numCh * 2), maxFrames);
-        out.resize(nFrames);
-        std::vector<int16_t> buf(nFrames * numCh);
-        fread(buf.data(), 2, nFrames * numCh, f);
-        const float inv = 1.f / 32768.f;
-        for (uint32_t i = 0; i < nFrames; i++) out[i] = buf[i * numCh] * inv;
-    }
-    fclose(f);
-    return !out.empty();
-}
 
 // ─── Sample bank ─────────────────────────────────────────────
 struct SampleEntry { std::vector<float> data; int sr = 44100; std::string name; };
@@ -136,7 +75,7 @@ static std::vector<SampleEntry> loadBankFromDir(const std::string& dir) {
         const size_t idx = (paths.size() <= want) ? k : (k * paths.size()) / want;
         SampleEntry e;
         e.name = rack::system::getFilename(paths[idx]);
-        if (loadWavMono(paths[idx], e.data, e.sr)) bank.push_back(std::move(e));
+        if (WavRead::loadWavMono(paths[idx], e.data, e.sr)) bank.push_back(std::move(e));
     }
     return bank;
 }
