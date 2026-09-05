@@ -15,7 +15,7 @@ Two-voice detuned oscillator core. PITCH, DETUNE (0–100¢), TIMBRE (sine to ha
 
 ---
 
-### DroneClone — 22HP
+### DroneClone — 26HP
 ![DroneClone](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/DroneClone.png)
 
 8-voice amplified string wall. MASS, TENSION, SHIMMER, JAWARI (sitar buzz), WEIGHT, DRIFT. CHOKE gate + RTN feedback input. Up to 128 simultaneous oscillators.
@@ -141,7 +141,7 @@ Section-based performance conductor. DENSITY sweeps 4 channels in progressively.
 
 ## Effects
 
-### Collapse Saturator — 12HP
+### Collapse Saturator — 16HP
 ![CollapseSat](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/CollapseSat.png)
 
 Stereo drive/saturation. Three harmonic modes: ODD (tanh), EVEN (tape-like), FULL (hard clip). COLLAPSE gate instantly maxes drive with shaped RECOVERY. Sidechain input.

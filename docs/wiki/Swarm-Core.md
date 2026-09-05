@@ -6,6 +6,8 @@ Bio-acoustic sample engine playing recorded insects. The bank is InsectSet32 —
 
 It is the only module in the plugin that reads files from disk, and that has two consequences worth knowing before you patch it.
 
+With nothing patched into **TRIG**, DENSITY drives an internal event clock from 0.5 to 30 Hz, so the module sounds on its own; patch TRIG and it takes over. **SPECIMEN** now has an attenuverter and a CV input, so which insect plays can be sequenced. **MODE** latches rather than needing to be held.
+
 ---
 
 ## Sound in 60 seconds

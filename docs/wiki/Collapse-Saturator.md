@@ -1,10 +1,14 @@
-# Collapse Saturator — 12 HP
+# Collapse Saturator — 16 HP
 
 ![Collapse Saturator in VCV Rack](https://raw.githubusercontent.com/dboles99/amplified-futures-vcv/master/docs/panels/rack/CollapseSat.png)
 
 Stereo drive and saturation with a collapse gate. DRIVE sets pre-gain from ×1 to ×10, BUZZ picks the character of the clipping, and COLLAPSE is the performance control — a gate that ramps drive to maximum in a millisecond and then eases back to where you left it over RECOVERY.
 
 COLLAPSE adds distortion rather than removing it. It is an event, not a limiter.
+
+**LEVEL** trims the output, **MIX** blends the saturated signal against the dry one, and **SC AMT** sets how hard the sidechain pushes DRIVE. All three default to the behaviour the module had before they existed — unity, fully wet, and the sidechain depth that used to be fixed — so a patch saved earlier sounds the same.
+
+The panel reads **COLLAPSE SAT**. It and Collapse EG both used to print `COLLAPSE`, which made them indistinguishable in the browser.
 
 ---
 
