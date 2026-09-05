@@ -1,7 +1,7 @@
 {
   "slug": "amplified-futures",
   "name": "Amplified Futures",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "license": "MIT",
   "brand": "Amplified Futures",
   "description": "Experimental Rack instruments for drone, feedback, physical modeling, no-wave sequencing, and massed-signal composition.",
@@ -67,7 +67,7 @@
       "name": "Drift",
       "description": "Slow random modulation source. RATE/WANDER/SLEW with CV. SMOOTH, STEP, and GATE outputs. SYNC trigger. V/OCT thru.",
       "tags": [
-        "Modulation",
+        "Low-frequency oscillator",
         "Random"
       ],
       "keywords": "wander slew smooth step gate sync random"
@@ -177,7 +177,7 @@
       "name": "Quad VCA",
       "description": "Four-channel VCA and mixer with normalled inputs and output saturation",
       "tags": [
-        "VCA",
+        "Voltage-controlled amplifier",
         "Mixer",
         "Utility"
       ]
