@@ -166,10 +166,10 @@ struct PulseWidget : ModuleWidget {
 		setModule(module);
 		setPanel(createPanel(asset::plugin(pluginInstance, "res/Pulse.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<AFScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<AFScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		// 4×4 step grid — spread across 12HP
 		const float stepX[4] = { 12.f, 22.f, 32.f, 42.f };
@@ -195,11 +195,16 @@ struct PulseWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(49.f, 83.f)), module, Pulse::DECAY_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(12.f, 96.f)), module, Pulse::METAL_PARAM));
-		addParam(createParamCentered<Trimpot>(            mm2px(Vec(19.f, 89.f)), module, Pulse::METAL_ATTEN_PARAM));
+		// Row 2's attenuverters sit LEFT of their knobs. Stacked under the row-1
+		// CV jacks they overlapped them by 3.1px - two controls that cannot both
+		// be grabbed. 6mm of vertical space cannot hold an 11.85px jack above an
+		// 8.93px trimpot; moving them sideways buys the clearance without
+		// widening the panel.
+		addParam(createParamCentered<Trimpot>(            mm2px(Vec( 5.f, 89.f)), module, Pulse::METAL_ATTEN_PARAM));
 		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(19.f, 103.f)), module, Pulse::METAL_CV_INPUT));
 
 		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(42.f, 96.f)), module, Pulse::CRACK_PARAM));
-		addParam(createParamCentered<Trimpot>(            mm2px(Vec(49.f, 89.f)), module, Pulse::CRACK_ATTEN_PARAM));
+		addParam(createParamCentered<Trimpot>(            mm2px(Vec(35.f, 89.f)), module, Pulse::CRACK_ATTEN_PARAM));
 		addInput(createInputCentered<PJ301MPort>(         mm2px(Vec(49.f, 103.f)), module, Pulse::CRACK_CV_INPUT));
 
 		// IO row: TRG · V/OCT IN · V/OCT OUT · OUT

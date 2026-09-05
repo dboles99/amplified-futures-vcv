@@ -228,10 +228,10 @@ struct MassDriverWidget : ModuleWidget {
         setPanel(createPanel(asset::plugin(pluginInstance, "res/MassDriver.svg")));
 
         // Corner screws
-        addChild(createWidget<ScrewBlack>(mm2px(Vec(7.5f,   1.f))));
-        addChild(createWidget<ScrewBlack>(mm2px(Vec(152.5f, 1.f))));
-        addChild(createWidget<ScrewBlack>(mm2px(Vec(7.5f,   124.f))));
-        addChild(createWidget<ScrewBlack>(mm2px(Vec(152.5f, 124.f))));
+        addChild(createWidget<AFScrew>(mm2px(Vec(7.5f,   1.f))));
+        addChild(createWidget<AFScrew>(mm2px(Vec(152.5f, 1.f))));
+        addChild(createWidget<AFScrew>(mm2px(Vec(7.5f,   124.f))));
+        addChild(createWidget<AFScrew>(mm2px(Vec(152.5f, 124.f))));
 
         // ── Left channel strips (CH 1–8) ─────────────────────────────
         // SVG px coords → mm: divide by 3
