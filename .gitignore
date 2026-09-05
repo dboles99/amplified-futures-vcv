@@ -24,3 +24,8 @@ __pycache__/
 
 # WAV fixtures the reader suite synthesises at run time
 /tests/t_*.wav
+
+# The panel render manifest must travel with the renders, or a fresh clone
+# has no way to tell a stale PNG from a current one. The blanket .* above was
+# catching it by accident.
+!/docs/panels/.render-manifest.json
