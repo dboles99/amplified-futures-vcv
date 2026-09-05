@@ -211,27 +211,59 @@ struct DroneClone : Module {
 
 				driftPhase[c][i] += driftRate[i];
 				if (driftPhase[c][i] >= 1.f) driftPhase[c][i] -= 1.f;
-				detuneFreq *= 1.f + drift * 0.008f * std::sin(2.f * M_PI * driftPhase[c][i]);
+				// At DRIFT 0 this multiplied by exactly 1, for the price of a sin.
+				if (drift > 0.f)
+					detuneFreq *= 1.f + drift * 0.008f * std::sin(2.f * M_PI * driftPhase[c][i]);
 
 				voices[c][i].phase += detuneFreq * args.sampleTime;
 				if (voices[c][i].phase >= 1.f) voices[c][i].phase -= 1.f;
 
 				float p = voices[c][i].phase;
-				float fundamental_wave = std::sin(2.f * M_PI * p);
+
+				// Every partial below is a harmonic of this one phase, so they
+				// all follow from a single sin/cos by angle addition:
+				//     s(n+1) = s(n)*c1 + c(n)*s1
+				//     c(n+1) = c(n)*c1 - s(n)*s1
+				// This is exact, not an approximation, and turns up to nine
+				// transcendentals per voice into two.
+				const float th = 2.f * M_PI * p;
+				const float s1 = std::sin(th);
+				const float c1 = std::cos(th);
+
+				float fundamental_wave = s1;
 				float toneSignal = fundamental_wave;
 
-				if (tension > 0.f) {
-					toneSignal += tension * 0.50f * std::sin(4.f * M_PI * p);
-					toneSignal += tension * 0.33f * std::sin(6.f * M_PI * p);
-					toneSignal += tension * 0.25f * std::sin(8.f * M_PI * p);
-					toneSignal /= 1.f + tension * 1.08f;
-				}
-				if (shimmer > 0.f) {
-					toneSignal += shimmer * 0.12f * std::sin(10.f * M_PI * p);
-					toneSignal += shimmer * 0.08f * std::sin(14.f * M_PI * p);
+				// Harmonics 2..4 for TENSION, extended to 5 and 7 for SHIMMER.
+				// Derived only when something actually asks for them.
+				if (tension > 0.f || shimmer > 0.f) {
+					const float s2 = 2.f * s1 * c1;
+					const float c2 = c1 * c1 - s1 * s1;
+					const float s3 = s2 * c1 + c2 * s1;
+					const float c3 = c2 * c1 - s2 * s1;
+					const float s4 = s3 * c1 + c3 * s1;
+
+					if (tension > 0.f) {
+						toneSignal += tension * 0.50f * s2;
+						toneSignal += tension * 0.33f * s3;
+						toneSignal += tension * 0.25f * s4;
+						toneSignal /= 1.f + tension * 1.08f;
+					}
+					if (shimmer > 0.f) {
+						const float c4 = c3 * c1 - s3 * s1;
+						const float s5 = s4 * c1 + c4 * s1;
+						const float c5 = c4 * c1 - s4 * s1;
+						const float s6 = s5 * c1 + c5 * s1;
+						const float c6 = c5 * c1 - s5 * s1;
+						const float s7 = s6 * c1 + c6 * s1;
+						toneSignal += shimmer * 0.12f * s5;
+						toneSignal += shimmer * 0.08f * s7;
+					}
 				}
 				if (jawari > 0.f) {
-					float buzz = std::max(0.f, (float)std::sin(2.f * M_PI * (p + 0.01f)));
+					// sin(th + 0.02*pi), by the same identity.
+					static const float kJawariSin = std::sin(0.02f * (float)M_PI);
+					static const float kJawariCos = std::cos(0.02f * (float)M_PI);
+					const float buzz = std::max(0.f, s1 * kJawariCos + c1 * kJawariSin);
 					toneSignal = toneSignal * (1.f - jawari * 0.35f) + buzz * jawari * 0.35f;
 				}
 

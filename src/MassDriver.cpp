@@ -72,6 +72,13 @@ struct MassDriver : Module {
     };
 
     bool   muted[16]    = {};
+
+    // Constant-power pan gains. They depend only on the channel index and
+    // WIDTH, so they change when the knob moves - not 32 transcendentals per
+    // sample for a value that is the same as the sample before.
+    float  panGainL[16] = {};
+    float  panGainR[16] = {};
+    float  panCachedWidth = -1.f;      // impossible width, forces the first fill
     float  collapseEnv  = 1.f;
     float  feedbackL    = 0.f;
     float  feedbackR    = 0.f;
@@ -134,6 +141,17 @@ struct MassDriver : Module {
         float density  = modp(DENSITY_PARAM,  DENSITY_ATTEN_PARAM,  DENSITY_CV_INPUT,  0.f, 1.f);
         float pressure = modp(PRESSURE_PARAM, PRESSURE_ATTEN_PARAM, PRESSURE_CV_INPUT, 0.f, 1.f);
         float width    = modp(WIDTH_PARAM,    WIDTH_ATTEN_PARAM,    WIDTH_CV_INPUT,    0.f, 1.f);
+
+        // Linear pan spread: ch 0 at -width, ch 15 at +width.
+        if (width != panCachedWidth) {
+            panCachedWidth = width;
+            for (int i = 0; i < 16; i++) {
+                const float panPos = (2.f * float(i) / 15.f - 1.f) * width;
+                const float panR   = (panPos + 1.f) * 0.5f;
+                panGainL[i] = std::cos(panR * float(M_PI) * 0.5f);
+                panGainR[i] = std::sin(panR * float(M_PI) * 0.5f);
+            }
+        }
         float mass     = modp(MASS_PARAM,     MASS_ATTEN_PARAM,     MASS_CV_INPUT,     0.f, 1.f);
         float feedback = modp(FEEDBACK_PARAM, FEEDBACK_ATTEN_PARAM, FEEDBACK_CV_INPUT, 0.f, 0.92f);
 
@@ -162,11 +180,8 @@ struct MassDriver : Module {
             float chGain = params[GAIN_PARAM + i].getValue();
             float sig = inputs[CH_INPUT + i].getVoltageSum() * chGain * densityGain;
 
-            // Linear pan spread: ch 0 at -width, ch 15 at +width
-            float panPos = (2.f * float(i) / 15.f - 1.f) * width;
-            float panR   = (panPos + 1.f) * 0.5f;
-            float L = sig * std::cos(panR * float(M_PI) * 0.5f);
-            float R = sig * std::sin(panR * float(M_PI) * 0.5f);
+            float L = sig * panGainL[i];
+            float R = sig * panGainR[i];
 
             mixL += L;
             mixR += R;

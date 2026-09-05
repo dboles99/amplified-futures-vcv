@@ -146,7 +146,7 @@ struct StringMassCore : Module {
 
 		for (int c = 0; c < polyCh; c++) {
 			float voct = inputs[VOCT_INPUT].getVoltage(c);
-			float freq = dsp::FREQ_C4 * std::pow(2.f, voct);
+			float freq = dsp::FREQ_C4 * dsp::exp2_taylor5( voct);
 
 			float sum = 0.f;
 
@@ -158,7 +158,7 @@ struct StringMassCore : Module {
 				if (mode == 0) {
 					// ── UNIS: symmetric spread around fundamental ────────
 					float cents = spreadPos * spreadCents;
-					voiceFreq   = freq * std::pow(2.f, cents / 1200.f);
+					voiceFreq   = freq * dsp::exp2_taylor5( cents / 1200.f);
 
 				} else if (mode == 1) {
 					// ── HARM: voices in harmonic series sections ─────────
@@ -170,13 +170,13 @@ struct StringMassCore : Module {
 					float secPos = (secLen > 1) ? (2.f * posInSec / float(secLen - 1) - 1.f) : 0.f;
 
 					float cents = secPos * spreadCents;
-					voiceFreq   = freq * harmRatios[sec] * std::pow(2.f, cents / 1200.f);
+					voiceFreq   = freq * harmRatios[sec] * dsp::exp2_taylor5( cents / 1200.f);
 
 				} else if (mode == 2) {
 					// ── JUST: M voices mapped to JI chromatic ratios ─────
 					int idx    = clamp((v * 12) / M, 0, 11);
 					float cents = spreadPos * spreadCents * 0.3f;  // narrower spread in JUST
-					voiceFreq  = freq * justRatios[idx] * std::pow(2.f, cents / 1200.f);
+					voiceFreq  = freq * justRatios[idx] * dsp::exp2_taylor5( cents / 1200.f);
 
 				} else {
 					// ── MICRO: slow per-voice vibrato at different rates ──
@@ -186,7 +186,7 @@ struct StringMassCore : Module {
 					microPhase[v][c] += lfoRate * args.sampleTime;
 					if (microPhase[v][c] >= 1.f) microPhase[v][c] -= 1.f;
 					float cents = std::sin(2.f * float(M_PI) * microPhase[v][c]) * spreadCents;
-					voiceFreq   = freq * std::pow(2.f, cents / 1200.f);
+					voiceFreq   = freq * dsp::exp2_taylor5( cents / 1200.f);
 				}
 
 				// Advance phasor
@@ -195,10 +195,22 @@ struct StringMassCore : Module {
 
 				// Waveform: sine + harmonics 2–4 (third-bridge harmonic stack)
 				float p = phase[v][c];
-				float s = (std::sin(2.f * float(M_PI) * p)
-				         + timbre * 0.5f  * std::sin(4.f * float(M_PI) * p)
-				         + timbre * 0.33f * std::sin(6.f * float(M_PI) * p)
-				         + timbre * 0.25f * std::sin(8.f * float(M_PI) * p)) / timbreNorm;
+				// Harmonics 2..4 follow from the fundamental by angle addition:
+				//   s(n+1) = s(n)*c1 + c(n)*s1,  c(n+1) = c(n)*c1 - s(n)*s1
+				// Exact, and four transcendentals per voice become two.
+				const float th = 2.f * float(M_PI) * p;
+				const float s1 = std::sin(th);
+				const float c1 = std::cos(th);
+				float s = s1;
+				if (timbre > 0.f) {
+					const float s2 = 2.f * s1 * c1;
+					const float c2 = c1 * c1 - s1 * s1;
+					const float s3 = s2 * c1 + c2 * s1;
+					const float c3 = c2 * c1 - s2 * s1;
+					const float s4 = s3 * c1 + c3 * s1;
+					s += timbre * 0.5f * s2 + timbre * 0.33f * s3 + timbre * 0.25f * s4;
+				}
+				s /= timbreNorm;
 
 				sum += s;
 			}
