@@ -28,6 +28,11 @@ struct CollapseSaturator : Module {
 		BUZZ_PARAM,
 		RECOVERY_PARAM,
 		RECOVERY_ATTEN_PARAM,
+		// Appended - never inserted above. Rack serialises params by position,
+		// so an insert would silently remap every saved patch.
+		LEVEL_PARAM,
+		MIX_PARAM,
+		SC_AMT_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -61,6 +66,12 @@ struct CollapseSaturator : Module {
 		configParam(RECOVERY_PARAM,       0.f, 1.f, 0.3f, "Recovery", "%", 0.f, 100.f);
 		configParam(RECOVERY_ATTEN_PARAM,-1.f, 1.f, 0.f,  "Recovery attenuverter");
 
+		// Defaults reproduce the previous behaviour exactly: unity out, fully
+		// wet, and the sidechain depth that used to be hard-coded at 0.5.
+		configParam(LEVEL_PARAM,  0.f, 2.f, 1.f, "Output level", "x");
+		configParam(MIX_PARAM,    0.f, 1.f, 1.f, "Dry / wet", "%", 0.f, 100.f);
+		configParam(SC_AMT_PARAM, 0.f, 1.f, 0.5f, "Sidechain amount", "%", 0.f, 100.f);
+
 		configInput(IN_L_INPUT,       "Left");
 		configInput(IN_R_INPUT,       "Right");
 		configInput(DRIVE_CV_INPUT,   "Drive CV");
@@ -88,7 +99,7 @@ struct CollapseSaturator : Module {
 		// Sidechain: boosts drive proportional to its amplitude
 		if (inputs[SIDECHAIN_INPUT].isConnected()) {
 			float sc = std::abs(inputs[SIDECHAIN_INPUT].getVoltage()) / 5.f;
-			drive = clamp(drive + sc * 0.5f, 0.f, 1.f);
+			drive = clamp(drive + sc * params[SC_AMT_PARAM].getValue(), 0.f, 1.f);
 		}
 
 		// Collapse: gate fires → ramp to full drive + hard clip, then recover
@@ -104,7 +115,8 @@ struct CollapseSaturator : Module {
 			int inId  = (ch == 0) ? IN_L_INPUT  : IN_R_INPUT;
 			int outId = (ch == 0) ? OUT_L_OUTPUT : OUT_R_OUTPUT;
 
-			float x = inputs[inId].getVoltage() / 5.f * preGain;
+			const float dry = inputs[inId].getVoltage();
+			float x = dry / 5.f * preGain;
 
 			float sat;
 			if (buzz == 0) {
@@ -126,7 +138,13 @@ struct CollapseSaturator : Module {
 				sat = sat + (hard - sat) * collapseEnv;
 			}
 
-			outputs[outId].setVoltage(sat * 5.f);
+			// Parallel blend, then output trim. preGain reaches x10, so
+			// without a trim the only way to hear more drive was more level.
+			const float wet = sat * 5.f;
+			const float mix = params[MIX_PARAM].getValue();
+			const float out = (dry * (1.f - mix) + wet * mix)
+			                * params[LEVEL_PARAM].getValue();
+			outputs[outId].setVoltage(clamp(out, -11.7f, 11.7f));
 		}
 
 		outputs[VOCT_OUTPUT].setVoltage(inputs[VOCT_INPUT].getVoltage());
@@ -157,6 +175,12 @@ struct CollapseSaturatorWidget : ModuleWidget {
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(60.96f,54.45f)), module, CollapseSaturator::COLLAPSE_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(60.96f,70.45f)), module, CollapseSaturator::SIDECHAIN_INPUT));
+
+		// Middle column: the 16 HP widening left it empty, and these three are
+		// the controls the module was actually missing rather than filler.
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(40.64f, 24.45f)), module, CollapseSaturator::LEVEL_PARAM));
+		addParam(createParamCentered<RoundSmallBlackKnob>(mm2px(Vec(40.64f, 56.45f)), module, CollapseSaturator::MIX_PARAM));
+		addParam(createParamCentered<Trimpot>(            mm2px(Vec(49.50f, 70.45f)), module, CollapseSaturator::SC_AMT_PARAM));
 
 		// ── Row 3+4: Stereo IO + V/OCT thru ──────────────────────
 		addInput(createInputCentered<PJ301MPort>( mm2px(Vec(20.32f,90.45f)), module, CollapseSaturator::IN_L_INPUT));

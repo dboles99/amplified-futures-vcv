@@ -196,11 +196,13 @@ Harmonic series pitch CV generator. PITCH root + SPREAD ensemble detuning. PARTI
 
 ---
 
-### COLLAPSE SATURATOR — 12HP
+### COLLAPSE SATURATOR — 16HP
 
 ![CollapseSat panel](docs/panels/CollapseSat.png)
 
 Stereo drive/saturation with collapse. DRIVE pre-gain. BUZZ character: ODD (symmetric tanh), EVEN (asymmetric tape DC-free), FULL (hard clip). COLLAPSE gate instantly maxes drive; RECOVERY sets return time. Sidechain input boosts drive. V/OCT pass-through.
+
+Widened to 16 HP and given the three controls it was missing: LEVEL (output trim - preGain reaches x10, so without it the only way to hear more drive was more level), MIX (parallel dry/wet blend) and SC AMT (the sidechain depth that used to be hard-coded). All three default to the previous behaviour, so patches saved before the change sound identical.
 
 **Inputs:** IN L, IN R, SIDECHAIN, COLLAPSE gate, DRIVE CV + ATT
 **Outputs:** OUT L, OUT R, THRU (V/OCT)
