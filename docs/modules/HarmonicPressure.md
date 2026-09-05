@@ -14,7 +14,7 @@ for i = 0 to COUNT−1:
     n = PARTIAL + i
     V/OCT[i] = rootPitch + log2(n)          ← JUST mode (exact harmonic series)
              | round((root + log2(n)) × 12) / 12  ← EQUAL (12-TET quantised)
-             | rootPitch + log2(n) + microOffset[i]  ← MICRO (JI + deterministic spread)
+             | rootPitch + log2(n) + drift[i](t)     ← DRIFT (JI + live movement)
 
 SPREAD ──► per-partial deterministic detune for ensemble colour (small cents offset)
 
@@ -33,7 +33,9 @@ SPREAD ──► per-partial deterministic detune for ensemble colour (small cen
 | SPREAD ATTEN | 3 | −1 to +1 | 0 | Attenuverter for SPREAD CV |
 | PARTIAL | 4 | 1–16 | 1 | First partial to output. 1 = fundamental, 2 = octave, 3 = perfect 5th above octave |
 | COUNT | 5 | 1–16 | 8 | Number of partials to output (= polyphonic channel count) |
-| TUNING | 6 | 0–2 | 0 | 0 = JUST, 1 = EQUAL, 2 = MICRO. Snap-enabled |
+| TUNING | 6 | 0–2 | 0 | 0 = JUST, 1 = EQUAL, 2 = DRIFT. Snap-enabled |
+| DRIFT RATE | 7 | 0–4 Hz | 0 | Speed of the drift movement. **DRIFT mode only** |
+| DRIFT COHERENCE | 8 | 0–1 | 1 | 0 = whole stack transposes together; 1 = partials drift independently. **DRIFT mode only** |
 
 ---
 
@@ -43,7 +45,7 @@ SPREAD ──► per-partial deterministic detune for ensemble colour (small cen
 | --- | --- |
 | JUST | Exact harmonic series ratios: partial n at root + log₂(n) V/OCT |
 | EQUAL | Same as JUST but each partial rounded to nearest 12-TET semitone |
-| MICRO | JUST + deterministic per-partial intonation offsets (SPREAD controls magnitude) |
+| DRIFT | JUST ratios that move. SPREAD sets depth in cents, DRIFT RATE the speed, DRIFT COHERENCE whether the movement is shared (transposition) or independent (chorus) |
 
 EQUAL mode quantises every partial to the chromatic scale, producing cluster chords instead of pure harmonic ratios. Useful for chromatic noise-rock textures where JI intervals feel too consonant.
 
@@ -68,7 +70,9 @@ EQUAL mode quantises every partial to the chromatic scale, producing cluster cho
 | 2 | SPREAD | CC 15 |
 | 4 | PARTIAL | CC 16 (0–7 = partial 1, 8–15 = partial 2, etc. — quantised in 8 steps of 127) |
 | 5 | COUNT | CC 17 |
-| 6 | TUNING | CC 18 (0–42 = JUST, 43–84 = EQUAL, 85–127 = MICRO) |
+| 6 | TUNING | CC 18 (0–42 = JUST, 43–84 = EQUAL, 85–127 = DRIFT) |
+| 7 | DRIFT RATE | CC 19 |
+| 8 | DRIFT COHERENCE | CC 20 |
 
 PARTIAL and COUNT are snap-enabled — CC values map to integer partial numbers automatically.
 
@@ -82,7 +86,7 @@ PARTIAL and COUNT are snap-enabled — CC values map to integer partial numbers 
 
 **Chromatic Cluster** — PARTIAL 1, COUNT 6, TUNING EQUAL, SPREAD 0. Every partial is rounded to the nearest semitone. Produces a chromatic cluster chord rather than a harmonic series. Works well for noise-rock harmonic tension.
 
-**Microtonal Swarm** — PARTIAL 1, COUNT 12, TUNING MICRO, SPREAD 0.5. Each of 12 partials is JI-tuned with added ensemble spread. 12 channels into StringMassCore MODE HARM — a 12 × 8 = 96 voice mass.
+**Drifting Swarm** — PARTIAL 1, COUNT 12, TUNING DRIFT, SPREAD 0.5, RATE 0.2 Hz, COHERENCE 1. Twelve JI partials, each wandering on its own. 12 channels into StringMassCore MODE HARM — a 12 × 8 = 96 voice mass that never quite settles.
 
 ---
 
@@ -123,7 +127,7 @@ PARTIAL and COUNT are snap-enabled — CC values map to integer partial numbers 
 
 ### SPREAD for ensemble warmth
 
-- TUNING MICRO, SPREAD 0.3–0.5.
+- TUNING DRIFT, SPREAD 0.3–0.5, RATE 0.1–0.3 Hz.
 - Each partial is detuned by a deterministic offset — simulating 100 players each tuning the same pitch slightly differently.
 - Very low SPREAD (0.1): just barely alive. High SPREAD (0.7): rich ensemble colour with slight pitch ambiguity.
 
@@ -150,3 +154,9 @@ PARTIAL and COUNT are snap-enabled — CC values map to integer partial numbers 
 | DroneClone | V/OCT IN for harmonic series chord walls |
 | Drift | SMOOTH → PITCH CV for slow root transpositions |
 | Choke | Route different partial ranges to separate channels for layered mixing |
+
+> **Changed in 2.3.0.** Tuning mode 2 was MICRO — just intonation plus a
+> *static* deterministic offset. It is now DRIFT, and that offset moves.
+> The parameter keeps its range and index, so patches saved before 2.3.0 load
+> normally, but one that used MICRO will now drift. JUST and EQUAL are
+> unchanged, and DRIFT RATE / DRIFT COHERENCE have no effect in either.

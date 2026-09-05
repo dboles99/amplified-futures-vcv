@@ -3,7 +3,7 @@
 ## Pending
 
 ### Shipping / library prep
-- [ ] **Factory presets** — `.vcvs` JSON preset files in `presets/amplified-futures/<slug>/`. 2–3 per module minimum.
+- [x] **Factory presets** — 57 `.vcvm` files in `presets/<slug>/`, at least two per module. Shipped in 2.3.0.
 - [ ] **How-to guides** — `docs/guides/` short task-focused docs.
 
 ### Modules

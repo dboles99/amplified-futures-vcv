@@ -35,7 +35,7 @@ If the sample folder is absent, falls back to a noise-burst so the module is alw
 
 | Param | Index | Range | Default | Notes |
 | --- | --- | --- | --- | --- |
-| SPECIMEN | 0 | 0–1 | 0 | Sample select: maps linearly across loaded bank (up to 64 samples) |
+| SPECIMEN | 0 | 0–1 | 0 | Sample select: maps linearly across the loaded bank of 32 samples |
 | PITCH | 1 | −24 to +24 st | 0 | Pitch offset in semitones. 0 = playback at original rate |
 | DENSITY | 2 | 0–1 | 0.5 | Swarm voice count: 0 = 1 voice, 1 = 8 voices. SPECIMEN mode: ignored |
 | SCATTER | 3 | 0–1 | 0.1 | Timing scatter between swarm voices (0 = simultaneous, 1 = max delay) |
@@ -46,6 +46,7 @@ If the sample folder is absent, falls back to a noise-burst so the module is alw
 | SCATTER ATT | 8 | −1 to +1 | 0 | Attenuverter for SCATTER CV |
 | DETUNE ATT | 9 | −1 to +1 | 0 | Attenuverter for DETUNE CV |
 | MODE | 10 | Toggle | Specimen | Button toggles Specimen / Swarm. LED: off = Specimen, lit = Swarm |
+| SPECIMEN ATT | 11 | −1 to +1 | 0 | Attenuverter for SPECIMEN CV |
 
 ---
 
@@ -175,3 +176,17 @@ For jog-wheel style SPECIMEN select: CC values 1–63 = CW (next sample), 65–1
 | Choke | OUT L/R into CH inputs for panning and level control alongside other sources |
 | CollapseSat | OUT → IN for saturation of the insect texture (EVEN mode adds warmth) |
 | WallConductor | OUT → CH input as an environmental texture layer beneath the drone wall |
+
+## Sample banks
+
+Two banks ship with the plugin, chosen from the module's right-click menu:
+**Cicadidae** (32 recordings, 23 species) and **Orthoptera** (32, 9 species).
+One is resident at a time. The choice is stored in the patch by bank *name*, so
+adding or reordering banks cannot repoint an existing patch at a different
+insect.
+
+`SPECIMEN CV` (input, with the SPECIMEN ATT attenuverter) selects within the
+active bank. Switching banks is a menu action rather than a parameter because it
+reloads from disk.
+
+Audio is InsectSet32, CC BY 4.0 — see `res/insects/banks/ATTRIBUTION.md`.

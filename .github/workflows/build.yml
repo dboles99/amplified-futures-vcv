@@ -43,3 +43,31 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/tests"
           make test
+
+  # The library builds submissions for all three platforms from source, so a
+  # compile error on mac or Linux is a rejection round-trip. Neither had ever
+  # been compiled before 2.3.0.
+  build-unix:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            sdk: Rack-SDK-2.6.6-lin-x64.zip
+          - os: macos-latest
+            sdk: Rack-SDK-2.6.6-mac-x64.zip
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download Rack SDK 2.6.6
+        run: |
+          curl -L "https://vcvrack.com/downloads/${{ matrix.sdk }}" -o Rack-SDK.zip
+          unzip -q Rack-SDK.zip
+
+      - name: Build plugin
+        run: RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK" make -j4
+
+      - name: Run core tests
+        run: cd tests && make test

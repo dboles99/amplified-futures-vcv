@@ -189,10 +189,10 @@ Section-based performance mixer/conductor. DENSITY sweeps 4 channels in. PRESSUR
 
 ![HarmonicPressure panel](docs/panels/HarmonicPressure.png)
 
-Harmonic series pitch CV generator. PITCH root + SPREAD ensemble detuning. PARTIAL selects first partial, COUNT sets how many (polyphonic channels). JUST / EQUAL / MICRO tuning modes. Outputs polyphonic V/OCT — pair directly with String Mass Core.
+Harmonic series pitch CV generator. PITCH root + SPREAD detuning. PARTIAL selects the first partial, COUNT sets how many (polyphonic channels). JUST / EQUAL / DRIFT tuning, with DRIFT RATE and DRIFT COHERENCE driving live per-partial movement. Outputs polyphonic V/OCT — pair directly with String Mass Core.
 
-**Inputs:** V/OCT root, PITCH CV + ATT, SPREAD CV + ATT, PARTIAL CV, COUNT CV
-**Outputs:** OUT (poly V/OCT), THRU (V/OCT pass-through)
+**Inputs:** V/OCT root, PITCH CV + ATT, SPREAD CV + ATT
+**Outputs:** V/OCT (polyphonic, COUNT channels)
 
 ---
 

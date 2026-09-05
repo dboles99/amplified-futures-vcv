@@ -19,3 +19,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+THIRD-PARTY ASSETS
+
+The MIT licence above covers the source code and panel artwork of this plugin.
+It does not cover the audio under res/insects/.
+
+Those recordings are derived from InsectSet32 by Marius Faiss
+(https://doi.org/10.5281/zenodo.7072196) and are licensed under Creative
+Commons Attribution 4.0 International (CC BY 4.0),
+https://creativecommons.org/licenses/by/4.0/ - not under the MIT licence.
+Attribution and a statement of the modifications made are in
+res/insects/banks/ATTRIBUTION.md, which must travel with the audio.

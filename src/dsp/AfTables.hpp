@@ -1,5 +1,6 @@
 #pragma once
-// Copyright (c) 2026 Daniel Boles. MIT — see LICENSE.
+// Copyright (c) 2026 Daniel Boles
+// SPDX-License-Identifier: MIT
 //
 // Named tuning tables. Data, not behaviour.
 //

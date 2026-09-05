@@ -33,6 +33,9 @@ V/OCT IN ───────────────────────�
 | BUZZ | 2 | 0–2 | 0 | 0 = ODD, 1 = EVEN, 2 = FULL. Snap-enabled switch |
 | RECOVERY | 3 | 0–1 | 0.3 | Post-collapse recovery: 0 = 10 ms, 1 = 2 s |
 | RECOVERY ATTEN | 4 | −1 to +1 | 0 | Attenuverter for RECOVERY CV |
+| LEVEL | 5 | 0–1 | 0.5 | Output level after the drive stage. Default reproduces pre-2.3.0 behaviour |
+| MIX | 6 | 0–1 | 1 | Dry/wet between the input and the saturated signal. 1 = fully saturated |
+| SC AMT | 7 | 0–1 | 1 | How strongly the sidechain input drives DRIVE |
 
 ---
 
