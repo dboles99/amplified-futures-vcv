@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/ParamSlew.hpp"
 #include "dsp/VcaCore.hpp"
 
 // ============================================================
@@ -55,7 +56,17 @@ struct QuadVCA : Module {
 		configOutput(MIX_OUTPUT, "Mix");
 	}
 
+	// A level knob multiplies the signal, so a jump in it is a click. The
+	// knob can jump for reasons this module never sees: DAW automation, a
+	// preset load, a coarse MIDI CC.
+	ParamSlew::Bank<4> levelSlew;
+	float slewSr = 0.f;
+
 	void process(const ProcessArgs& args) override {
+		if (args.sampleRate != slewSr) {
+			slewSr = args.sampleRate;
+			levelSlew.configure(5.f, slewSr);
+		}
 		const bool expo = params[CURVE_PARAM].getValue() > 0.5f;
 		const float pressure = params[PRESSURE_PARAM].getValue();
 
@@ -72,7 +83,9 @@ struct QuadVCA : Module {
 
 			// Knob sets the ceiling; CV scales within it. Unpatched CV leaves
 			// the knob in sole control rather than muting the channel.
-			float amount = params[LEVEL1_PARAM + i].getValue();
+			// Smooth the knob, not the CV - CV is audio rate and must stay
+			// immediate.
+			float amount = levelSlew.process(i, params[LEVEL1_PARAM + i].getValue());
 			if (inputs[CV1_INPUT + i].isConnected())
 				amount *= clamp(inputs[CV1_INPUT + i].getVoltage() / 10.f, 0.f, 1.f);
 

@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/ParamSlew.hpp"
 
 // ============================================================
 // CHOKE — 4-channel cheap-mixer-as-instrument
@@ -94,6 +95,20 @@ struct Choke : Module {
 			v += params[atten].getValue() * inputs[cv].getVoltage() / 5.f;
 		return clamp(v, lo, hi);
 	}
+	// As modp(), but the knob is smoothed and the CV is not. A gain knob that
+	// steps is a click; a CV that is smoothed is no longer a modulation input.
+	ParamSlew::Smoother gainSlew[4];
+	ParamSlew::Smoother& gainSlewFor(int i) { return gainSlew[i]; }
+	ParamSlew::Smoother mainSlew;
+	float slewSr = 0.f;
+
+	float modpSmoothed(ParamSlew::Smoother& sm, int p, int a, int c, float lo, float hi) {
+		float base  = sm.process(params[p].getValue());
+		float atten = params[a].getValue();
+		float cv    = inputs[c].getVoltage() / 10.f;
+		return clamp(base + atten * cv, 0.f, 1.f) * (hi - lo) + lo;
+	}
+
 
 	// Mute states are toggled by trigger, not held in a parameter, so they need
 	// saving explicitly or every mute resets on patch load.
@@ -118,7 +133,12 @@ struct Choke : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		float main = modp(MAIN_PARAM, MAIN_ATTEN_PARAM, MAIN_CV_INPUT, 0.f, 1.5f);
+		if (args.sampleRate != slewSr) {
+			slewSr = args.sampleRate;
+			for (int i = 0; i < 4; i++) gainSlew[i].configure(5.f, slewSr);
+			mainSlew.configure(5.f, slewSr);
+		}
+		float main = modpSmoothed(mainSlew, MAIN_PARAM, MAIN_ATTEN_PARAM, MAIN_CV_INPUT, 0.f, 1.5f);
 
 		float alpha = 1.f - std::exp(-2.f * M_PI * 600.f * args.sampleTime);
 
@@ -138,7 +158,7 @@ struct Choke : Module {
 				input += inputs[IN_1_INPUT + i].getVoltage(c);
 			input /= nch;
 
-			float gain = modp(GAIN_1_PARAM + i, GAIN_1_ATTEN_PARAM + i, GAIN_1_CV_INPUT + i, 0.f, 1.5f);
+			float gain = modpSmoothed(gainSlewFor(i), GAIN_1_PARAM + i, GAIN_1_ATTEN_PARAM + i, GAIN_1_CV_INPUT + i, 0.f, 1.5f);
 			input *= gain;
 
 			// TONE: blend between LP (~600 Hz) and dry

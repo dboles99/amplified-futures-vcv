@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/ParamSlew.hpp"
 
 // ============================================================
 // MASS DRIVER — AF-01, 32HP
@@ -79,6 +80,10 @@ struct MassDriver : Module {
     float  panGainL[16] = {};
     float  panGainR[16] = {};
     float  panCachedWidth = -1.f;      // impossible width, forces the first fill
+
+    // Sixteen channel gains, each multiplying its input directly.
+    ParamSlew::Smoother gainSlew[16];
+    float  slewSr = 0.f;
     float  collapseEnv  = 1.f;
     float  feedbackL    = 0.f;
     float  feedbackR    = 0.f;
@@ -140,6 +145,10 @@ struct MassDriver : Module {
         // ── Master params ─────────────────────────────────────────────
         float density  = modp(DENSITY_PARAM,  DENSITY_ATTEN_PARAM,  DENSITY_CV_INPUT,  0.f, 1.f);
         float pressure = modp(PRESSURE_PARAM, PRESSURE_ATTEN_PARAM, PRESSURE_CV_INPUT, 0.f, 1.f);
+        if (args.sampleRate != slewSr) {
+            slewSr = args.sampleRate;
+            for (int i = 0; i < 16; i++) gainSlew[i].configure(5.f, slewSr);
+        }
         float width    = modp(WIDTH_PARAM,    WIDTH_ATTEN_PARAM,    WIDTH_CV_INPUT,    0.f, 1.f);
 
         // Linear pan spread: ch 0 at -width, ch 15 at +width.
@@ -177,7 +186,7 @@ struct MassDriver : Module {
                 continue;
 
             float densityGain = clamp(density * 16.f - float(i), 0.f, 1.f);
-            float chGain = params[GAIN_PARAM + i].getValue();
+            float chGain = gainSlew[i].process(params[GAIN_PARAM + i].getValue());
             float sig = inputs[CH_INPUT + i].getVoltageSum() * chGain * densityGain;
 
             float L = sig * panGainL[i];

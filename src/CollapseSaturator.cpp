@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/ParamSlew.hpp"
 
 // ============================================================
 // COLLAPSE SATURATOR — stereo drive/saturation with collapse
@@ -91,7 +92,18 @@ struct CollapseSaturator : Module {
 		return clamp(v, lo, hi);
 	}
 
+	// LEVEL and MIX both scale the output directly.
+	ParamSlew::Smoother levelSlew, mixSlew;
+	float slewSr = 0.f;
+
 	void process(const ProcessArgs& args) override {
+		if (args.sampleRate != slewSr) {
+			slewSr = args.sampleRate;
+			levelSlew.configure(5.f, slewSr);
+			mixSlew.configure(5.f, slewSr);
+		}
+		const float levelSmoothed = levelSlew.process(params[LEVEL_PARAM].getValue());
+		const float mixSmoothed   = mixSlew.process(params[MIX_PARAM].getValue());
 		float drive    = modp(DRIVE_PARAM,    DRIVE_ATTEN_PARAM,    DRIVE_CV_INPUT,    0.f, 1.f);
 		float recovery = modp(RECOVERY_PARAM, RECOVERY_ATTEN_PARAM, RECOVERY_CV_INPUT, 0.f, 1.f);
 		int   buzz     = clamp((int)std::round(params[BUZZ_PARAM].getValue()), 0, 2);
@@ -141,9 +153,8 @@ struct CollapseSaturator : Module {
 			// Parallel blend, then output trim. preGain reaches x10, so
 			// without a trim the only way to hear more drive was more level.
 			const float wet = sat * 5.f;
-			const float mix = params[MIX_PARAM].getValue();
-			const float out = (dry * (1.f - mix) + wet * mix)
-			                * params[LEVEL_PARAM].getValue();
+			const float mix = mixSmoothed;
+			const float out = (dry * (1.f - mix) + wet * mix) * levelSmoothed;
 			outputs[outId].setVoltage(clamp(out, -11.7f, 11.7f));
 		}
 
