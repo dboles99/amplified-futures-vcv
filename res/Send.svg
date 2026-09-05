@@ -44,27 +44,27 @@
      id="rect1" />
   <line
      x1="0"
-     y1="120"
+     y1="63.7025"
      x2="180"
-     y2="120"
+     y2="63.7025"
      stroke="#141A12"
      stroke-width="0.4"
      opacity="0.5"
      id="line1" />
   <line
      x1="0"
-     y1="240"
+     y1="214.063"
      x2="180"
-     y2="240"
+     y2="214.063"
      stroke="#141A12"
      stroke-width="0.4"
      opacity="0.5"
      id="line2" />
   <line
      x1="0"
-     y1="320"
+     y1="314.303"
      x2="180"
-     y2="320"
+     y2="314.303"
      stroke="#141A12"
      stroke-width="0.4"
      opacity="0.3"
@@ -74,7 +74,7 @@
      x1="90"
      y1="35"
      x2="90"
-     y2="340"
+     y2="339.363"
      stroke="#141A12"
      stroke-width="0.6"
      opacity="0.6"
@@ -160,7 +160,7 @@
   <!-- CV jack dot (y=162.4) -->
   <circle
      cx="65.7"
-     cy="153"
+     cy="105.052"
      r="3"
      fill="#E8C547"
      id="circle10" />
@@ -187,7 +187,7 @@
      aria-label="B→A" />
   <circle
      cx="155.7"
-     cy="153"
+     cy="105.052"
      r="3"
      fill="#E8C547"
      id="circle14" />
@@ -247,7 +247,7 @@
      aria-label="A→C" />
   <circle
      cx="65.7"
-     cy="218"
+     cy="186.497"
      r="3"
      fill="#E8C547"
      id="circle21" />
@@ -274,7 +274,7 @@
      aria-label="C→A" />
   <circle
      cx="155.7"
-     cy="218"
+     cy="186.497"
      r="3"
      fill="#E8C547"
      id="circle25" />
@@ -330,7 +330,7 @@
   <!-- IN_A (x=45, y=265.8) -->
   <circle
      cx="45"
-     cy="255"
+     cy="232.858"
      r="3"
      fill="#E8C547"
      id="circle30" />
@@ -342,7 +342,7 @@
   <!-- IN_B (x=135, y=265.8) -->
   <circle
      cx="135"
-     cy="255"
+     cy="232.858"
      r="3"
      fill="#E8C547"
      id="circle31" />
@@ -354,7 +354,7 @@
   <!-- OUT_A (x=45, y=307.3) -->
   <circle
      cx="45"
-     cy="297"
+     cy="285.484"
      r="3"
      fill="#FF4A0E"
      id="circle32" />
@@ -371,7 +371,7 @@
   <!-- OUT_B (x=135, y=307.3) -->
   <circle
      cx="135"
-     cy="297"
+     cy="285.484"
      r="3"
      fill="#FF4A0E"
      id="circle34" />
@@ -408,7 +408,7 @@
   <!-- VOCT_INPUT (x=45) -->
   <circle
      cx="45"
-     cy="333"
+     cy="330.592"
      r="2.5"
      fill="#E8C547"
      id="circle37" />
@@ -420,7 +420,7 @@
   <!-- VOCT_OUTPUT (x=135) -->
   <circle
      cx="135"
-     cy="333"
+     cy="330.592"
      r="2.5"
      fill="#5A7350"
      id="circle38" />
