@@ -22,6 +22,10 @@ WIKILINK = re.compile(r"\[\[([^\]|]+?)\]\]")
 IMAGE = re.compile(r"!\[[^\]]*\]\((https://raw\.githubusercontent\.com/[^)]+)\)")
 # The HP need not end the heading — Mass Driver trails its "(AF-01)" designation.
 HP_HEADING = re.compile(r"^#\s+.+?—\s*(\d+)\s*HP\b", re.MULTILINE)
+# The "Full parameter spec" link every module page carries into docs/modules/.
+# Matched on the blob URL rather than the link text, because the text is the
+# path and would match itself if someone wrote it without a link at all.
+SPEC_LINK = re.compile(r"/blob/[^/]+/docs/modules/([A-Za-z0-9_-]+)\.md")
 VIEWBOX = re.compile(r'viewBox="\s*[\d.]+\s+[\d.]+\s+([\d.]+)\s+[\d.]+\s*"')
 
 # Pages that exist for structure, not content, and are never link targets.
@@ -101,6 +105,51 @@ def check_module_pages(wiki_dir: Path, plugin_json: Path) -> list[str]:
     return errors
 
 
+def check_module_refs(modules_dir: Path, plugin_json: Path) -> list[str]:
+    """Every module has a parameter reference, and none is left behind.
+
+    docs/modules/ is the second half of the manual - the wiki page is the
+    narrative, this is the parameter spec it links out to - and until now
+    nothing checked it, though CONTRIBUTING said otherwise. That is how a
+    reference page went on describing a mode the module no longer had.
+    """
+    errors = []
+    if not modules_dir.is_dir():
+        return [f"{modules_dir.name}/: directory missing entirely"]
+
+    present = {p.stem: p for p in sorted(modules_dir.glob("*.md"))}
+    expected = {m["slug"] for m in _modules(plugin_json)}
+
+    for slug in sorted(expected - set(present)):
+        errors.append(f"module {slug}: no parameter reference docs/modules/{slug}.md")
+    for stem in sorted(set(present) - expected):
+        errors.append(
+            f"docs/modules/{stem}.md: no module of that slug — renamed or removed?")
+    return errors
+
+
+def check_spec_links(wiki_dir: Path, modules_dir: Path) -> list[str]:
+    """Each wiki page's "Full parameter spec" link must resolve.
+
+    The link is a github.com blob URL, so a broken one is invisible offline and
+    still renders as a link: the page looks complete and the destination 404s.
+    """
+    # Compared against the real directory listing, not Path.exists(). This is
+    # developed on Windows, where the filesystem is case-insensitive, so
+    # exists() says yes to docs/modules/Dronecore.md when the file is
+    # DroneCore.md. github.com is case-sensitive: the link 404s for every
+    # reader while passing the check on the machine that wrote it.
+    actual = {p.stem for p in modules_dir.glob("*.md")}
+    errors = []
+    for path in sorted(wiki_dir.glob("*.md")):
+        for target in SPEC_LINK.findall(path.read_text(encoding="utf-8")):
+            if target not in actual:
+                errors.append(
+                    f"{path.name}: parameter spec link points at "
+                    f"docs/modules/{target}.md, which does not exist")
+    return errors
+
+
 def check_image_urls(wiki_dir: Path) -> list[str]:
     import requests
 
@@ -127,6 +176,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     wiki_dir = args.repo / "docs" / "wiki"
+    modules_dir = args.repo / "docs" / "modules"
     res_dir = args.repo / "res"
     plugin_json = args.repo / "plugin.json"
 
@@ -134,6 +184,8 @@ def main(argv: list[str] | None = None) -> int:
     errors += check_module_pages(wiki_dir, plugin_json)
     errors += check_hp(wiki_dir, res_dir, plugin_json)
     errors += check_wikilinks(wiki_dir)
+    errors += check_module_refs(modules_dir, plugin_json)
+    errors += check_spec_links(wiki_dir, modules_dir)
     if args.network:
         errors += check_image_urls(wiki_dir)
 
@@ -143,8 +195,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\n{len(errors)} problem(s).")
         return 1
     pages = len(list(wiki_dir.glob("*.md")))
+    refs = len(list(modules_dir.glob("*.md")))
     modules = len(_modules(plugin_json))
-    print(f"OK  {pages} pages, {modules} modules, HP and links consistent.")
+    print(f"OK  {pages} pages, {refs} parameter refs, {modules} modules, "
+          f"HP and links consistent.")
     return 0
 
 
