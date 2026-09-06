@@ -107,6 +107,25 @@ PITCH and SPREAD have an attenuverter (−1 to +1) and a CV input. PARTIAL, COUN
 
 ---
 
+## Factory presets
+
+Three presets shipped from the pitch research. Every figure below is derived,
+not chosen to look tidy, and `SPREAD` reads in cents as `knob x 20`.
+
+**Branca Mass** — SPREAD 0.6 (12 cents), DRIFT RATE 0.1 Hz, COHERENCE 1.0.
+Massed detuning that shimmers without the centre of the stack moving, which is
+what full coherence buys: every partial drifts together rather than wandering
+apart. Authored in **DRIFT** tuning mode rather than JUST. Drift is scoped to
+DRIFT mode only, so a JUST preset carrying a drift rate would sit completely
+static and the rate would be decoration.
+
+**Chatham 7-4** — JUST, first partial 7, SPREAD 0.1 (2 cents), no drift. The
+seventh partial is 969 cents above its octave, a flat minor seventh no piano
+can play, and the narrow spread keeps it identifiable rather than smeared.
+
+**Raga Drone** — JUST, SPREAD 0, no drift. Deliberately the still one: a fixed
+just-intonation reference with no movement of any kind, for tuning against.
+
 ## See also
 
 [[String-Mass-Core]] · [[DroneClone]] · [[DroneCore]] · [[Music-Theory]] · [[Playbooks]]

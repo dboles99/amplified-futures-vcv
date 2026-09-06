@@ -111,6 +111,29 @@ The two harmonic controls are the ones worth learning. TENSION adds odd harmonic
 
 ---
 
+## Factory presets
+
+Two presets from the pitch research. `SPREAD` is quoted here as the spacing
+between **adjacent** voices - `knob x 1200 / 7` - because adjacent voices are
+what you hear beating. The extremes of the stack are 1200 cents apart at
+SPREAD 1.0, which is a different note rather than a beat. The module's
+right-click menu reports the resulting beat rate at the current pitch.
+
+**Vinyl Wow** — SPREAD 0.0505, i.e. **8.656 cents** between neighbours. That
+is not a taste value: it is `1731.234 x 0.5 / 100`, the pitch deviation of a
+pressing whose spindle hole is 0.5 mm off centre, read at 100 mm groove
+radius. The matching wow *rate* is 0.556 Hz, once per revolution at 33 1/3 rpm.
+
+  Honest limitation: DroneClone has no drift-*rate* control - its drift speeds
+  are fixed in the module - so 0.556 Hz cannot be dialled in. The preset sets
+  the depth correctly and approximates the rate. Read it as "wow of the right
+  size", not a realisation of the figure.
+
+**Disco Strings** — SPREAD 0.1021, i.e. **17.5 cents** between neighbours,
+the midpoint of the 10-25 cent range measured as F0 dispersion across a large
+string section, with all eight voices running. Detune wide enough to read as a
+section rather than a chorus pedal.
+
 ## See also
 
 [[DroneCore]] · [[String-Mass-Core]] · [[Send]] · [[Feedback-Governor]] · [[Wall-Conductor]] · [[Playbooks]]
