@@ -25,6 +25,7 @@
 // a comb filter rather than nothing.
 // ============================================================
 #include <cstddef>
+#include <cstdint>
 
 // Fixed-size POD, written every sample into a buffer the receiver owns.
 // No allocation, no std::vector, no strings: this crosses the audio thread.
@@ -33,10 +34,11 @@ struct TransportMessage {
     float reset;      // 0 or 10 V
     float running;    // 0 or 10 V
     float bpm;        // for modules wanting tempo rather than edges
+    uint32_t seq;     // advances once per sample the producer writes
     bool  valid;      // false when nothing upstream is driving the bus
 
     TransportMessage()
-        : clock(0.f), reset(0.f), running(0.f), bpm(0.f), valid(false) {}
+        : clock(0.f), reset(0.f), running(0.f), bpm(0.f), seq(0u), valid(false) {}
 };
 
 // The message is memcpy'd between modules, so it must stay trivially
@@ -69,12 +71,38 @@ inline float transportPick(bool patched, float patchedVolts,
     return 0.f;
 }
 
-// True when the module should act on the bus at all: something upstream is
-// driving it AND the transport is running. A stopped clock holds its
-// consumers stopped rather than letting them free-run, which is what the
+// True when the module should take a CLOCK edge from the bus: something
+// upstream is driving it AND the transport is running. A stopped clock holds
+// its consumers stopped rather than letting them free-run, which is what the
 // cable would do.
 inline bool transportEngaged(const TransportMessage& bus) {
     return bus.valid && bus.running > 1.f;
+}
+
+// RESET is deliberately NOT gated on running.
+//
+// Street Grid Clock emits its RESET pulse whether or not the transport is
+// running - doReset is independent of it - and aligning a sequence while
+// stopped, then starting, is the ordinary way to use a reset. Gating the bus
+// on running would mean a patched RESET cable worked stopped and the bus did
+// not, which breaks the rule the whole design rests on: the bus behaves like
+// the cable it replaces.
+inline bool transportResetEngaged(const TransportMessage& bus) {
+    return bus.valid;
+}
+
+// Has the producer actually written since the last sample?
+//
+// The model check alone is not enough. A module that is BYPASSED runs
+// processBypass() instead of process(), so it stops writing while remaining a
+// valid writer by model - and the receiver's consumerMessage then holds the
+// last message forever. A clock frozen high would clock nothing; a clock
+// frozen low would look like a stopped transport that cannot be restarted.
+// Neither is detectable by inspecting the buffer's contents, so the producer
+// stamps a sequence number and the receiver watches it advance.
+inline bool transportAdvanced(bool seenBefore, uint32_t lastSeq,
+                              const TransportMessage& msg) {
+    return !seenBefore || msg.seq != lastSeq;
 }
 
 // What a module forwards to its right when it is passing the bus along.

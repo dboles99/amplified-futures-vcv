@@ -62,14 +62,40 @@ struct TransportReceiver {
     // keep clocking from a module that is no longer there. The left
     // neighbour's model is therefore re-checked every sample, not cached at
     // onExpanderChange: cheap, and it cannot go stale.
-    TransportMessage read(Module* m) const {
+    // Not const: the sequence check has to remember what it last saw.
+    TransportMessage read(Module* m) {
         const Module* left = m->leftExpander.module;
         if (!left || !afWritesTransport(left->model))
-            return TransportMessage();
+            return forget();
         const void* src = m->leftExpander.consumerMessage;
         if (!src)
+            return forget();
+
+        const TransportMessage msg =
+            *reinterpret_cast<const TransportMessage*>(src);
+        if (!msg.valid)
+            return forget();
+
+        // A producer that has stopped writing - bypassed, most likely - leaves
+        // its last message in the buffer and stays a valid writer by model, so
+        // the contents alone cannot distinguish live from frozen.
+        if (!transportAdvanced(seen, lastSeq, msg))
             return TransportMessage();
-        return *reinterpret_cast<const TransportMessage*>(src);
+
+        lastSeq = msg.seq;
+        seen = true;
+        return msg;
+    }
+
+private:
+    uint32_t lastSeq = 0;
+    bool seen = false;
+
+    // No producer at all: drop the history too, so reconnecting the same
+    // module does not look like a stalled one on its first sample.
+    TransportMessage forget() {
+        seen = false;
+        return TransportMessage();
     }
 };
 

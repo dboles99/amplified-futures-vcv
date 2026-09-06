@@ -7,6 +7,7 @@
 // Those are the three things that would be wrong quietly.
 #include "../src/dsp/TransportBus.hpp"
 #include <cstdio>
+#include <type_traits>
 
 static int g_failures = 0;
 
@@ -84,6 +85,63 @@ int main() {
               "a vanished producer delivers no edge, even holding a stale 10 V");
     }
 
+    // ── Reset is not gated on running ───────────────────────
+    //
+    // Street Grid Clock emits RESET whether or not it is running, and aligning
+    // a sequence while stopped then starting is the ordinary way to use it. A
+    // patched cable works stopped; the bus has to as well, or the bus stops
+    // behaving like the cable it replaces.
+    {
+        TransportMessage bus = running_bus(0.f);
+        bus.running = 0.f;
+        bus.reset = 10.f;
+        check(!transportEngaged(bus), "a stopped transport gives no clock");
+        check(transportResetEngaged(bus), "a stopped transport still gives reset");
+        check(transportPick(false, 0.f, transportResetEngaged(bus), bus.reset) == 10.f,
+              "an unpatched reset fires from a stopped transport");
+    }
+
+    {
+        TransportMessage none;
+        check(!transportResetEngaged(none),
+              "reset from an absent transport is still nothing");
+    }
+
+    {
+        TransportMessage bus = running_bus(0.f);
+        bus.running = 0.f;
+        bus.reset = 10.f;
+        check(transportPick(true, 0.f, transportResetEngaged(bus), bus.reset) == 0.f,
+              "a patched reset still beats the bus while stopped");
+    }
+
+    // ── A producer that stops writing ───────────────────────
+    //
+    // A BYPASSED module runs processBypass() instead of process(), so it stops
+    // writing while still being a valid writer by model. Its last message sits
+    // in the receiver's buffer unchanged - a clock frozen high or low, neither
+    // distinguishable from a live one by looking at the contents. The sequence
+    // number is what separates them.
+    {
+        TransportMessage msg = running_bus(10.f);
+        msg.seq = 41;
+        check(transportAdvanced(false, 0, msg),
+              "the first message ever seen counts as advanced");
+        check(transportAdvanced(true, 40, msg),
+              "a message with a new sequence is live");
+        check(!transportAdvanced(true, 41, msg),
+              "a message repeating its sequence is a producer that stopped");
+    }
+
+    // The counter wrapping must not read as a stall: the values differ either
+    // side of the wrap, which is all the check asks.
+    {
+        TransportMessage msg = running_bus(10.f);
+        msg.seq = 0;
+        check(transportAdvanced(true, 0xFFFFFFFFu, msg),
+              "a wrapped sequence still counts as advanced");
+    }
+
     // ── Forwarding ──────────────────────────────────────────
     {
         TransportMessage bus = running_bus(10.f);
@@ -112,7 +170,13 @@ int main() {
         TransportMessage a = running_bus(7.f);
         TransportMessage b = a;             // the copy the expander performs
         check(b.clock == 7.f && b.valid, "a copied message keeps its contents");
-        check(sizeof(TransportMessage) == sizeof(a), "size is fixed, not dynamic");
+        // Not sizeof(T) == sizeof(a), which is true by definition and tests
+        // nothing. These are the properties that actually make the copy above
+        // safe across the expander boundary.
+        check(std::is_trivially_copyable<TransportMessage>::value,
+              "the message is trivially copyable");
+        check(std::is_standard_layout<TransportMessage>::value,
+              "the message is standard-layout");
     }
 
     std::printf("\n%s\n", g_failures ? "FAILURES" : "all passed");

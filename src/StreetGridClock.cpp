@@ -60,6 +60,9 @@ struct StreetGridClock : Module {
 	dsp::BooleanTrigger runTrig, resetBtnTrig;
 	dsp::SchmittTrigger extTrig, resetInTrig;
 	dsp::PulseGenerator pulses[5];
+	// Advances every sample, so a receiver can tell a live producer from a
+	// bypassed one whose last message is still sitting in the buffer.
+	uint32_t busSeq = 0;
 
 	StreetGridClock() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -164,6 +167,7 @@ struct StreetGridClock : Module {
 		bus.reset = outputs[RESET_OUTPUT].getVoltage();
 		bus.running = running ? 10.f : 0.f;
 		bus.bpm = bpm;
+		bus.seq = ++busSeq;
 		bus.valid = true;
 		transportSendRight(this, bus);
 	}

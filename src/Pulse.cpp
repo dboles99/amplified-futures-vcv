@@ -121,6 +121,15 @@ struct Pulse : Module {
 		}
 	}
 
+	// A bypassed module runs this INSTEAD of process(), so without it the
+	// chain downstream freezes on whatever was last written. Bypass should
+	// pass the transport through like a wire, which is what it already means
+	// for audio.
+	void processBypass(const ProcessArgs& args) override {
+		Module::processBypass(args);
+		transportSendRight(this, transportForward(transport.read(this)));
+	}
+
 	void process(const ProcessArgs& args) override {
 		// Read before anything else: a patched input still wins, but the
 		// bus has to be sampled every call or the forward below is stale.
