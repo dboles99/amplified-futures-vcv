@@ -131,13 +131,45 @@ jobs:
           path: dist/*.vcvplugin
           if-no-files-found: error
 
+  # The documentation checks existed but ran nowhere: CI compiled the plugin
+  # and ran the C++ core suite, while check_wiki.py and its tests only ever ran
+  # when someone remembered to. A check nothing invokes is a check that has
+  # stopped, and the manual is the part of this repo most able to drift without
+  # anyone noticing - drift is the whole thing check_wiki exists to catch.
+  docs:
+    name: docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pytest
+        run: python -m pip install --quiet pytest
+
+      # The tests import check_wiki directly, so they run from tools/.
+      - name: Test the checker
+        run: cd tools && python -m pytest test_check_wiki.py -q
+
+      # Offline only. --network fetches every image URL, which makes a green
+      # build depend on githubusercontent being up.
+      - name: Check the manual against the plugin
+        run: python tools/check_wiki.py
+
   # Independent distribution. The VCV library builds from source and needs none
   # of this, but it is not carrying the plugin, so the GitHub release is the
   # only way anyone installs it - and until now that release held a Windows
   # build alone, which is most of the audience unable to install at all.
   release:
     name: attach binaries to the release
-    needs: [build, build-unix]
+    # docs gates the release too. check_wiki only fails on structural faults -
+    # a module with no page, an HP claim contradicting its panel, a link into
+    # nothing - never on prose, so this cannot block a release over a typo. Any
+    # of those shipping in a release is worse than the release waiting.
+    needs: [build, build-unix, docs]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
