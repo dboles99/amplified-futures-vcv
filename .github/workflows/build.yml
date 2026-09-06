@@ -70,13 +70,16 @@ jobs:
           - os: ubuntu-latest
             arch: lin-x64
             sdk: Rack-SDK-2.6.6-lin-x64.zip
+            expect: x86-64
           - os: macos-latest
             arch: mac-arm64
             sdk: Rack-SDK-2.6.6-mac-arm64.zip
+            expect: arm64
           - os: macos-latest
             arch: mac-x64
             sdk: Rack-SDK-2.6.6-mac-x64.zip
             cross: x86_64-apple-darwin
+            expect: x86_64
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -102,12 +105,23 @@ jobs:
         if: ${{ !matrix.cross }}
         run: cd tests && make test
 
+      # Read the binary itself, not the filename. Rack derives both the target
+      # and the package name from the same MACHINE, so a name-only check passes
+      # by construction and proves nothing about what was actually emitted -
+      # which is the whole risk of building an x64 slice on an arm64 host.
       - name: Verify the binary is the architecture it claims
         run: |
+          bin=$(ls plugin.so plugin.dylib 2>/dev/null | head -1)
+          [ -n "$bin" ] || { echo "::error::no built binary found"; exit 1; }
+          desc=$(file -b "$bin")
+          echo "$bin: $desc"
+          case "$desc" in
+            *${{ matrix.expect }}*) echo "OK: ${{ matrix.expect }}" ;;
+            *) echo "::error::expected ${{ matrix.expect }}, got: $desc"; exit 1 ;;
+          esac
           f=$(ls dist/*.vcvplugin)
-          echo "built: $f"
           case "$f" in
-            *-${{ matrix.arch }}.vcvplugin) echo "name matches ${{ matrix.arch }}" ;;
+            *-${{ matrix.arch }}.vcvplugin) echo "package: $(basename "$f")" ;;
             *) echo "::error::expected ${{ matrix.arch }} in $f"; exit 1 ;;
           esac
 

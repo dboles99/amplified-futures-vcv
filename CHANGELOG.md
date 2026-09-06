@@ -17,17 +17,28 @@ The first release that macOS and Linux users can install. No new modules.
   macOS since 2.3.0 and discarded the results every time — it ran `make`, never
   `make dist`, so 2.3.0 shipped a Windows build alone and most of the audience
   could not install at all. **mac-arm64 had never been built**, which on current
-  hardware is most Mac users. Both Mac slices are cross-compiled on one runner
-  by Rack's own `CROSS_COMPILE` path, and each binary is checked to be the
-  architecture its filename claims.
-- **Five Drone Clone presets** — Branca Mass, Chatham 7-4, Raga Drone, Disco
-  Strings and Vinyl Wow. Each is the same three layers (table, drift rate,
-  coherence) at different settings rather than a mode of its own. The numbers
-  are derived rather than chosen: Disco Strings sits at 17.5 cents, the midpoint
-  of the 10–25 cents measured as F0 dispersion across a large string section.
-  Vinyl Wow's 8.656 cents is a 0.5 mm off-centre pressing read at 100 mm radius;
-  its drift *rate* is only approximated, because Drone Clone has no drift-rate
-  control, and the wiki says so rather than implying otherwise.
+  hardware is most Mac users. Both Mac slices come from one runner — arm64
+  natively, x64 cross-compiled by Rack's own `CROSS_COMPILE` path — and each
+  binary is read back with `file` to confirm it is the architecture its
+  filename claims, rather than trusting the name Rack generated.
+- **Five presets, derived rather than chosen.**
+
+  *Harmonic Pressure* gains **Branca Mass**, **Chatham 7-4** and **Raga Drone**
+  — each the same three layers (table, drift rate, coherence) at different
+  settings rather than a mode of its own, which is what the single architecture
+  buys. All three declare drift rate and coherence explicitly; the three that
+  shipped earlier stop at the tuning parameter and inherit whatever the defaults
+  happen to be, which is not the same as declaring them. Branca Mass is authored
+  in DRIFT tuning, not JUST: drift is scoped to DRIFT mode, so a JUST preset
+  carrying a rate would sit still and the number would be decoration.
+
+  *Drone Clone* gains **Disco Strings** at 17.5 cents, the midpoint of the
+  10–25 cents measured as F0 dispersion across a large string section, and
+  **Vinyl Wow** at 8.656 cents — a 0.5 mm off-centre pressing read at 100 mm
+  radius. Vinyl Wow's drift *rate* is only approximated, because Drone Clone has
+  no drift-rate control; the wiki says so rather than implying the figure was
+  realised. Drone Clone cents throughout are adjacent-voice spacing, not the
+  span of the stack: adjacent voices are what beat.
 
 ### Changed
 
