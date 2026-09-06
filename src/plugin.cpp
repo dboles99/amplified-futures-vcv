@@ -50,7 +50,7 @@ void init(Plugin* p) {
 // forwards, so a row of them chains from the clock at its left end; Street
 // Grid Clock originates the bus and reads nothing.
 
-bool afReadsTransport(engine::Model* model) {
+bool afReadsTransport(plugin::Model* model) {
 	return model == modelPulse
 	    || model == modelRatchet
 	    || model == modelSitarGrid
@@ -58,6 +58,6 @@ bool afReadsTransport(engine::Model* model) {
 	    || model == modelDrift;
 }
 
-bool afWritesTransport(engine::Model* model) {
+bool afWritesTransport(plugin::Model* model) {
 	return model == modelStreetGridClock || afReadsTransport(model);
 }

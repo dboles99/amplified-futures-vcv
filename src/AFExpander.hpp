@@ -34,12 +34,12 @@ using namespace rack;
 // Does this model read a transport bus arriving from its left - that is, does
 // it own TransportMessage buffers on its left side? Defined in plugin.cpp,
 // where every Model in the plugin is visible.
-bool afReadsTransport(engine::Model* model);
+bool afReadsTransport(plugin::Model* model);
 
 // Does this model drive a transport bus rightwards? Street Grid Clock
 // originates one; every reader also forwards, so a row chains from the clock
 // at its left end.
-bool afWritesTransport(engine::Model* model);
+bool afWritesTransport(plugin::Model* model);
 
 
 // Owned by any module that reads the bus. Declare one as a member and call
