@@ -3,6 +3,7 @@ name: Build
 on:
   push:
     branches: ["master"]
+    tags: ["v*"]
   pull_request:
     branches: ["master"]
 
@@ -11,6 +12,7 @@ permissions:
 
 jobs:
   build:
+    name: win-x64
     runs-on: windows-latest
 
     steps:
@@ -36,7 +38,7 @@ jobs:
         shell: msys2 {0}
         run: |
           cd "$GITHUB_WORKSPACE"
-          RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK" make -j4
+          RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK" make -j4 dist
 
       - name: Run core tests
         shell: msys2 {0}
@@ -44,18 +46,37 @@ jobs:
           cd "$GITHUB_WORKSPACE/tests"
           make test
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vcvplugin-win-x64
+          path: dist/*.vcvplugin
+          if-no-files-found: error
+
   # The library builds submissions for all three platforms from source, so a
   # compile error on mac or Linux is a rejection round-trip. Neither had ever
   # been compiled before 2.3.0.
+  #
+  # Both Mac slices are built on the arm64 runner. Rack supports this directly:
+  # CROSS_COMPILE feeds --target to clang (compile.mk), and Apple's toolchain
+  # targets x86_64 from Apple Silicon without a separate SDK. Matching each
+  # slice to its own runner would be cleaner, but that means an Intel macOS
+  # image, and those are being retired out from under exactly this kind of job.
   build-unix:
+    name: ${{ matrix.arch }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
+            arch: lin-x64
             sdk: Rack-SDK-2.6.6-lin-x64.zip
           - os: macos-latest
+            arch: mac-arm64
+            sdk: Rack-SDK-2.6.6-mac-arm64.zip
+          - os: macos-latest
+            arch: mac-x64
             sdk: Rack-SDK-2.6.6-mac-x64.zip
+            cross: x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -66,8 +87,66 @@ jobs:
           curl -L "https://vcvrack.com/downloads/${{ matrix.sdk }}" -o Rack-SDK.zip
           unzip -q Rack-SDK.zip
 
+      # CROSS_COMPILE is passed as an environment variable and is empty for the
+      # native slices. GNU Make's ifdef treats an empty value as undefined, so
+      # arch.mk falls through to detecting the host - no branching needed here.
       - name: Build plugin
-        run: RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK" make -j4
+        env:
+          CROSS_COMPILE: ${{ matrix.cross }}
+        run: RACK_DIR="$GITHUB_WORKSPACE/Rack-SDK" make -j4 dist
 
+      # A cross-built binary cannot be run by the runner that produced it, so
+      # the test suite is skipped for that slice alone rather than pretending.
+      # The same sources are tested natively by the mac-arm64 job beside it.
       - name: Run core tests
+        if: ${{ !matrix.cross }}
         run: cd tests && make test
+
+      - name: Verify the binary is the architecture it claims
+        run: |
+          f=$(ls dist/*.vcvplugin)
+          echo "built: $f"
+          case "$f" in
+            *-${{ matrix.arch }}.vcvplugin) echo "name matches ${{ matrix.arch }}" ;;
+            *) echo "::error::expected ${{ matrix.arch }} in $f"; exit 1 ;;
+          esac
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vcvplugin-${{ matrix.arch }}
+          path: dist/*.vcvplugin
+          if-no-files-found: error
+
+  # Independent distribution. The VCV library builds from source and needs none
+  # of this, but it is not carrying the plugin, so the GitHub release is the
+  # only way anyone installs it - and until now that release held a Windows
+  # build alone, which is most of the audience unable to install at all.
+  release:
+    name: attach binaries to the release
+    needs: [build, build-unix]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: vcvplugin-*
+          path: dist
+          merge-multiple: true
+
+      - name: Show what will be attached
+        run: ls -lh dist/
+
+      - name: Upload to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(ls dist/*.vcvplugin | wc -l)
+          if [ "$n" -ne 4 ]; then
+            echo "::error::expected 4 platform builds, found $n"
+            exit 1
+          fi
+          gh release upload "${GITHUB_REF_NAME}" dist/*.vcvplugin \
+            --clobber --repo "${GITHUB_REPOSITORY}"
