@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "AFExpander.hpp"
 #include "dsp/RatchetCore.hpp"
 
 // ============================================================
@@ -53,6 +54,9 @@ struct Ratchet : Module {
 	RatchetCore core;
 	dsp::SchmittTrigger trigIn;
 
+	// Transport bus arriving from a Street Grid Clock to the left.
+	TransportReceiver transport;
+
 	Ratchet() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configParam(COUNT_PARAM, 1.f, 8.f, 2.f, "Repeats");
@@ -67,6 +71,7 @@ struct Ratchet : Module {
 		configOutput(END_OUTPUT, "End of burst");
 
 		core.setSampleRate(APP->engine->getSampleRate());
+		transport.init(this);
 	}
 
 	void onSampleRateChange(const SampleRateChangeEvent& e) override {
@@ -79,6 +84,10 @@ struct Ratchet : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+		// Read before anything else: a patched input still wins, but the
+		// bus has to be sampled every call or the forward below is stale.
+		const TransportMessage bus = transport.read(this);
+
 		// COUNT is an integer, so it gets its own CV maths rather than modp():
 		// full CV swing covers the whole 1-8 span, and the result is rounded
 		// once at the end so the knob and the CV cannot disagree by a step.
@@ -89,7 +98,10 @@ struct Ratchet : Module {
 		}
 		const int n = int(std::round(clamp(count, 1.f, 8.f)));
 
-		const bool edge = trigIn.process(inputs[TRIG_INPUT].getVoltage(), 0.1f, 1.f);
+		const bool edge = trigIn.process(
+		    transportPick(inputs[TRIG_INPUT].isConnected(),
+		                  inputs[TRIG_INPUT].getVoltage(),
+		                  transportEngaged(bus), bus.clock), 0.1f, 1.f);
 		RatchetCore::Out out = core.process(edge, n,
 		                                    params[SPREAD_PARAM].getValue(),
 		                                    params[PROB_PARAM].getValue());
@@ -100,6 +112,9 @@ struct Ratchet : Module {
 		// A 1 ms pulse is invisible at frame rate, so the light is smoothed.
 		// It shows the burst, which is the thing you want to see on a ratchet.
 		lights[BURST_LIGHT].setBrightnessSmooth(out.trig ? 1.f : 0.f, args.sampleTime, 20.f);
+
+		// Pass the bus along so a row of modules chains from one clock.
+		transportSendRight(this, transportForward(bus));
 	}
 };
 
