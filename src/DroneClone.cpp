@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/AfTuning.hpp"
 
 // AF safety orange LED — not in the Rack SDK standard set
 struct AFOrangeLight : GrayModuleLightWidget {
@@ -84,6 +85,13 @@ struct DroneClone : Module {
 	Voice voices[16][8];
 
 	float chokeLevel  = 1.f;
+
+	// Beat rate between ADJACENT voices at the current pitch and SPREAD,
+	// published for the context menu. Not the rate between the extremes:
+	// at SPREAD 1.0 the outermost pair is 1200 cents apart, which is a
+	// different note rather than a beat, and reporting it would tell the
+	// player nothing about the shimmer they can actually hear.
+	float beatRateHz_ = 0.f;
 	bool  gateWasHigh = false;
 	dsp::SchmittTrigger btnTrig;
 
@@ -186,6 +194,16 @@ struct DroneClone : Module {
 		for (int c = 0; c < channels; c++) {
 			float basePitch = fundKnob + inputs[VOCT_INPUT].getVoltage(c);
 			float baseFreq  = dsp::FREQ_C4 * dsp::exp2_taylor5(basePitch);
+
+			// Channel 0 only, and outside the voice loop: this is a readout,
+			// not a signal, and writing it once per voice would leave it
+			// holding whichever voice happened to run last.
+			// Beat rate is linear in frequency, so the same cents value
+			// shimmers in the bass and roughens in the treble - AfTuning.hpp.
+			if (c == 0) {
+				const float adjacentCents = spread * 1200.f / 7.f;
+				beatRateHz_ = af::tuning::beatHz(baseFreq, adjacentCents);
+			}
 
 			float massKnob = modpoly(MASS_PARAM, MASS_ATTEN_PARAM, MASS_CV_INPUT, c, 0.f, 1.f);
 			float massFloat = massKnob * 8.f;
@@ -366,6 +384,17 @@ struct DroneCloneWidget : ModuleWidget {
 		// OUT / RTN row (y=116mm)
 		addOutput(createOutputCentered<AFPortOut>(mm2px(Vec(88.64f, 116.f)), module, DroneClone::OUT_OUTPUT));
 		addInput(createInputCentered<AFPortIn>( mm2px(Vec(112.3f, 116.f)), module, DroneClone::RTN_INPUT));
+	}
+
+	// SPREAD reads in cents, which does not tell you what you will hear:
+	// the same detune beats at a different rate in every octave.
+	void appendContextMenu(Menu* menu) override {
+		DroneClone* m = dynamic_cast<DroneClone*>(module);
+		if (!m)          // the module browser instantiates the widget with none
+			return;
+		menu->addChild(new MenuSeparator);
+		menu->addChild(createMenuLabel(
+			"Beat rate: " + string::f("%.2f", m->beatRateHz_) + " Hz"));
 	}
 };
 
