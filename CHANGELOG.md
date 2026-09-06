@@ -6,6 +6,39 @@ Versions follow `MAJOR.MINOR.REVISION`, and MAJOR tracks the Rack major version
 it is built for — so every release here is `2.x.y`.
 See <https://vcvrack.com/manual/Manifest>.
 
+## 2.3.1 — 2026-09-06
+
+The first release that macOS and Linux users can install. No new modules.
+
+### Added
+
+- **Builds for all four platforms.** `win-x64`, `lin-x64`, `mac-x64` and
+  `mac-arm64`, attached to the release automatically. CI has compiled Linux and
+  macOS since 2.3.0 and discarded the results every time — it ran `make`, never
+  `make dist`, so 2.3.0 shipped a Windows build alone and most of the audience
+  could not install at all. **mac-arm64 had never been built**, which on current
+  hardware is most Mac users. Both Mac slices are cross-compiled on one runner
+  by Rack's own `CROSS_COMPILE` path, and each binary is checked to be the
+  architecture its filename claims.
+- **Five Drone Clone presets** — Branca Mass, Chatham 7-4, Raga Drone, Disco
+  Strings and Vinyl Wow. Each is the same three layers (table, drift rate,
+  coherence) at different settings rather than a mode of its own. The numbers
+  are derived rather than chosen: Disco Strings sits at 17.5 cents, the midpoint
+  of the 10–25 cents measured as F0 dispersion across a large string section.
+  Vinyl Wow's 8.656 cents is a 0.5 mm off-centre pressing read at 100 mm radius;
+  its drift *rate* is only approximated, because Drone Clone has no drift-rate
+  control, and the wiki says so rather than implying otherwise.
+
+### Changed
+
+- **Drone Clone reports SPREAD in Hz.** Cents do not tell you what you will
+  hear — beat rate is linear in frequency, so the same detune shimmers in the
+  bass and roughens in the treble. The right-click menu now gives the rate at
+  the current pitch. The range is unchanged; altering it would change the sound
+  of every saved patch. The figure is the rate between *adjacent* voices, not
+  the extremes: at SPREAD 1.0 the outermost pair is 1200 cents apart, which is a
+  different note rather than a beat.
+
 ## 2.3.0 — 2026-09-05
 
 Adds the four AF utility modules that have been on `master` since 2026-07-26 but

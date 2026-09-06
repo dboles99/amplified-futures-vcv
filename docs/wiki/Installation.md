@@ -9,10 +9,25 @@ Amplified Futures is a VCV Rack 2 plugin. There are three ways to get it.
 | Route | Status |
 |---|---|
 | **VCV Library** | Not yet listed. [library.vcvrack.com](https://library.vcvrack.com/?brand=Amplified+Futures) currently returns no results |
-| **GitHub Release** | [Latest release](https://github.com/dboles99/amplified-futures-vcv/releases/latest) — **Windows x64 only**, about 18 MB — Swarm Core ships two curated 32-sample banks |
+| **GitHub Release** | [Latest release](https://github.com/dboles99/amplified-futures-vcv/releases/latest) — **Windows, macOS and Linux**, about 18 MB each — Swarm Core ships two curated 32-sample banks |
 | **Build from source** | All platforms — see [[Building-from-Source]] |
 
-macOS and Linux users need the source route. Cross-building is not set up, so there is no download for those platforms rather than a broken one.
+Four builds are attached to each release from 2.3.1 onward. Take the one matching your machine:
+
+| File | For |
+|---|---|
+| `amplified-futures-<version>-win-x64.vcvplugin` | Windows |
+| `amplified-futures-<version>-mac-arm64.vcvplugin` | macOS on Apple Silicon (M1 and later) |
+| `amplified-futures-<version>-mac-x64.vcvplugin` | macOS on Intel |
+| `amplified-futures-<version>-lin-x64.vcvplugin` | Linux |
+
+Releases before 2.3.1 carry a Windows build only; on those versions macOS and Linux need the source route.
+
+The macOS builds are not code-signed or notarised, so macOS quarantines them on download and Rack will fail to load the plugin. Clear the flag after unzipping, then start Rack:
+
+```sh
+xattr -dr com.apple.quarantine ~/Library/Application\ Support/Rack2/plugins/amplified-futures
+```
 
 ---
 
