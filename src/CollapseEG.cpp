@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "AFExpander.hpp"
 #include "dsp/EnvCore.hpp"
 
 // ============================================================
@@ -53,6 +54,9 @@ struct CollapseEG : Module {
 	dsp::SchmittTrigger gateTrig, trigTrig;
 	dsp::PulseGenerator eocPulse;
 
+	// Transport bus arriving from a Street Grid Clock to the left.
+	TransportReceiver transport;
+
 	CollapseEG() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configParam(ATTACK_PARAM, 0.f, 1.f, 0.1f, "Attack");
@@ -67,13 +71,27 @@ struct CollapseEG : Module {
 		configOutput(EOC_OUTPUT, "End of cycle");
 		core.setSampleRate(44100.f);
 		core.reset();
+		transport.init(this);
 	}
 
 	void onSampleRateChange() override {
 		core.setSampleRate(APP->engine->getSampleRate());
 	}
 
+	// A bypassed module runs this INSTEAD of process(), so without it the
+	// chain downstream freezes on whatever was last written. Bypass should
+	// pass the transport through like a wire, which is what it already means
+	// for audio.
+	void processBypass(const ProcessArgs& args) override {
+		Module::processBypass(args);
+		transportSendRight(this, transportForward(transport.read(this)));
+	}
+
 	void process(const ProcessArgs& args) override {
+		// Read before anything else: a patched input still wins, but the
+		// bus has to be sampled every call or the forward below is stale.
+		const TransportMessage bus = transport.read(this);
+
 		const float misfire = params[MISFIRE_PARAM].getValue();
 		const bool loop = params[LOOP_PARAM].getValue() > 0.5f;
 
@@ -83,7 +101,10 @@ struct CollapseEG : Module {
 		const float decay  = 0.0005f * std::pow(16000.f, params[DECAY_PARAM].getValue());
 		const float curve  = params[CURVE_PARAM].getValue();
 
-		if (trigTrig.process(inputs[TRIG_INPUT].getVoltage(), 0.1f, 2.f))
+		if (trigTrig.process(
+		        transportPick(inputs[TRIG_INPUT].isConnected(),
+		                      inputs[TRIG_INPUT].getVoltage(),
+		                      transportEngaged(bus), bus.clock), 0.1f, 2.f))
 			core.trigger(misfire);
 		if (gateTrig.process(inputs[GATE_INPUT].getVoltage(), 0.1f, 2.f))
 			core.trigger(misfire);
@@ -102,6 +123,9 @@ struct CollapseEG : Module {
 		outputs[INV_OUTPUT].setVoltage((1.f - env) * 10.f);
 		outputs[EOC_OUTPUT].setVoltage(eocPulse.process(args.sampleTime) ? 10.f : 0.f);
 		lights[ENV_LIGHT].setBrightness(env);
+
+		// Pass the bus along so a row of modules chains from one clock.
+		transportSendRight(this, transportForward(bus));
 	}
 };
 

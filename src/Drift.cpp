@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "AFExpander.hpp"
 
 // ============================================================
 // DRIFT — slow random modulation source
@@ -55,6 +56,9 @@ struct Drift : Module {
 	float gate    = 0.f;
 	dsp::SchmittTrigger syncTrig;
 
+	// Transport bus arriving from a Street Grid Clock to the left.
+	TransportReceiver transport;
+
 	Drift() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		configParam(RATE_PARAM,          0.f, 1.f, 0.35f, "Rate",   "%", 0.f, 100.f);
@@ -75,6 +79,7 @@ struct Drift : Module {
 		configOutput(STEP_OUTPUT,    "Stepped random (±5 V)");
 		configOutput(GATE_OUTPUT,    "Step gate (10 V, 5 ms)");
 		configOutput(VOCT_OUTPUT,    "V/oct (thru)");
+		transport.init(this);
 	}
 
 	// Clamp a base param ± attenuated CV to [lo, hi]
@@ -85,13 +90,29 @@ struct Drift : Module {
 		return clamp(v, lo, hi);
 	}
 
+	// A bypassed module runs this INSTEAD of process(), so without it the
+	// chain downstream freezes on whatever was last written. Bypass should
+	// pass the transport through like a wire, which is what it already means
+	// for audio.
+	void processBypass(const ProcessArgs& args) override {
+		Module::processBypass(args);
+		transportSendRight(this, transportForward(transport.read(this)));
+	}
+
 	void process(const ProcessArgs& args) override {
+		// Read before anything else: a patched input still wins, but the
+		// bus has to be sampled every call or the forward below is stale.
+		const TransportMessage bus = transport.read(this);
+
 		float rateP   = modp(RATE_PARAM,   RATE_ATTEN_PARAM,   RATE_CV_INPUT,   0.f, 1.f);
 		float wanderP = modp(WANDER_PARAM, WANDER_ATTEN_PARAM, WANDER_CV_INPUT, 0.f, 1.f);
 		float slewP   = modp(SLEW_PARAM,   SLEW_ATTEN_PARAM,   SLEW_CV_INPUT,   0.f, 1.f);
 
 		// SYNC: rising edge forces immediate step
-		if (syncTrig.process(inputs[SYNC_INPUT].getVoltage()))
+		if (syncTrig.process(
+		        transportPick(inputs[SYNC_INPUT].isConnected(),
+		                      inputs[SYNC_INPUT].getVoltage(),
+		                      transportEngaged(bus), bus.clock)))
 			phase = 1.f;
 
 		// Rate: 0.01 Hz to 10 Hz (exponential)
@@ -117,6 +138,9 @@ struct Drift : Module {
 		outputs[STEP_OUTPUT].setVoltage(target * 5.f);
 		outputs[GATE_OUTPUT].setVoltage(gate);
 		outputs[VOCT_OUTPUT].setVoltage(inputs[VOCT_INPUT].getVoltage());
+
+		// Pass the bus along so a row of modules chains from one clock.
+		transportSendRight(this, transportForward(bus));
 	}
 };
 

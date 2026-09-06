@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "AFExpander.hpp"
 
 // ============================================================
 // PULSE — 16-step no-wave step percussion
@@ -65,6 +66,9 @@ struct Pulse : Module {
 	float crackEnv = 0.f;
 	float noiseLP  = 0.f;
 
+	// Transport bus arriving from a Street Grid Clock to the left.
+	TransportReceiver transport;
+
 	Pulse() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
 		for (int i = 0; i < 16; i++)
@@ -85,6 +89,7 @@ struct Pulse : Module {
 		configInput(VOCT_INPUT,     "V/oct (thru)");
 		configOutput(OUT_OUTPUT,    "Audio");
 		configOutput(VOCT_OUTPUT,   "V/oct (thru)");
+		transport.init(this);
 	}
 
 	float modp(int param, int atten, int cv, float lo, float hi) {
@@ -116,7 +121,20 @@ struct Pulse : Module {
 		}
 	}
 
+	// A bypassed module runs this INSTEAD of process(), so without it the
+	// chain downstream freezes on whatever was last written. Bypass should
+	// pass the transport through like a wire, which is what it already means
+	// for audio.
+	void processBypass(const ProcessArgs& args) override {
+		Module::processBypass(args);
+		transportSendRight(this, transportForward(transport.read(this)));
+	}
+
 	void process(const ProcessArgs& args) override {
+		// Read before anything else: a patched input still wins, but the
+		// bus has to be sampled every call or the forward below is stale.
+		const TransportMessage bus = transport.read(this);
+
 		for (int i = 0; i < 16; i++) {
 			if (stepTrig[i].process(params[STEP_PARAM + i].getValue() > 0.5f))
 				steps[i] = !steps[i];
@@ -124,7 +142,9 @@ struct Pulse : Module {
 			lights[STEP_LIGHT + i * 2 + 1].setBrightness(i == currentStep ? 0.5f : 0.f);
 		}
 
-		if (trgTrig.process(inputs[TRG_INPUT].getVoltage())) {
+		if (trgTrig.process(transportPick(inputs[TRG_INPUT].isConnected(),
+		                                  inputs[TRG_INPUT].getVoltage(),
+		                                  transportEngaged(bus), bus.clock))) {
 			currentStep = (currentStep + 1) % 16;
 			if (steps[currentStep]) {
 				env      = 1.f;
@@ -154,6 +174,9 @@ struct Pulse : Module {
 
 		outputs[OUT_OUTPUT].setVoltage(5.f * std::tanh(sig * 2.f));
 		outputs[VOCT_OUTPUT].setVoltage(inputs[VOCT_INPUT].getVoltage());
+
+		// Pass the bus along so a row of modules chains from one clock.
+		transportSendRight(this, transportForward(bus));
 	}
 };
 

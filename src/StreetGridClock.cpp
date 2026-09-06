@@ -4,6 +4,7 @@
 
 #include "plugin.hpp"
 #include "dsp/ClockCore.hpp"
+#include "AFExpander.hpp"
 
 // ============================================================
 // STREET GRID CLOCK (AF-02) — 12 HP master clock
@@ -59,6 +60,9 @@ struct StreetGridClock : Module {
 	dsp::BooleanTrigger runTrig, resetBtnTrig;
 	dsp::SchmittTrigger extTrig, resetInTrig;
 	dsp::PulseGenerator pulses[5];
+	// Advances every sample, so a receiver can tell a live producer from a
+	// bypassed one whose last message is still sitting in the buffer.
+	uint32_t busSeq = 0;
 
 	StreetGridClock() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -153,6 +157,19 @@ struct StreetGridClock : Module {
 		outputs[DIV4_OUTPUT].setVoltage(pulses[2].process(args.sampleTime) ? 10.f : 0.f);
 		outputs[DIV8_OUTPUT].setVoltage(pulses[3].process(args.sampleTime) ? 10.f : 0.f);
 		outputs[RESET_OUTPUT].setVoltage(pulses[4].process(args.sampleTime) ? 10.f : 0.f);
+
+		// Drive the transport bus rightwards from the voltages the jacks are
+		// carrying this sample, not from the raw ticks - a neighbour
+		// inheriting the bus and a neighbour patched to CLK must see the same
+		// edge, including its 1 ms width.
+		TransportMessage bus;
+		bus.clock = outputs[CLK_OUTPUT].getVoltage();
+		bus.reset = outputs[RESET_OUTPUT].getVoltage();
+		bus.running = running ? 10.f : 0.f;
+		bus.bpm = bpm;
+		bus.seq = ++busSeq;
+		bus.valid = true;
+		transportSendRight(this, bus);
 	}
 };
 

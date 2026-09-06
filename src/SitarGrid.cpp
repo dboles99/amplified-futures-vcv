@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "AFExpander.hpp"
 #include "dsp/SitarStringCore.hpp"
 
 // ============================================================
@@ -142,6 +143,9 @@ struct SitarGrid : Module {
     dsp::PulseGenerator gatePulse;
     dsp::PulseGenerator riffPulse;
 
+    // Transport bus arriving from a Street Grid Clock to the left.
+    TransportReceiver transport;
+
     SitarGrid() {
         config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -213,6 +217,7 @@ struct SitarGrid : Module {
             configLight(RIFF_LIGHT  + i, string::f("Riff step %d",  i + 1));
         }
         configLight(BD_LIGHT, "Breakdown active");
+        transport.init(this);
     }
 
     // ── String model ─────────────────────────────────────
@@ -267,7 +272,20 @@ struct SitarGrid : Module {
             locked = json_boolean_value(v);
     }
 
+    // A bypassed module runs this INSTEAD of process(), so without it the
+    // chain downstream freezes on whatever was last written. Bypass should
+    // pass the transport through like a wire, which is what it already means
+    // for audio.
+    void processBypass(const ProcessArgs& args) override {
+        Module::processBypass(args);
+        transportSendRight(this, transportForward(transport.read(this)));
+    }
+
     void process(const ProcessArgs& args) override {
+        // Read before anything else: a patched input still wins, but the
+        // bus has to be sampled every call or the forward below is stale.
+        const TransportMessage bus = transport.read(this);
+
         const float sr = args.sampleRate;
 
         // ── Read params ──────────────────────────────────────
@@ -308,7 +326,10 @@ struct SitarGrid : Module {
             locked = !locked;
 
         // ── Reset ────────────────────────────────────────────
-        if (resetTrig.process(inputs[RESET_INPUT].getVoltage())) {
+        if (resetTrig.process(
+                transportPick(inputs[RESET_INPUT].isConnected(),
+                              inputs[RESET_INPUT].getVoltage(),
+                              transportResetEngaged(bus), bus.reset))) {
             pitchStep = resStep = riffStep = resClockCnt = 0;
         }
 
@@ -342,7 +363,10 @@ struct SitarGrid : Module {
         lights[BD_LIGHT].setSmoothBrightness(bdIntensity, args.sampleTime);
 
         // ── Clock: advance sequencers ─────────────────────────
-        if (clockTrig.process(inputs[CLOCK_INPUT].getVoltage()) && !locked) {
+        if (clockTrig.process(
+                transportPick(inputs[CLOCK_INPUT].isConnected(),
+                              inputs[CLOCK_INPUT].getVoltage(),
+                              transportEngaged(bus), bus.clock)) && !locked) {
             // Advance pitch + riff
             float pitchDir = params[PITCH_DIR_PARAM].getValue();
             if (pitchDir < 0.33f) {
@@ -501,6 +525,9 @@ struct SitarGrid : Module {
         outputs[GATE_OUTPUT     ].setVoltage(gatePulse.process(args.sampleTime) ? 10.f : 0.f);
         outputs[RIFF_TRIG_OUTPUT].setVoltage(riffPulse.process(args.sampleTime) ? 10.f : 0.f);
         outputs[RES_CV_OUTPUT   ].setVoltage(resKnob * 10.f);
+
+        // Pass the bus along so a row of modules chains from one clock.
+        transportSendRight(this, transportForward(bus));
     }
 };
 
