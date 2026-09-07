@@ -243,6 +243,13 @@ struct SwarmCore : Module {
     float  voicePan[NUM_VOICES] = {-1.f, -.71f, -.33f, 0.f, 0.f, .33f, .71f, 1.f};
     // Jitter applied around each voice's home pan, refreshed per trigger.
     float  voicePanJitter[NUM_VOICES] = {};
+    // Each voice's pitch in volts, so the polyphonic CV out can report what the
+    // swarm is actually doing rather than an average of it.
+    float  voicePitchV[NUM_VOICES] = {};
+
+    // What the CV jack carries. Stored in the patch; 0 is what it always did.
+    enum CvMode { CV_SWARM_ENV = 0, CV_VOICE_ENV = 1, CV_VOICE_PITCH = 2 };
+    int cvMode = CV_SWARM_ENV;
 
     // xorshift32. Seeded once per module rather than per trigger, so a patch
     // is stable across a session while no two triggers are alike. Deliberately
@@ -388,12 +395,15 @@ struct SwarmCore : Module {
 
     json_t* dataToJson() override {
         json_t* root = json_object();
+        json_object_set_new(root, "cvMode", json_integer(cvMode));
         if (bankIndex >= 0 && bankIndex < (int) bankNames.size())
             json_object_set_new(root, "bank", json_string(bankNames[bankIndex].c_str()));
         return root;
     }
 
     void dataFromJson(json_t* root) override {
+        if (json_t* j = json_object_get(root, "cvMode"))
+            cvMode = (int) json_integer_value(j);
         json_t* b = json_object_get(root, "bank");
         if (!b)
             return;
@@ -521,6 +531,7 @@ struct SwarmCore : Module {
                     // A different recording per voice, and a level that varies:
                     // the two things that separate a swarm from one insect
                     // played eight times.
+                    voicePitchV[v] = (pitchSt + detuneSt) / 12.f;
                     voices[v].trigger(voiceSample(sampleIdx, v, numSamples),
                                       speed, decayCoef,
                                       0.55f + rnd() * 0.45f);
@@ -537,6 +548,10 @@ struct SwarmCore : Module {
                     float spread = (v - numVoices * 0.5f) / numVoices;
                     const float detuneSt = (spread + rndBi() * 0.5f) * detune;
                     float speed = baseSpeed * srRatio * std::pow(2.f, detuneSt / 12.f);
+                    // Scattered voices trigger here, later than the rest. The
+                    // CV has to learn their pitch too, or a polyphonic channel
+                    // reports the pitch of whatever last used that slot.
+                    voicePitchV[v] = (pitchSt + detuneSt) / 12.f;
                     voices[v].trigger(voiceSample(sampleIdx, v, numSamples),
                                       speed, decayCoef,
                                       0.55f + rnd() * 0.45f);
@@ -583,7 +598,23 @@ struct SwarmCore : Module {
         outputs[OUT_R_OUTPUT].setVoltage(clamp(outR * norm * 5.f, -10.f, 10.f));
         // Unipolar 0-10V swarm envelope: the summed voice activity, so the CV
         // tracks how much of the swarm is currently sounding.
-        outputs[CV_OUTPUT].setVoltage(clamp(envSum * INV_SQRT_N, 0.f, 1.f) * 10.f);
+        // Polyphonic CV. One jack, every voice on its own channel - a
+        // downstream quantiser or VCA then sees eight insects rather than
+        // their sum, which is the individuation that summing throws away.
+        // A monophonic cable reads channel 0, so old patches are unaffected.
+        if (cvMode == CV_SWARM_ENV) {
+            outputs[CV_OUTPUT].setChannels(1);
+            outputs[CV_OUTPUT].setVoltage(clamp(envSum * INV_SQRT_N, 0.f, 1.f) * 10.f);
+        } else {
+            const int ch = std::max(1, numVoices);
+            outputs[CV_OUTPUT].setChannels(ch);
+            for (int v = 0; v < ch; v++) {
+                const float val = (cvMode == CV_VOICE_PITCH)
+                                    ? voicePitchV[v]
+                                    : clamp(voices[v].env, 0.f, 1.f) * 10.f;
+                outputs[CV_OUTPUT].setVoltage(val, v);
+            }
+        }
         lights[ACTIVE_LIGHT].setBrightness(anyActive ? 1.f : 0.f);
     }
 };
@@ -656,6 +687,20 @@ struct SwarmCoreWidget : ModuleWidget {
         SwarmCore* m = dynamic_cast<SwarmCore*>(module);
         if (!m || m->bankNames.empty())
             return;
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createMenuLabel("CV output"));
+        {
+            const char* names[3] = { "Swarm envelope (mono)",
+                                     "Per-voice envelope (poly)",
+                                     "Per-voice pitch V/oct (poly)" };
+            for (int i = 0; i < 3; i++) {
+                menu->addChild(createCheckMenuItem(
+                    names[i], "",
+                    [=]() { return m->cvMode == i; },
+                    [=]() { m->cvMode = i; }));
+            }
+        }
+
         menu->addChild(new MenuSeparator);
         menu->addChild(createMenuLabel("Sample bank"));
         for (size_t i = 0; i < m->bankNames.size(); i++) {
