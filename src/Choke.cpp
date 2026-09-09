@@ -87,6 +87,11 @@ struct Choke : Module {
 		configInput(MAIN_CV_INPUT, "Main level CV");
 		configInput(VOCT_INPUT,    "V/oct (thru)");
 		configOutput(VOCT_OUTPUT,  "V/oct (thru)");
+
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		// The audio outputs are a mix of four channels, so only the thru is routed.
+		configBypass(VOCT_INPUT, VOCT_OUTPUT);
 	}
 
 	float modp(int param, int atten, int cv, float lo, float hi) {

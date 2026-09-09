@@ -6,6 +6,27 @@ Versions follow `MAJOR.MINOR.REVISION`, and MAJOR tracks the Rack major version
 it is built for — so every release here is `2.x.y`.
 See <https://vcvrack.com/manual/Manifest>.
 
+## Unreleased
+
+### Fixed
+
+- **Bypass no longer silences a module.** Thirteen modules now declare
+  `configBypass`, so bypassing one passes its input through instead of dropping
+  its outputs to zero. Until now every effect in the plugin had this defect:
+  hitting Ctrl+E to compare an effect against the dry signal killed the patch
+  instead. 21 routes in total.
+
+  Bypass is only declared where one input maps to one output. Choke, Wall
+  Conductor and Mass Driver mix several inputs into a stereo pair, so their
+  audio outputs have no single source and get none — which is what Fundamental
+  does for VCMixer, Mixer, Unity, Sum and MidSide. Send gets `IN A` to `OUT A`
+  only, because `OUT B` carries A through the send rather than B, and wiring the
+  symmetrical-looking pair would have been wrong.
+
+  The ten modules with a V/OCT thru route it on bypass as well. That thru is a
+  wire by design, and leaving it unrouted meant bypassing a module dropped the
+  pitch chain to 0 V and retuned everything downstream to C4.
+
 ## 2.3.1 — 2026-09-06
 
 The first release that macOS and Linux users can install. No new modules.

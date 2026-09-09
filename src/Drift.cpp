@@ -75,6 +75,10 @@ struct Drift : Module {
 		configOutput(STEP_OUTPUT,    "Stepped random (±5 V)");
 		configOutput(GATE_OUTPUT,    "Step gate (10 V, 5 ms)");
 		configOutput(VOCT_OUTPUT,    "V/oct (thru)");
+
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		configBypass(VOCT_INPUT, VOCT_OUTPUT);
 	}
 
 	// Clamp a base param ± attenuated CV to [lo, hi]

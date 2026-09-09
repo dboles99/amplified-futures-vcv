@@ -111,6 +111,10 @@ struct StringMassCore : Module {
 		configOutput(AUDIO_OUTPUT,   "Audio mass (poly)");
 		configOutput(VOCT_OUTPUT,    "V/oct thru (poly)");
 
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		configBypass(VOCT_INPUT, VOCT_OUTPUT);
+
 		// Stagger initial phases to avoid startup coherence spike
 		for (int v = 0; v < 16; v++)
 			for (int c = 0; c < 16; c++) {

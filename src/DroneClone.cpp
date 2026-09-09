@@ -139,6 +139,10 @@ struct DroneClone : Module {
 			configLight(VOICE_LIGHT_0 + i, string::f("Voice %d", i + 1));
 		configLight(CHOKE_LIGHT, "Choke");
 
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		configBypass(VOCT_INPUT, VOCT_OUTPUT);
+
 		const float rates[8] = {0.31f, 0.47f, 0.61f, 0.79f, 0.89f, 1.03f, 1.19f, 1.37f};
 		for (int i = 0; i < 8; i++)
 			driftRate[i] = rates[i] * 0.003f;

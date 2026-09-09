@@ -76,6 +76,12 @@ struct Send : Module {
 		configOutput(OUT_A_OUTPUT,    "A main");
 		configOutput(OUT_B_OUTPUT,    "B send");
 		configOutput(VOCT_OUTPUT,     "V/oct (thru)");
+
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		// OUT_B carries A through the send, not B, so it has no bypass source.
+		configBypass(IN_A_INPUT, OUT_A_OUTPUT);
+		configBypass(VOCT_INPUT, VOCT_OUTPUT);
 	}
 
 	float modp(int param, int atten, int cv, float lo, float hi) {

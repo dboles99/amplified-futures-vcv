@@ -54,6 +54,14 @@ struct QuadVCA : Module {
 		configParam(PRESSURE_PARAM, 0.f, 1.f, 0.f, "Pressure", "%", 0.f, 100.f);
 		configSwitch(CURVE_PARAM, 0.f, 1.f, 0.f, "Response", {"Linear", "Exponential"});
 		configOutput(MIX_OUTPUT, "Mix");
+
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		// MIX_OUTPUT sums the four, so no single input maps to it.
+		configBypass(IN1_INPUT, OUT1_OUTPUT);
+		configBypass(IN2_INPUT, OUT2_OUTPUT);
+		configBypass(IN3_INPUT, OUT3_OUTPUT);
+		configBypass(IN4_INPUT, OUT4_OUTPUT);
 	}
 
 	// A level knob multiplies the signal, so a jump in it is a click. The

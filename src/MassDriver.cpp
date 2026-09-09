@@ -132,6 +132,11 @@ struct MassDriver : Module {
         configOutput(AUX_R_OUTPUT,  "Aux R (pre-pressure)");
         configOutput(SUM_OUTPUT,    "Sum (mono)");
         configOutput(VOCT_OUTPUT,   "V/oct thru");
+
+        // Bypass passes audio through rather than muting it. Without this, bypassing
+        // the module drops its outputs to zero and the patch goes quiet.
+        // The audio outputs are a mix, so only the thru is routed.
+        configBypass(VOCT_INPUT, VOCT_OUTPUT);
     }
 
     void process(const ProcessArgs& args) override {

@@ -72,6 +72,15 @@ struct SignalBloc : Module {
 		configOutput(MULT1_OUTPUT, "Mult 1");
 		configOutput(MULT2_OUTPUT, "Mult 2");
 		configOutput(MULT3_OUTPUT, "Mult 3");
+
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		// SUM_OUTPUT adds three inputs, so it has no bypass source.
+		configBypass(IN1_INPUT, OUT1_OUTPUT);
+		configBypass(IN2_INPUT, OUT2_OUTPUT);
+		configBypass(MULT_INPUT, MULT1_OUTPUT);
+		configBypass(MULT_INPUT, MULT2_OUTPUT);
+		configBypass(MULT_INPUT, MULT3_OUTPUT);
 	}
 
 	void process(const ProcessArgs& args) override {

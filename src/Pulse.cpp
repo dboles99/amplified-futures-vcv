@@ -85,6 +85,10 @@ struct Pulse : Module {
 		configInput(VOCT_INPUT,     "V/oct (thru)");
 		configOutput(OUT_OUTPUT,    "Audio");
 		configOutput(VOCT_OUTPUT,   "V/oct (thru)");
+
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		configBypass(VOCT_INPUT, VOCT_OUTPUT);
 	}
 
 	float modp(int param, int atten, int cv, float lo, float hi) {

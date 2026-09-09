@@ -62,6 +62,10 @@ struct DroneCore : Module {
 		configInput(TIMBRE_CV_INPUT,"Timbre CV");
 		configOutput(SINE_OUTPUT,   "Sine audio (poly)");
 		configOutput(VOCT_OUTPUT,   "V/oct thru (poly)");
+
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		configBypass(PITCH_INPUT, VOCT_OUTPUT);
 	}
 
 	void process(const ProcessArgs& args) override {

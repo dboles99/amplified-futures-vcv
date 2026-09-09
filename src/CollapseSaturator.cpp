@@ -83,6 +83,12 @@ struct CollapseSaturator : Module {
 		configOutput(OUT_L_OUTPUT,    "Left");
 		configOutput(OUT_R_OUTPUT,    "Right");
 		configOutput(VOCT_OUTPUT,     "V/oct (thru)");
+
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		configBypass(IN_L_INPUT, OUT_L_OUTPUT);
+		configBypass(IN_R_INPUT, OUT_R_OUTPUT);
+		configBypass(VOCT_INPUT, VOCT_OUTPUT);
 	}
 
 	float modp(int param, int atten, int cv, float lo, float hi) {

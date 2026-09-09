@@ -78,6 +78,11 @@ struct FeedbackGovernor : Module {
 		configInput(VOCT_INPUT,       "V/oct (thru)");
 		configOutput(RETURN_OUTPUT,   "Signal out (back into chain)");
 		configOutput(VOCT_OUTPUT,     "V/oct (thru)");
+
+		// Bypass passes audio through rather than muting it. Without this, bypassing
+		// the module drops its outputs to zero and the patch goes quiet.
+		configBypass(SEND_INPUT, RETURN_OUTPUT);
+		configBypass(VOCT_INPUT, VOCT_OUTPUT);
 	}
 
 	float modp(int param, int atten, int cv, float lo, float hi) {
