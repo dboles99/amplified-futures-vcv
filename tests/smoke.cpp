@@ -120,7 +120,51 @@ void disconnectInputs(Module* m) {
 // Returns a crude signature of everything the module emitted, so two runs can
 // be compared. Sum of absolute values is enough to catch "this control does
 // nothing at all" without pretending to be a similarity metric.
-double runFor(Module* m, float sr, int samples, bool patched, bool* clean) {
+// Did any output sit at a constant non-zero value for the whole run while the
+// input was moving? That is a DC latch, and it is the failure the rest of this
+// harness was blind to.
+//
+// Wall Conductor did exactly this from release until 2026-09-10: its feedback
+// bus had no DC blocker, so past a loop gain of 1 it converged on a silent
+// rail at up to 4.99 V within ten samples. Finite, inside plus or minus 12 V,
+// and therefore passing every check here. Legal output is not the same as
+// audio.
+// Only audio outputs. A constant non-zero level is correct behaviour for
+// plenty of things: CollapseEG's INV is (1 - env) * 10, so at rest it sits at
+// a correct and constant 10 V, and Drift's SMOOTH and STEP are CV. Checking
+// every output flagged three modules, all of them fine, which is how a useful
+// check turns into one nobody reads.
+bool isAudioOutput(Module* m, size_t o) {
+	if (o >= m->outputInfos.size() || !m->outputInfos[o])
+		return false;
+	std::string n = m->outputInfos[o]->name;
+	for (char& c : n) c = char(std::tolower((unsigned char) c));
+	static const char* NOT_AUDIO[] = {
+		"env", "inv", "eoc", "end of", "gate", "trig", "clock", "clk",
+		"v/oct", "voct", "cv", "pitch", "step", "smooth", "reset", "div",
+	};
+	for (const char* k : NOT_AUDIO)
+		if (n.find(k) != std::string::npos)
+			return false;
+	return true;
+}
+
+bool dcLatched(Module* m, const std::vector<float>& lo, const std::vector<float>& hi) {
+	for (size_t o = 0; o < lo.size(); o++) {
+		if (!isAudioOutput(m, o))
+			continue;
+		const float span = hi[o] - lo[o];
+		const float level = std::fabs(lo[o]);
+		if (span < 1e-6f && level > 0.1f)
+			return true;
+	}
+	return false;
+}
+
+double runFor(Module* m, float sr, int samples, bool patched, bool* clean,
+              std::vector<float>* loOut, std::vector<float>* hiOut) {
+	std::vector<float> lo(m->outputs.size(),  1e30f);
+	std::vector<float> hi(m->outputs.size(), -1e30f);
 	Module::ProcessArgs args;
 	args.sampleRate = sr;
 	args.sampleTime = 1.f / sr;
@@ -144,10 +188,13 @@ double runFor(Module* m, float sr, int samples, bool patched, bool* clean) {
 				float v = m->outputs[o].getVoltage(c);
 				if (!std::isfinite(v)) { *clean = false; return acc; }
 				if (std::fabs(v) > VOLTAGE_LIMIT) { *clean = false; return acc; }
+				if (c == 0) { if (v < lo[o]) lo[o] = v; if (v > hi[o]) hi[o] = v; }
 				acc += std::fabs(double(v));
 			}
 		}
 	}
+	if (loOut) *loOut = lo;
+	if (hiOut) *hiOut = hi;
 	return acc;
 }
 
@@ -177,7 +224,7 @@ void testModule(const Case& cs) {
 		// 1. defaults, nothing patched. Must not run away on its own.
 		resetToDefaults(m);
 		bool clean = true;
-		runFor(m, sr, RUN, false, &clean);
+		runFor(m, sr, RUN, false, &clean, nullptr, nullptr);
 		checks++;
 		if (!clean)
 			fail(std::string(cs.name) + " @" + std::to_string(int(sr)) +
@@ -194,12 +241,21 @@ void testModule(const Case& cs) {
 				m->params[i].setValue(extreme ? pq->maxValue : pq->minValue);
 			}
 			clean = true;
-			runFor(m, sr, RUN, true, &clean);
+			std::vector<float> lo, hi;
+			runFor(m, sr, RUN, true, &clean, &lo, &hi);
 			checks++;
 			if (!clean)
 				fail(std::string(cs.name) + " @" + std::to_string(int(sr)) +
 				     ": all params at " + (extreme ? "max" : "min") +
 				     " produced a non-finite or out-of-range output");
+
+			// The input is moving throughout. An output that does not move,
+			// and is not at zero, has latched.
+			checks++;
+			if (clean && dcLatched(m, lo, hi))
+				fail(std::string(cs.name) + " @" + std::to_string(int(sr)) +
+				     ": all params at " + (extreme ? "max" : "min") +
+				     " left an output stuck at a constant non-zero value");
 		}
 
 		delete m;

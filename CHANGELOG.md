@@ -8,6 +8,23 @@ See <https://vcvrack.com/manual/Manifest>.
 
 ## Unreleased
 
+### Fixed
+
+- **Wall Conductor latched to a silent DC rail and stayed there.** Its
+  feedback bus was a bare one-sample delay with no DC blocker, so the
+  autonomous loop was `y[n] = 5*tanh(feedback*drive*y[n-1]/5)`, whose origin
+  is unstable whenever `feedback * (1 + 3*pressure) > 1`. At FEEDBACK maximum
+  that is PRESSURE above 0.029, about three percent into the knob. Past it the
+  loop converged on a non-zero fixed point: measured 4.47 V at PRESSURE 0.25
+  and 4.99 V at maximum, reached within ten samples from silence. The module
+  went dead and did not recover until the patch was reloaded.
+
+  The feedback bus is now DC-blocked at 5 Hz, which is what Feedback Governor
+  has always done. This does not remove the instability and is not meant to:
+  past the same boundary the loop now oscillates rather than latching, which
+  is what controlled feedback is for. Sonically breaking at high FEEDBACK with
+  any PRESSURE, patch-safe, and the previous behaviour was silence.
+
 ### Added
 
 - **An offline smoke test that reaches every module.** The core suites cover

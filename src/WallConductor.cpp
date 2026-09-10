@@ -66,6 +66,8 @@ struct WallConductor : Module {
 	float collapseEnv = 1.f;
 	float feedbackL   = 0.f;
 	float feedbackR   = 0.f;
+	float fbHpL       = 0.f;   // DC blocker state for the feedback bus
+	float fbHpR       = 0.f;
 
 	WallConductor() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -149,8 +151,29 @@ struct WallConductor : Module {
 		float outL = 5.f * std::tanh(mixL * drive / 5.f) * collapseEnv;
 		float outR = 5.f * std::tanh(mixR * drive / 5.f) * collapseEnv;
 
-		feedbackL = outL;
-		feedbackR = outR;
+		// The feedback bus is DC-blocked before it re-enters the mix.
+		//
+		// Without this the loop is y[n] = 5*tanh(feedback*drive*y[n-1]/5),
+		// whose origin is unstable whenever feedback*(1 + 3*pressure) > 1.
+		// At FEEDBACK maximum that is PRESSURE above 0.029, so it is reachable
+		// three percent into the knob. Past it the loop converges on a
+		// non-zero DC fixed point and sits there: measured 4.47 V at PRESSURE
+		// 0.25 and 4.99 V at maximum, reached within ten samples from silence.
+		//
+		// A DC rail is legal output, which is why nothing caught it. It is
+		// within plus or minus 12 V and it is finite, so the offline harness
+		// passed it. It is also completely silent, and it does not recover
+		// until the patch is reloaded.
+		//
+		// Blocking DC does not remove the instability, and is not meant to.
+		// Past the same boundary the loop now oscillates instead of latching,
+		// which is what controlled feedback is supposed to do. Feedback
+		// Governor has always had this filter; this module did not.
+		const float hpAlpha = 1.f - std::exp(-2.f * float(M_PI) * 5.f * args.sampleTime);
+		fbHpL += hpAlpha * (outL - fbHpL);
+		fbHpR += hpAlpha * (outR - fbHpR);
+		feedbackL = outL - fbHpL;
+		feedbackR = outR - fbHpR;
 
 		outputs[OUT_L_OUTPUT].setVoltage(outL);
 		outputs[OUT_R_OUTPUT].setVoltage(outR);
