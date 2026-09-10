@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/MassEngine.hpp"
 
 // ============================================================
 // STRING MASS CORE — 16-voice harmonic mass oscillator
@@ -27,33 +28,8 @@
 // Polyphonic: one mass per V/OCT channel, output poly matches
 // ============================================================
 
-// Octave-reduced odd harmonics 1,3,5,7,9,11,13,15
-static const float harmRatios[8] = {
-    1.f,       // 1st  — fundamental
-    1.5f,      // 3rd  — perfect fifth
-    1.25f,     // 5th  — major third
-    1.75f,     // 7th  — harmonic 7th (blue note)
-    1.125f,    // 9th  — major second
-    1.375f,    // 11th — tritone
-    1.625f,    // 13th — minor sixth (sharp)
-    1.875f     // 15th — major seventh
-};
-
-// JI chromatic ratios (12-note, Ptolemaic)
-static const float justRatios[12] = {
-    1.f,        // 1/1   unison
-    1.0667f,    // 16/15 minor second
-    1.125f,     // 9/8   major second
-    1.2f,       // 6/5   minor third
-    1.25f,      // 5/4   major third
-    1.3333f,    // 4/3   perfect fourth
-    1.4063f,    // 45/32 tritone
-    1.5f,       // 3/2   perfect fifth
-    1.6f,       // 8/5   minor sixth
-    1.6667f,    // 5/3   major sixth
-    1.7778f,    // 16/9  minor seventh
-    1.875f      // 15/8  major seventh
-};
+// The tuning tables and the engine itself now live in dsp/MassEngine.hpp,
+// shared with the commercial plug-in so the two renderers cannot drift.
 
 struct StringMassCore : Module {
 	enum ParamId {
@@ -83,9 +59,11 @@ struct StringMassCore : Module {
 		LIGHTS_LEN
 	};
 
-	// [voice][poly_channel]
-	float phase[16][16]      = {};
-	float microPhase[16][16] = {};  // slow LFO phase for MICRO mode
+	// One mass per polyphonic channel. The engine owns its own phase state
+	// and staggers it on construction, which is what the loop in this
+	// constructor used to do by hand.
+	af::MassEngine engines[16];
+	float engineSr = 0.f;
 
 	StringMassCore() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -115,12 +93,6 @@ struct StringMassCore : Module {
 		// the module drops its outputs to zero and the patch goes quiet.
 		configBypass(VOCT_INPUT, VOCT_OUTPUT);
 
-		// Stagger initial phases to avoid startup coherence spike
-		for (int v = 0; v < 16; v++)
-			for (int c = 0; c < 16; c++) {
-				phase[v][c]      = float(v) / 16.f;
-				microPhase[v][c] = float(v) / 16.f;
-			}
 	}
 
 	float modp(int param, int atten, int cv, float lo, float hi) {
@@ -131,96 +103,29 @@ struct StringMassCore : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		int polyCh = std::max(1, inputs[VOCT_INPUT].getChannels());
+		if (args.sampleRate != engineSr) {
+			engineSr = args.sampleRate;
+			for (auto& e : engines)
+				e.setSampleRate(engineSr);
+		}
+
+		const int polyCh = std::max(1, inputs[VOCT_INPUT].getChannels());
 		outputs[AUDIO_OUTPUT].setChannels(polyCh);
 		outputs[VOCT_OUTPUT].setChannels(polyCh);
 
-		int M = (int)std::round(modp(MASS_PARAM, MASS_ATTEN_PARAM, MASS_CV_INPUT, 1.f, 16.f));
-		float spread = modp(SPREAD_PARAM, SPREAD_ATTEN_PARAM, SPREAD_CV_INPUT, 0.f, 1.f);
-		float timbre = modp(TIMBRE_PARAM, TIMBRE_ATTEN_PARAM, TIMBRE_CV_INPUT, 0.f, 1.f);
+		af::MassEngine::Params p;
+		p.voices = (int) std::round(modp(MASS_PARAM, MASS_ATTEN_PARAM, MASS_CV_INPUT, 1.f, 16.f));
+		p.spread = modp(SPREAD_PARAM, SPREAD_ATTEN_PARAM, SPREAD_CV_INPUT, 0.f, 1.f);
+		p.timbre = modp(TIMBRE_PARAM, TIMBRE_ATTEN_PARAM, TIMBRE_CV_INPUT, 0.f, 1.f);
+		p.mode   = clamp((int) std::round(params[MODE_PARAM].getValue()), 0, 3);
 
-		int mode     = clamp((int)std::round(params[MODE_PARAM].getValue()),    0, 3);
-		int secParam = clamp((int)std::round(params[SECTION_PARAM].getValue()), 0, 2);
-		int sections = (secParam == 0) ? 1 : (secParam == 1) ? 2 : 4;
-		sections = std::min(sections, M);
+		const int secParam = clamp((int) std::round(params[SECTION_PARAM].getValue()), 0, 2);
+		p.sections = (secParam == 0) ? 1 : (secParam == 1) ? 2 : 4;
 
-		float spreadCents = spread * 50.f;   // 0–50 cents total spread
-		float timbreNorm  = 1.f + timbre * 1.08f;
-		float norm        = 1.f / std::sqrt(float(M));
-
+		// The engine clamps voices and sections itself, so this does not.
 		for (int c = 0; c < polyCh; c++) {
-			float voct = inputs[VOCT_INPUT].getVoltage(c);
-			float freq = dsp::FREQ_C4 * dsp::exp2_taylor5( voct);
-
-			float sum = 0.f;
-
-			for (int v = 0; v < M; v++) {
-				float voiceFreq;
-				// Linear spread position across all voices: -1 to +1
-				float spreadPos = (M > 1) ? (2.f * v / float(M - 1) - 1.f) : 0.f;
-
-				if (mode == 0) {
-					// ── UNIS: symmetric spread around fundamental ────────
-					float cents = spreadPos * spreadCents;
-					voiceFreq   = freq * dsp::exp2_taylor5( cents / 1200.f);
-
-				} else if (mode == 1) {
-					// ── HARM: voices in harmonic series sections ─────────
-					int sec      = clamp((v * sections) / M, 0, 7);
-					int secStart = sec * M / sections;
-					int secEnd   = (sec + 1) * M / sections;
-					int secLen   = std::max(1, secEnd - secStart);
-					int posInSec = v - secStart;
-					float secPos = (secLen > 1) ? (2.f * posInSec / float(secLen - 1) - 1.f) : 0.f;
-
-					float cents = secPos * spreadCents;
-					voiceFreq   = freq * harmRatios[sec] * dsp::exp2_taylor5( cents / 1200.f);
-
-				} else if (mode == 2) {
-					// ── JUST: M voices mapped to JI chromatic ratios ─────
-					int idx    = clamp((v * 12) / M, 0, 11);
-					float cents = spreadPos * spreadCents * 0.3f;  // narrower spread in JUST
-					voiceFreq  = freq * justRatios[idx] * dsp::exp2_taylor5( cents / 1200.f);
-
-				} else {
-					// ── MICRO: slow per-voice vibrato at different rates ──
-					// Each voice has its own LFO rate (0.03–0.26 Hz), creating
-					// independent beating that accumulates psychoacoustically
-					float lfoRate = 0.03f + float(v) * 0.015f;
-					microPhase[v][c] += lfoRate * args.sampleTime;
-					if (microPhase[v][c] >= 1.f) microPhase[v][c] -= 1.f;
-					float cents = std::sin(2.f * float(M_PI) * microPhase[v][c]) * spreadCents;
-					voiceFreq   = freq * dsp::exp2_taylor5( cents / 1200.f);
-				}
-
-				// Advance phasor
-				phase[v][c] += voiceFreq * args.sampleTime;
-				if (phase[v][c] >= 1.f) phase[v][c] -= 1.f;
-
-				// Waveform: sine + harmonics 2–4 (third-bridge harmonic stack)
-				float p = phase[v][c];
-				// Harmonics 2..4 follow from the fundamental by angle addition:
-				//   s(n+1) = s(n)*c1 + c(n)*s1,  c(n+1) = c(n)*c1 - s(n)*s1
-				// Exact, and four transcendentals per voice become two.
-				const float th = 2.f * float(M_PI) * p;
-				const float s1 = std::sin(th);
-				const float c1 = std::cos(th);
-				float s = s1;
-				if (timbre > 0.f) {
-					const float s2 = 2.f * s1 * c1;
-					const float c2 = c1 * c1 - s1 * s1;
-					const float s3 = s2 * c1 + c2 * s1;
-					const float c3 = c2 * c1 - s2 * s1;
-					const float s4 = s3 * c1 + c3 * s1;
-					s += timbre * 0.5f * s2 + timbre * 0.33f * s3 + timbre * 0.25f * s4;
-				}
-				s /= timbreNorm;
-
-				sum += s;
-			}
-
-			// 1/√M normalisation + tanh soft ceiling
-			outputs[AUDIO_OUTPUT].setVoltage(5.f * std::tanh(sum * norm), c);
+			const float voct = inputs[VOCT_INPUT].getVoltage(c);
+			outputs[AUDIO_OUTPUT].setVoltage(engines[c].process(voct, p), c);
 			outputs[VOCT_OUTPUT].setVoltage(voct, c);
 		}
 	}

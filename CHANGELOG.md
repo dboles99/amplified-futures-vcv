@@ -8,6 +8,32 @@ See <https://vcvrack.com/manual/Manifest>.
 
 ## Unreleased
 
+### Changed
+
+- **String Mass Core now runs on a shared engine, and is roughly twice as
+  fast.** Its DSP moved out of the module and into `src/dsp/MassEngine.hpp`,
+  which the commercial plug-in also uses, so the two renderers are one
+  instrument rather than two implementations that happen to agree. The module
+  went from 271 lines to 177.
+
+  The engine substitutes a polynomial sincos for `std::sin` and `std::cos`.
+  At 16 polyphonic channels of 16 voices the cost per second of audio falls
+  from 110% of a core to 49% in UNIS, 137% to 78% in HARM, 114% to 61% in
+  JUST, and **303% to 80% in MICRO**, which previously could not run in real
+  time at all. At the 128 oscillators the series is described by, MICRO falls
+  from 156% to 38%.
+
+  **This changes the output, by 1.73e-06 V at worst on a plus or minus 5 V
+  signal, which is -129 dB.** Inaudible, but not nothing, and stated rather
+  than glossed. The polynomial is accurate to 1.22e-07 across the full turn,
+  better than the 6e-06 Rack itself accepts from `exp2_taylor5` in the same
+  expression.
+
+  Two tests protect this. `tests/golden.cpp` compares the module against
+  output frozen before the rewiring, and `commercial/branca-core` keeps an
+  exact-trig build that was verified bit-identical to the old module across
+  36 cases before the switch was made.
+
 ### Fixed
 
 - **Wall Conductor latched to a silent DC rail and stayed there.** Its
