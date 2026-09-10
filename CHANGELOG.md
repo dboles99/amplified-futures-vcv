@@ -10,6 +10,22 @@ See <https://vcvrack.com/manual/Manifest>.
 
 ### Changed
 
+- **DroneClone's DRIFT ran about 144 times too fast, and changed with the
+  sample rate.** `driftPhase` was incremented by a per-sample constant with
+  no `sampleTime`, so the eight drift LFOs ran at 41 to 197 Hz at 48 kHz
+  instead of the 0.31 to 1.37 Hz their constants plainly intend, and doubled
+  again at 96 kHz.
+
+  At those rates a 0.8% depth is not a slow detune wander, it is frequency
+  modulation with audible sidebands. It also meant the same patch sounded
+  different at every sample rate, which is the part that makes it a defect
+  rather than a taste.
+
+  The rates are now used as Hz and multiplied by `sampleTime`. **This changes
+  the sound of any patch with DRIFT above zero**, and it changes it a lot:
+  what was a buzz becomes the slow movement the control was named for.
+  Patch-safe, no parameter ranges altered.
+
 - **Wall Conductor now runs on a shared engine too.** Its DSP moved to
   `src/dsp/WallEngine.hpp`, including the DC blocker on the feedback bus, so
   the fix travels with the engine rather than living in one renderer. The

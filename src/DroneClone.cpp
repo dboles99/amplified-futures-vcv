@@ -143,9 +143,18 @@ struct DroneClone : Module {
 		// the module drops its outputs to zero and the patch goes quiet.
 		configBypass(VOCT_INPUT, VOCT_OUTPUT);
 
+		// Hz, and used as Hz. These are multiplied by sampleTime in process()
+		// so the drift runs at the rate written here on every sample rate.
+		//
+		// They previously carried a hardcoded 0.003 per-sample scale and no
+		// sampleTime, which put DRIFT at 41 to 197 Hz at 48 kHz rather than
+		// 0.31 to 1.37 Hz: about 144 times too fast, and doubling again at
+		// 96 kHz. At those rates a 0.8% depth is not a slow wander, it is
+		// frequency modulation with audible sidebands, and the same patch
+		// sounded different at every sample rate.
 		const float rates[8] = {0.31f, 0.47f, 0.61f, 0.79f, 0.89f, 1.03f, 1.19f, 1.37f};
 		for (int i = 0; i < 8; i++)
-			driftRate[i] = rates[i] * 0.003f;
+			driftRate[i] = rates[i];
 	}
 
 	// CV-attenuated mono param helper
@@ -231,7 +240,7 @@ struct DroneClone : Module {
 				float detuneCents   = normalizedPos * spread * 1200.f;
 				float detuneFreq    = baseFreq * dsp::exp2_taylor5(detuneCents / 1200.f);
 
-				driftPhase[c][i] += driftRate[i];
+				driftPhase[c][i] += driftRate[i] * args.sampleTime;
 				if (driftPhase[c][i] >= 1.f) driftPhase[c][i] -= 1.f;
 				// At DRIFT 0 this multiplied by exactly 1, for the price of a sin.
 				if (drift > 0.f)
