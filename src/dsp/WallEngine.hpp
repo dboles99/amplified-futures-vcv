@@ -17,9 +17,23 @@
 
 #pragma once
 
+#include "RackMath.hpp"
+
 #include <cmath>
 
 namespace af {
+namespace detail {
+
+// Fixed channel positions, left to right. At namespace scope rather than as a
+// static local inside process(), because a static local is a lock: the
+// compiler guards its initialisation so that two threads cannot race to run
+// it. These initialisers are constant so no guard is actually emitted, but
+// -Wfunction-effects reasons about the declaration rather than the codegen and
+// will not certify a function containing one as non-blocking. Hoisting it is
+// free and keeps the certification, which is worth more than the locality.
+static const float WALL_PANS[4] = { -1.f, -0.33f, 0.33f, 1.f };
+
+}  // namespace detail
 
 class WallEngine {
 public:
@@ -36,7 +50,7 @@ public:
 		sampleTime_ = 1.f / sr;
 		// Constant for a given rate, so it is computed once rather than per
 		// sample. Same value either way; exp is deterministic.
-		hpAlpha_ = 1.f - std::exp(-2.f * float(M_PI) * 5.f * sampleTime_);
+		hpAlpha_ = 1.f - std::exp(-2.f * rackmath::PI * 5.f * sampleTime_);
 	}
 
 	void reset() {
@@ -57,11 +71,8 @@ public:
 		collapseEnv_ += (collapseTarget - collapseEnv_) *
 		                (1.f - std::exp(-sampleTime_ / tau));
 
-		// Fixed positions, left to right. Width scales the spread rather than
-		// moving individual channels, so the shape of the wall is constant
-		// and only its breadth changes.
-		static const float PANS[4] = { -1.f, -0.33f, 0.33f, 1.f };
-
+		// Width scales the spread rather than moving individual channels, so
+		// the shape of the wall is constant and only its breadth changes.
 		float mixL = feedbackL_ * p.feedback;
 		float mixR = feedbackR_ * p.feedback;
 
@@ -70,9 +81,9 @@ public:
 			// all four fading together. Density is a count, not a volume.
 			const float gain = clampf(p.density * 4.f - float(i), 0.f, 1.f);
 			const float sig  = ch[i] * gain;
-			const float panR = (PANS[i] * p.width + 1.f) * 0.5f;
-			mixL += sig * std::cos(panR * float(M_PI) * 0.5f);
-			mixR += sig * std::sin(panR * float(M_PI) * 0.5f);
+			const float panR = (detail::WALL_PANS[i] * p.width + 1.f) * 0.5f;
+			mixL += sig * std::cos(panR * rackmath::PI * 0.5f);
+			mixR += sig * std::sin(panR * rackmath::PI * 0.5f);
 		}
 
 		const float drive = 1.f + p.pressure * 3.f;

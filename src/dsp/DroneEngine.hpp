@@ -19,6 +19,7 @@
 
 #include "RackMath.hpp"
 
+#include <algorithm>   // std::max, used by the jawari branch
 #include <cmath>
 
 namespace af {
@@ -30,6 +31,21 @@ namespace detail {
 static const float DRONE_DRIFT_RATES[8] = {
 	0.31f, 0.47f, 0.61f, 0.79f, 0.89f, 1.03f, 1.19f, 1.37f
 };
+
+// The jawari bridge offset, sin and cos of 0.02*pi.
+//
+// These were static locals inside process(), and that was a real defect
+// rather than a style point. std::sin is not a constant expression, so the
+// compiler had to emit a thread-safe initialisation guard, and that guard is
+// a lock. It was acquired on the audio thread, on the first sample at which
+// anyone turned JAWARI above zero. Found by -Wfunction-effects, which is
+// exactly the class of thing it is for: a lock nobody would ever notice by
+// listening, on a path taken once per session.
+//
+// At namespace scope they are initialised before main, off the audio thread,
+// and the values are bit-identical, so the frozen reference still holds.
+static const float DRONE_JAWARI_SIN = std::sin(0.02f * rackmath::PI);
+static const float DRONE_JAWARI_COS = std::cos(0.02f * rackmath::PI);
 
 }  // namespace detail
 
@@ -89,7 +105,7 @@ public:
 			// At DRIFT 0 this multiplies by exactly 1, for the price of a sin.
 			if (p.drift > 0.f)
 				detuneFreq *= 1.f + p.drift * 0.008f *
-				              std::sin(2.f * float(M_PI) * driftPhase_[i]);
+				              std::sin(2.f * rackmath::PI * driftPhase_[i]);
 
 			voice_[i].phase += detuneFreq * sampleTime_;
 			if (voice_[i].phase >= 1.f) voice_[i].phase -= 1.f;
@@ -99,7 +115,7 @@ public:
 			//   s(n+1) = s(n)*c1 + c(n)*s1,  c(n+1) = c(n)*c1 - s(n)*s1
 			// Exact, not an approximation, and it turns up to nine
 			// transcendentals per voice into two.
-			const float th = 2.f * float(M_PI) * voice_[i].phase;
+			const float th = 2.f * rackmath::PI * voice_[i].phase;
 			const float s1 = std::sin(th);
 			const float c1 = std::cos(th);
 
@@ -135,9 +151,8 @@ public:
 				// A sitar bridge only touches the string on one side of the
 				// swing, so the buzz is a half-wave of a slightly shifted
 				// copy. sin(th + 0.02*pi) by the same identity.
-				static const float SIN_OFF = std::sin(0.02f * float(M_PI));
-				static const float COS_OFF = std::cos(0.02f * float(M_PI));
-				const float buzz = std::max(0.f, s1 * COS_OFF + c1 * SIN_OFF);
+				const float buzz = std::max(0.f, s1 * detail::DRONE_JAWARI_COS +
+				                                 c1 * detail::DRONE_JAWARI_SIN);
 				toneSignal = toneSignal * (1.f - p.jawari * 0.35f) +
 				             buzz * p.jawari * 0.35f;
 			}
@@ -147,7 +162,7 @@ public:
 				voice_[i].subPhase += detuneFreq * 0.25f * sampleTime_;
 				if (voice_[i].subPhase >= 1.f) voice_[i].subPhase -= 1.f;
 				subSignal = p.weight * 0.4f *
-				            std::sin(2.f * float(M_PI) * voice_[i].subPhase);
+				            std::sin(2.f * rackmath::PI * voice_[i].subPhase);
 			}
 
 			output += (toneSignal + subSignal) * voice_[i].level;

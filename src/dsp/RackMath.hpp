@@ -26,6 +26,19 @@
 namespace af {
 namespace rackmath {
 
+// M_PI is not standard C++. It is a POSIX name that libstdc++ exposes by
+// default and MSVC hides behind _USE_MATH_DEFINES, which has to be defined
+// before <cmath> is first included anywhere in the translation unit. No
+// header can guarantee that about a file that includes it. The Rack makefile
+// sets it globally, the JUCE build has no reason to, and the engines are
+// meant to compile under both without either of them arranging anything.
+//
+// The literal carries more digits than a float can hold on purpose: it rounds
+// to exactly the same float as (float)M_PI, so replacing one with the other
+// changes no arithmetic and the frozen references still hold.
+constexpr float PI = 3.14159265358979323846f;
+
+
 // rack::dsp::FREQ_C4
 constexpr float FREQ_C4 = 261.6256f;
 

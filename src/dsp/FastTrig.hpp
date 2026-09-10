@@ -38,6 +38,8 @@
 
 #pragma once
 
+#include "RackMath.hpp"
+
 #include <cmath>
 
 namespace af {
@@ -81,7 +83,7 @@ inline void sincos2pi(float phase, float* sOut, float* cOut) {
 	if (swap)
 		f = 1.f - f;
 
-	const float x = f * (float(M_PI) / 4.f);   // [0, pi/4]
+	const float x = f * (rackmath::PI / 4.f);   // [0, pi/4]
 	float s = sinPoly(x);
 	float c = cosPoly(x);
 

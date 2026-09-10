@@ -141,7 +141,7 @@ public:
 				microPhase_[v] += lfoRate * sampleTime_;
 				if (microPhase_[v] >= 1.f) microPhase_[v] -= 1.f;
 #ifdef AF_MASS_EXACT_TRIG
-				const float lfo = std::sin(2.f * float(M_PI) * microPhase_[v]);
+				const float lfo = std::sin(2.f * rackmath::PI * microPhase_[v]);
 #else
 				// The extra sine per voice per sample that makes MICRO cost
 				// 2.9 times UNIS. Only the sine is wanted here, but the pair
@@ -178,7 +178,7 @@ public:
 			// fine", and it is why the slow path is kept rather than deleted.
 			float s1, c1;
 #ifdef AF_MASS_EXACT_TRIG
-			const float th = 2.f * float(M_PI) * phase_[v];
+			const float th = 2.f * rackmath::PI * phase_[v];
 			s1 = std::sin(th);
 			c1 = std::cos(th);
 #else
