@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/DroneEngine.hpp"
 #include "dsp/AfTuning.hpp"
 
 // AF safety orange LED — not in the Rack SDK standard set
@@ -76,14 +77,11 @@ struct DroneClone : Module {
 		LIGHTS_LEN
 	};
 
-	struct Voice {
-		float phase    = 0.f;
-		float subPhase = 0.f;
-		float level    = 0.f;
-		float drift    = 0.f;
-	};
-	Voice voices[16][8];
 
+	// One wall per polyphonic channel. Each engine owns its own voices and
+	// drift phases; the module keeps only what is global or host-facing.
+	af::DroneEngine engines[16];
+	float engineSr = 0.f;
 	float chokeLevel  = 1.f;
 
 	// Beat rate between ADJACENT voices at the current pitch and SPREAD,
@@ -95,8 +93,6 @@ struct DroneClone : Module {
 	bool  gateWasHigh = false;
 	dsp::SchmittTrigger btnTrig;
 
-	float driftPhase[16][8] = {};
-	float driftRate[8]      = {};
 
 	DroneClone() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -143,18 +139,6 @@ struct DroneClone : Module {
 		// the module drops its outputs to zero and the patch goes quiet.
 		configBypass(VOCT_INPUT, VOCT_OUTPUT);
 
-		// Hz, and used as Hz. These are multiplied by sampleTime in process()
-		// so the drift runs at the rate written here on every sample rate.
-		//
-		// They previously carried a hardcoded 0.003 per-sample scale and no
-		// sampleTime, which put DRIFT at 41 to 197 Hz at 48 kHz rather than
-		// 0.31 to 1.37 Hz: about 144 times too fast, and doubling again at
-		// 96 kHz. At those rates a 0.8% depth is not a slow wander, it is
-		// frequency modulation with audible sidebands, and the same patch
-		// sounded different at every sample rate.
-		const float rates[8] = {0.31f, 0.47f, 0.61f, 0.79f, 0.89f, 1.03f, 1.19f, 1.37f};
-		for (int i = 0; i < 8; i++)
-			driftRate[i] = rates[i];
 	}
 
 	// CV-attenuated mono param helper
@@ -174,25 +158,35 @@ struct DroneClone : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		// Global params (CV mono)
-		float spread   = modp(SPREAD_PARAM,   SPREAD_ATTEN_PARAM,    SPREAD_CV_INPUT,    0.f, 1.f);
-		float weight   = modp(WEIGHT_PARAM,   WEIGHT_ATTEN_PARAM,    WEIGHT_CV_INPUT,    0.f, 1.f);
-		float shimmer  = modp(SHIMMER_PARAM,  SHIMMER_ATTEN_PARAM,   SHIMMER_CV_INPUT,   0.f, 1.f);
-		float jawari   = modp(JAWARI_PARAM,   JAWARI_ATTEN_PARAM,    JAWARI_CV_INPUT,    0.f, 1.f);
-		float drift    = modp(DRIFT_PARAM,    DRIFT_ATTEN_PARAM,     DRIFT_CV_INPUT,     0.f, 1.f);
-		float chokeAmt = modp(CHOKE_AMT_PARAM,CHOKE_AMT_ATTEN_PARAM, CHOKE_AMT_CV_INPUT, 0.f, 1.f);
-		float fundKnob = modp(FUNDAMENTAL_PARAM, FUNDAMENTAL_ATTEN_PARAM, FUNDAMENTAL_CV_INPUT, -4.f, 4.f);
+		if (args.sampleRate != engineSr) {
+			engineSr = args.sampleRate;
+			for (auto& e : engines)
+				e.setSampleRate(engineSr);
+		}
 
-		float decayV   = modp(DECAY_PARAM, DECAY_ATTEN_PARAM, DECAY_CV_INPUT, 0.f, 1.f);
-		float decayTime = 0.02f * std::pow(400.f, decayV);
+		// Global, mono CV.
+		af::DroneEngine::Params p;
+		p.spread  = modp(SPREAD_PARAM,  SPREAD_ATTEN_PARAM,  SPREAD_CV_INPUT,  0.f, 1.f);
+		p.weight  = modp(WEIGHT_PARAM,  WEIGHT_ATTEN_PARAM,  WEIGHT_CV_INPUT,  0.f, 1.f);
+		p.shimmer = modp(SHIMMER_PARAM, SHIMMER_ATTEN_PARAM, SHIMMER_CV_INPUT, 0.f, 1.f);
+		p.jawari  = modp(JAWARI_PARAM,  JAWARI_ATTEN_PARAM,  JAWARI_CV_INPUT,  0.f, 1.f);
+		p.drift   = modp(DRIFT_PARAM,   DRIFT_ATTEN_PARAM,   DRIFT_CV_INPUT,   0.f, 1.f);
 
-		// Choke (global)
-		bool btnDown  = params[CHOKE_PARAM].getValue() > 0.5f;
-		bool gateHigh = inputs[CHOKE_INPUT].getVoltage() > 2.f;
-		bool choking  = btnDown || gateHigh;
+		const float chokeAmt = modp(CHOKE_AMT_PARAM, CHOKE_AMT_ATTEN_PARAM,
+		                            CHOKE_AMT_CV_INPUT, 0.f, 1.f);
+		const float fundKnob = modp(FUNDAMENTAL_PARAM, FUNDAMENTAL_ATTEN_PARAM,
+		                            FUNDAMENTAL_CV_INPUT, -4.f, 4.f);
+		const float decayV   = modp(DECAY_PARAM, DECAY_ATTEN_PARAM,
+		                            DECAY_CV_INPUT, 0.f, 1.f);
+		const float decayTime = 0.02f * std::pow(400.f, decayV);
 
-		float chokeTarget = choking ? (1.f - chokeAmt) : 1.f;
-		float chokeRate   = 1.f / (decayTime * args.sampleRate);
+		// Choke is global rather than per voice, so it stays in the module.
+		const bool btnDown  = params[CHOKE_PARAM].getValue() > 0.5f;
+		const bool gateHigh = inputs[CHOKE_INPUT].getVoltage() > 2.f;
+		const bool choking  = btnDown || gateHigh;
+
+		const float chokeTarget = choking ? (1.f - chokeAmt) : 1.f;
+		const float chokeRate   = 1.f / (decayTime * args.sampleRate);
 		if (choking && chokeLevel > chokeTarget)
 			chokeLevel -= chokeRate;
 		else if (!choking && chokeLevel < 1.f)
@@ -200,120 +194,30 @@ struct DroneClone : Module {
 		chokeLevel = clamp(chokeLevel, 0.f, 1.f);
 		lights[CHOKE_LIGHT].setBrightness(choking ? 1.f : 0.f);
 
-		int channels = std::max(1, inputs[VOCT_INPUT].getChannels());
+		const int channels = std::max(1, inputs[VOCT_INPUT].getChannels());
 		outputs[OUT_OUTPUT].setChannels(channels);
 		outputs[VOCT_OUTPUT].setChannels(channels);
 
 		for (int c = 0; c < channels; c++) {
-			float basePitch = fundKnob + inputs[VOCT_INPUT].getVoltage(c);
-			float baseFreq  = dsp::FREQ_C4 * dsp::exp2_taylor5(basePitch);
+			const float basePitch = fundKnob + inputs[VOCT_INPUT].getVoltage(c);
 
 			// Channel 0 only, and outside the voice loop: this is a readout,
-			// not a signal, and writing it once per voice would leave it
-			// holding whichever voice happened to run last.
-			// Beat rate is linear in frequency, so the same cents value
-			// shimmers in the bass and roughens in the treble - AfTuning.hpp.
+			// not a signal, and writing it per voice would leave it holding
+			// whichever voice happened to run last. Beat rate is linear in
+			// frequency, so the same cents shimmers in the bass and roughens
+			// in the treble - AfTuning.hpp.
 			if (c == 0) {
-				const float adjacentCents = spread * 1200.f / 7.f;
+				const float baseFreq = dsp::FREQ_C4 * dsp::exp2_taylor5(basePitch);
+				const float adjacentCents = p.spread * 1200.f / 7.f;
 				beatRateHz_ = af::tuning::beatHz(baseFreq, adjacentCents);
 			}
 
-			float massKnob = modpoly(MASS_PARAM, MASS_ATTEN_PARAM, MASS_CV_INPUT, c, 0.f, 1.f);
-			float massFloat = massKnob * 8.f;
+			// MASS and TENSION are per channel, so they are read inside the loop.
+			p.mass = modpoly(MASS_PARAM, MASS_ATTEN_PARAM, MASS_CV_INPUT, c, 0.f, 1.f);
+			p.tension = modpoly(TENSION_PARAM, TENSION_ATTEN_PARAM, TENS_CV_INPUT,
+			                    c, 0.f, 1.f);
 
-			float tension = modpoly(TENSION_PARAM, TENSION_ATTEN_PARAM, TENS_CV_INPUT, c, 0.f, 1.f);
-
-			float output = 0.f;
-
-			for (int i = 0; i < 8; i++) {
-				float targetLevel = (static_cast<float>(i) < massFloat) ? 1.f : 0.f;
-				if (massFloat > static_cast<float>(i) && massFloat < static_cast<float>(i) + 1.f)
-					targetLevel = massFloat - static_cast<float>(i);
-				voices[c][i].level += (targetLevel - voices[c][i].level) * 4e-4f;
-
-				if (voices[c][i].level < 1e-4f) {
-					if (c == 0) lights[VOICE_LIGHT_0 + i].setBrightness(0.f);
-					continue;
-				}
-
-				float normalizedPos = (i / 7.f) - 0.5f;
-				float detuneCents   = normalizedPos * spread * 1200.f;
-				float detuneFreq    = baseFreq * dsp::exp2_taylor5(detuneCents / 1200.f);
-
-				driftPhase[c][i] += driftRate[i] * args.sampleTime;
-				if (driftPhase[c][i] >= 1.f) driftPhase[c][i] -= 1.f;
-				// At DRIFT 0 this multiplied by exactly 1, for the price of a sin.
-				if (drift > 0.f)
-					detuneFreq *= 1.f + drift * 0.008f * std::sin(2.f * M_PI * driftPhase[c][i]);
-
-				voices[c][i].phase += detuneFreq * args.sampleTime;
-				if (voices[c][i].phase >= 1.f) voices[c][i].phase -= 1.f;
-
-				float p = voices[c][i].phase;
-
-				// Every partial below is a harmonic of this one phase, so they
-				// all follow from a single sin/cos by angle addition:
-				//     s(n+1) = s(n)*c1 + c(n)*s1
-				//     c(n+1) = c(n)*c1 - s(n)*s1
-				// This is exact, not an approximation, and turns up to nine
-				// transcendentals per voice into two.
-				const float th = 2.f * M_PI * p;
-				const float s1 = std::sin(th);
-				const float c1 = std::cos(th);
-
-				float fundamental_wave = s1;
-				float toneSignal = fundamental_wave;
-
-				// Harmonics 2..4 for TENSION, extended to 5 and 7 for SHIMMER.
-				// Derived only when something actually asks for them.
-				if (tension > 0.f || shimmer > 0.f) {
-					const float s2 = 2.f * s1 * c1;
-					const float c2 = c1 * c1 - s1 * s1;
-					const float s3 = s2 * c1 + c2 * s1;
-					const float c3 = c2 * c1 - s2 * s1;
-					const float s4 = s3 * c1 + c3 * s1;
-
-					if (tension > 0.f) {
-						toneSignal += tension * 0.50f * s2;
-						toneSignal += tension * 0.33f * s3;
-						toneSignal += tension * 0.25f * s4;
-						toneSignal /= 1.f + tension * 1.08f;
-					}
-					if (shimmer > 0.f) {
-						const float c4 = c3 * c1 - s3 * s1;
-						const float s5 = s4 * c1 + c4 * s1;
-						const float c5 = c4 * c1 - s4 * s1;
-						const float s6 = s5 * c1 + c5 * s1;
-						const float c6 = c5 * c1 - s5 * s1;
-						const float s7 = s6 * c1 + c6 * s1;
-						toneSignal += shimmer * 0.12f * s5;
-						toneSignal += shimmer * 0.08f * s7;
-					}
-				}
-				if (jawari > 0.f) {
-					// sin(th + 0.02*pi), by the same identity.
-					static const float kJawariSin = std::sin(0.02f * (float)M_PI);
-					static const float kJawariCos = std::cos(0.02f * (float)M_PI);
-					const float buzz = std::max(0.f, s1 * kJawariCos + c1 * kJawariSin);
-					toneSignal = toneSignal * (1.f - jawari * 0.35f) + buzz * jawari * 0.35f;
-				}
-
-				float subSignal = 0.f;
-				if (weight > 0.f) {
-					voices[c][i].subPhase += detuneFreq * 0.25f * args.sampleTime;
-					if (voices[c][i].subPhase >= 1.f) voices[c][i].subPhase -= 1.f;
-					subSignal = weight * 0.4f * std::sin(2.f * M_PI * voices[c][i].subPhase);
-				}
-
-				output += (toneSignal + subSignal) * voices[c][i].level;
-
-				if (c == 0) {
-					float ledBright = voices[c][i].level * (0.5f + 0.5f * fundamental_wave);
-					lights[VOICE_LIGHT_0 + i].setSmoothBrightness(ledBright, args.sampleTime);
-				}
-			}
-
-			output /= 8.f;
+			float output = engines[c].process(basePitch, p.mass * 8.f, p);
 			output *= chokeLevel;
 
 			if (inputs[RTN_INPUT].isConnected())
@@ -321,6 +225,21 @@ struct DroneClone : Module {
 
 			outputs[OUT_OUTPUT].setVoltage(5.f * std::tanh(output), c);
 			outputs[VOCT_OUTPUT].setVoltage(inputs[VOCT_INPUT].getVoltage(c), c);
+
+			// Lights are the host's business, so they read the engine rather
+			// than living inside it.
+			if (c == 0) {
+				for (int i = 0; i < af::DroneEngine::VOICES; i++) {
+					const float lvl = engines[c].voiceLevel(i);
+					if (lvl < 1e-4f) {
+						lights[VOICE_LIGHT_0 + i].setBrightness(0.f);
+					} else {
+						lights[VOICE_LIGHT_0 + i].setSmoothBrightness(
+							lvl * (0.5f + 0.5f * engines[c].voiceWave(i)),
+							args.sampleTime);
+					}
+				}
+			}
 		}
 	}
 };

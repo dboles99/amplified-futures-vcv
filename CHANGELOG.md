@@ -10,6 +10,24 @@ See <https://vcvrack.com/manual/Manifest>.
 
 ### Changed
 
+- **DroneClone now runs on a shared engine.** Its DSP moved to
+  `src/dsp/DroneEngine.hpp`, one instance per polyphonic channel, each owning
+  its eight voices and their drift phases. The module went from 405 lines to
+  334 and now handles only what is genuinely the host's: parameters, the
+  global choke, polyphony, the return input and the panel lights, which read
+  the engine through `voiceLevel()` and `voiceWave()` rather than being
+  written from inside it.
+
+  Output matches the reference captured before extraction to within
+  2.98e-06 V across eight settings, the largest in the drift case where
+  phase accumulates over the warmup.
+
+  Two known warts were carried across unchanged and are commented as such:
+  the voice fade coefficient is per sample rather than per second, and the
+  output divisor is a fixed 8 rather than the live voice count, so MASS
+  raises level as well as voice count. Both are on the list. Fixing them
+  inside a port would have made the port unverifiable.
+
 - **DroneClone's DRIFT ran about 144 times too fast, and changed with the
   sample rate.** `driftPhase` was incremented by a per-sample constant with
   no `sampleTime`, so the eight drift LFOs ran at 41 to 197 Hz at 48 kHz
