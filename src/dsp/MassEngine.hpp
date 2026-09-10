@@ -202,6 +202,14 @@ public:
 		if (p.driftDepth > 0.f) {
 			sharedDriftPhase_ += p.driftRate * sampleTime_;
 			if (sharedDriftPhase_ >= 1.f) sharedDriftPhase_ -= 1.f;
+			// Kept so the modulation matrix can use the field's own drift as
+			// a source rather than a second LFO that merely runs at the same
+			// rate. Written, never read, by the audio path itself.
+			float c;
+			fasttrig::sincos2pi(sharedDriftPhase_, &sharedDrift_, &c);
+			(void) c;
+		} else {
+			sharedDrift_ = 0.f;
 		}
 
 		float sum = 0.f;
@@ -345,12 +353,18 @@ public:
 		return 5.f * std::tanh(sum * norm);
 	}
 
+	// The field's shared drift LFO, bipolar, for the modulation matrix
+	// and for a display. Zero when drift depth is zero, because then
+	// there is no drift to be the source of.
+	float sharedDrift() const { return sharedDrift_; }
+
 private:
 	float sampleTime_ = 1.f / 44100.f;
 	float phase_[MAX_VOICES] = {};
 	float microPhase_[MAX_VOICES] = {};
 	float driftPhase_[MAX_VOICES] = {};
 	float sharedDriftPhase_ = 0.f;
+	float sharedDrift_ = 0.f;
 };
 
 }  // namespace af
