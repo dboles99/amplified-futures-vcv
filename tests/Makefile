@@ -45,5 +45,16 @@ test_wav_read$(EXE): test_wav_read.cpp ../src/dsp/WavRead.hpp
 	$(CXX) $(CXXFLAGS) -o $@ test_wav_read.cpp
 
 clean:
-	rm -f $(BINS) $(addsuffix .exe,$(BINS))
-.PHONY: test clean
+	rm -f $(BINS) $(addsuffix .exe,$(BINS)) smoke.exe
+
+# Deliberately NOT part of `test`, which CI runs. The smoke harness links the
+# real libRack and needs an installed Rack to find libRack.dll at runtime; CI
+# has the SDK and nothing else, so adding it here would turn a green build red
+# for a reason that has nothing to do with the code.
+#
+# It is the only thing that exercises the fourteen modules whose DSP lives
+# inline in a Module subclass, so run it locally before a release.
+smoke:
+	sh smoke.sh
+
+.PHONY: test clean smoke

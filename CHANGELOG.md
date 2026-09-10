@@ -8,7 +8,32 @@ See <https://vcvrack.com/manual/Manifest>.
 
 ## Unreleased
 
+### Added
+
+- **An offline smoke test that reaches every module.** The core suites cover
+  the DSP headers written without a Rack dependency, which is AF-02 to AF-06
+  and leaves fourteen modules untested, because their DSP lives inline in a
+  `Module` subclass. `tests/smoke.cpp` links the real libRack, asks each Model
+  for a Module exactly as Rack does, and drives `process()` by hand: 171
+  checks across three sample rates, patched and unpatched, every parameter at
+  both extremes, asserting nothing goes non-finite or past 12 V.
+
+  It is not part of `make test`, because it needs an installed Rack to find
+  `libRack.dll` and CI has only the SDK. Run `make smoke` in `tests/` locally.
+
+  A dead-control detector was written and then removed. It could not tell an
+  unwired control from one needing a state the harness cannot reach, and
+  reported every attenuverter on eight modules plus forty parameters on Sitar
+  Grid. The reasoning is kept in a comment in the file so nobody rebuilds it.
+
 ### Fixed
+
+- **Ratchet crashed when constructed outside Rack.** Its constructor called
+  `APP->engine->getSampleRate()`, and `APP` is `contextGet()`, a thread-local
+  that only exists inside Rack. Harmless in the host and fatal anywhere else,
+  which is why nothing had caught it. It now sets a literal default and lets
+  `onSampleRateChange()` do the real work, which is what CollapseEG and Street
+  Grid Clock were already doing. Found by the smoke test on its first run.
 
 - **Bypass no longer silences a module.** Thirteen modules now declare
   `configBypass`, so bypassing one passes its input through instead of dropping

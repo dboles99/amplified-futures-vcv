@@ -66,7 +66,13 @@ struct Ratchet : Module {
 		configOutput(TRIG_OUTPUT, "Burst");
 		configOutput(END_OUTPUT, "End of burst");
 
-		core.setSampleRate(APP->engine->getSampleRate());
+		// A literal, not APP->engine->getSampleRate(). APP is contextGet(),
+		// a thread-local that is only set inside Rack, so reaching for it in
+		// a constructor makes the module impossible to instantiate anywhere
+		// else and crashes the offline harness outright. Rack calls
+		// onSampleRateChange() when the module is added, which is what
+		// actually sets this. CollapseEG already did it this way.
+		core.setSampleRate(44100.f);
 	}
 
 	void onSampleRateChange(const SampleRateChangeEvent& e) override {
