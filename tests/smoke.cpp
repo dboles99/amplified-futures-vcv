@@ -102,7 +102,12 @@ void feedInputs(Module* m, int n, float sr) {
 	bool high = period > 0 && (n % period) < (period / 8);
 
 	for (size_t i = 0; i < m->inputs.size(); i++) {
-		m->inputs[i].setChannels(POLY);
+		// Direct member write, not setChannels(). Rack's setChannels() returns
+		// early on a port with channels == 0, so a disconnected port stays
+		// disconnected and every "polyphonic" test here silently ran on one
+		// channel. Modules that use max(1, getChannels()) hid it; Wall
+		// Conductor, which sums over getChannels(), is what exposed it.
+		m->inputs[i].channels = POLY;
 		for (int c = 0; c < POLY; c++) {
 			float v = wantsPulses(m, i)
 				? (high ? 10.f : 0.f)

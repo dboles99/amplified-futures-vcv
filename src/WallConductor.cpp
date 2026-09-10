@@ -3,6 +3,7 @@
 // Part of the Amplified Futures Branca Series. See LICENSE.
 
 #include "plugin.hpp"
+#include "dsp/WallEngine.hpp"
 
 // ============================================================
 // WALL CONDUCTOR — section-based performance mixer/conductor
@@ -63,11 +64,10 @@ struct WallConductor : Module {
 		LIGHTS_LEN
 	};
 
-	float collapseEnv = 1.f;
-	float feedbackL   = 0.f;
-	float feedbackR   = 0.f;
-	float fbHpL       = 0.f;   // DC blocker state for the feedback bus
-	float fbHpR       = 0.f;
+	// All of the state now lives in the engine, including the DC blocker on
+	// the feedback bus.
+	af::WallEngine engine;
+	float engineSr = 0.f;
 
 	WallConductor() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -118,62 +118,29 @@ struct WallConductor : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		float density  = modp(DENSITY_PARAM,  DENSITY_ATTEN_PARAM,  DENSITY_CV_INPUT,  0.f, 1.f);
-		float pressure = modp(PRESSURE_PARAM, PRESSURE_ATTEN_PARAM, PRESSURE_CV_INPUT, 0.f, 1.f);
-		float width    = modp(WIDTH_PARAM,    WIDTH_ATTEN_PARAM,    WIDTH_CV_INPUT,    0.f, 1.f);
-		float feedback = modp(FEEDBACK_PARAM, FEEDBACK_ATTEN_PARAM, FEEDBACK_CV_INPUT, 0.f, 0.92f);
-		float recovery = modp(RECOVERY_PARAM, RECOVERY_ATTEN_PARAM, RECOVERY_CV_INPUT, 0.f, 1.f);
-
-		bool collapseActive = (params[COLLAPSE_PARAM].getValue() > 0.5f)
-		                   || (inputs[COLLAPSE_INPUT].getVoltage() >= 1.f);
-		float collapseTarget = collapseActive ? 0.f : 1.f;
-		float attackTime   = 0.002f;
-		float recoveryTime = 0.05f + recovery * 9.95f;
-		float tau = (collapseTarget < collapseEnv) ? attackTime : recoveryTime;
-		collapseEnv += (collapseTarget - collapseEnv) * (1.f - std::exp(-args.sampleTime / tau));
-
-		// Fixed panning positions for the 4 channels (L–center-L–center-R–R)
-		const float pans[4]  = { -1.f, -0.33f, 0.33f, 1.f };
-		const int   chIds[4] = { CH1_INPUT, CH2_INPUT, CH3_INPUT, CH4_INPUT };
-
-		float mixL = feedbackL * feedback;
-		float mixR = feedbackR * feedback;
-
-		for (int i = 0; i < 4; i++) {
-			float gain = clamp(density * 4.f - float(i), 0.f, 1.f);
-			float sig  = sumInput(chIds[i]) * gain;
-			float panR = (pans[i] * width + 1.f) * 0.5f;
-			mixL += sig * std::cos(panR * float(M_PI) * 0.5f);
-			mixR += sig * std::sin(panR * float(M_PI) * 0.5f);
+		if (args.sampleRate != engineSr) {
+			engineSr = args.sampleRate;
+			engine.setSampleRate(engineSr);
 		}
 
-		float drive = 1.f + pressure * 3.f;
-		float outL = 5.f * std::tanh(mixL * drive / 5.f) * collapseEnv;
-		float outR = 5.f * std::tanh(mixR * drive / 5.f) * collapseEnv;
+		af::WallEngine::Params p;
+		p.density  = modp(DENSITY_PARAM,  DENSITY_ATTEN_PARAM,  DENSITY_CV_INPUT,  0.f, 1.f);
+		p.pressure = modp(PRESSURE_PARAM, PRESSURE_ATTEN_PARAM, PRESSURE_CV_INPUT, 0.f, 1.f);
+		p.width    = modp(WIDTH_PARAM,    WIDTH_ATTEN_PARAM,    WIDTH_CV_INPUT,    0.f, 1.f);
+		p.feedback = modp(FEEDBACK_PARAM, FEEDBACK_ATTEN_PARAM, FEEDBACK_CV_INPUT, 0.f, 0.92f);
+		p.recovery = modp(RECOVERY_PARAM, RECOVERY_ATTEN_PARAM, RECOVERY_CV_INPUT, 0.f, 1.f);
+		p.collapse = (params[COLLAPSE_PARAM].getValue() > 0.5f)
+		          || (inputs[COLLAPSE_INPUT].getVoltage() >= 1.f);
 
-		// The feedback bus is DC-blocked before it re-enters the mix.
-		//
-		// Without this the loop is y[n] = 5*tanh(feedback*drive*y[n-1]/5),
-		// whose origin is unstable whenever feedback*(1 + 3*pressure) > 1.
-		// At FEEDBACK maximum that is PRESSURE above 0.029, so it is reachable
-		// three percent into the knob. Past it the loop converges on a
-		// non-zero DC fixed point and sits there: measured 4.47 V at PRESSURE
-		// 0.25 and 4.99 V at maximum, reached within ten samples from silence.
-		//
-		// A DC rail is legal output, which is why nothing caught it. It is
-		// within plus or minus 12 V and it is finite, so the offline harness
-		// passed it. It is also completely silent, and it does not recover
-		// until the patch is reloaded.
-		//
-		// Blocking DC does not remove the instability, and is not meant to.
-		// Past the same boundary the loop now oscillates instead of latching,
-		// which is what controlled feedback is supposed to do. Feedback
-		// Governor has always had this filter; this module did not.
-		const float hpAlpha = 1.f - std::exp(-2.f * float(M_PI) * 5.f * args.sampleTime);
-		fbHpL += hpAlpha * (outL - fbHpL);
-		fbHpR += hpAlpha * (outR - fbHpR);
-		feedbackL = outL - fbHpL;
-		feedbackR = outR - fbHpR;
+		// Polyphonic summing is a host concern, so it happens here rather than
+		// in the engine, which takes four plain channel values.
+		const int chIds[4] = { CH1_INPUT, CH2_INPUT, CH3_INPUT, CH4_INPUT };
+		float ch[4];
+		for (int i = 0; i < 4; i++)
+			ch[i] = sumInput(chIds[i]);
+
+		float outL = 0.f, outR = 0.f;
+		engine.process(ch, p, &outL, &outR);
 
 		outputs[OUT_L_OUTPUT].setVoltage(outL);
 		outputs[OUT_R_OUTPUT].setVoltage(outR);

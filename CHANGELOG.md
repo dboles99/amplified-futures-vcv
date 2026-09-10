@@ -10,6 +10,17 @@ See <https://vcvrack.com/manual/Manifest>.
 
 ### Changed
 
+- **Wall Conductor now runs on a shared engine too.** Its DSP moved to
+  `src/dsp/WallEngine.hpp`, including the DC blocker on the feedback bus, so
+  the fix travels with the engine rather than living in one renderer. The
+  module went from 240 lines to 208. Output matches the pre-extraction
+  reference to within 7.15e-07 V, and two of the seven reference cases are
+  bit-identical; the rest differ only because the DC blocker coefficient is
+  now computed once per sample rate instead of once per sample.
+
+  `WallEngine::loopGain()` is exposed so a UI can show how close the loop is
+  to self-oscillation. Below 1 it decays, at and above it diverges.
+
 - **String Mass Core now runs on a shared engine, and is roughly twice as
   fast.** Its DSP moved out of the module and into `src/dsp/MassEngine.hpp`,
   which the commercial plug-in also uses, so the two renderers are one
