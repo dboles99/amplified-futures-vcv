@@ -25,26 +25,6 @@ See <https://vcvrack.com/manual/Manifest>.
   is what controlled feedback is for. Sonically breaking at high FEEDBACK with
   any PRESSURE, patch-safe, and the previous behaviour was silence.
 
-### Added
-
-- **An offline smoke test that reaches every module.** The core suites cover
-  the DSP headers written without a Rack dependency, which is AF-02 to AF-06
-  and leaves fourteen modules untested, because their DSP lives inline in a
-  `Module` subclass. `tests/smoke.cpp` links the real libRack, asks each Model
-  for a Module exactly as Rack does, and drives `process()` by hand: 171
-  checks across three sample rates, patched and unpatched, every parameter at
-  both extremes, asserting nothing goes non-finite or past 12 V.
-
-  It is not part of `make test`, because it needs an installed Rack to find
-  `libRack.dll` and CI has only the SDK. Run `make smoke` in `tests/` locally.
-
-  A dead-control detector was written and then removed. It could not tell an
-  unwired control from one needing a state the harness cannot reach, and
-  reported every attenuverter on eight modules plus forty parameters on Sitar
-  Grid. The reasoning is kept in a comment in the file so nobody rebuilds it.
-
-### Fixed
-
 - **Ratchet crashed when constructed outside Rack.** Its constructor called
   `APP->engine->getSampleRate()`, and `APP` is `contextGet()`, a thread-local
   that only exists inside Rack. Harmless in the host and fatal anywhere else,
@@ -68,6 +48,24 @@ See <https://vcvrack.com/manual/Manifest>.
   The ten modules with a V/OCT thru route it on bypass as well. That thru is a
   wire by design, and leaving it unrouted meant bypassing a module dropped the
   pitch chain to 0 V and retuned everything downstream to C4.
+
+### Added
+
+- **An offline smoke test that reaches every module.** The core suites cover
+  the DSP headers written without a Rack dependency, which is AF-02 to AF-06
+  and leaves fourteen modules untested, because their DSP lives inline in a
+  `Module` subclass. `tests/smoke.cpp` links the real libRack, asks each Model
+  for a Module exactly as Rack does, and drives `process()` by hand: 171
+  checks across three sample rates, patched and unpatched, every parameter at
+  both extremes, asserting nothing goes non-finite or past 12 V.
+
+  It is not part of `make test`, because it needs an installed Rack to find
+  `libRack.dll` and CI has only the SDK. Run `make smoke` in `tests/` locally.
+
+  A dead-control detector was written and then removed. It could not tell an
+  unwired control from one needing a state the harness cannot reach, and
+  reported every attenuverter on eight modules plus forty parameters on Sitar
+  Grid. The reasoning is kept in a comment in the file so nobody rebuilds it.
 
 ## 2.3.1 — 2026-09-06
 
