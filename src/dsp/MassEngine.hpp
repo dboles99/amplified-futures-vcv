@@ -132,6 +132,73 @@ public:
 		float driftCoherence = 1.f;    // 1 together, 0 independent
 	};
 
+	// Where the field's members actually are, for a display to draw.
+	//
+	// This exists so that a picture of the field is READ FROM the field
+	// rather than recomputed beside it. Every member's frequency is a
+	// function of mode, section arithmetic, spread, first partial and drift,
+	// and a renderer that works it out for itself is a second implementation
+	// that agrees today. The drift term is not derivable from any control
+	// position at all, which settles it: the display has to be told.
+	//
+	// A plain struct of fixed arrays. No allocation, no atomics, nothing that
+	// makes it unsafe to fill from the audio thread; whoever reads it across
+	// a thread boundary owns that problem, because the answer differs between
+	// a Rack module and a plug-in editor.
+	struct Telemetry {
+		int   count = 0;
+		float freq[MAX_VOICES]  = {};   // Hz, after spread and after drift
+		float level[MAX_VOICES] = {};   // 0 to 1, the taper ramp
+	};
+
+	// The reference lattice a mode is built on, as ratios above the
+	// fundamental, written into out and returned as a count.
+	//
+	// It is here and not in the renderer because these are the same tables the
+	// audio path indexes. A display that carried its own copy of the odd
+	// harmonics would keep drawing the old ladder for as long as it took
+	// somebody to notice, and the whole argument for the lattice layer is that
+	// JUST and HARMONIC are visibly different pictures rather than two entries
+	// in a dropdown.
+	//
+	// UNIS and MICRO both return one: their members are distributed around the
+	// fundamental rather than onto a structure, MICRO by an independent
+	// vibrato per member. Drawing a ladder there would invent one.
+	static int latticeRatios(int mode, float* out) {
+		if (mode == HARM) {
+			for (int i = 0; i < 8; i++) out[i] = detail::HARM_RATIOS[i];
+			return 8;
+		}
+		if (mode == JUST) {
+			for (int i = 0; i < 12; i++) out[i] = detail::JUST_RATIOS[i];
+			return 12;
+		}
+		out[0] = 1.f;
+		return 1;
+	}
+
+	// Which rung of the lattice member v sits on, or -1 where the mode has no
+	// lattice.
+	//
+	// The expressions below are the ones in process(), deliberately: a
+	// display marking the rungs in use has to agree with the audio path about
+	// which they are, and the only way to guarantee that is to ask the same
+	// question of the same arithmetic. The grid draws all eight rungs of the
+	// ladder because that is the structure; this says which of them the
+	// current patch is standing on.
+	static int latticeIndexOf(int mode, int v, int voices, int sections) {
+		const int M = rackmath::clamp(voices, 1, MAX_VOICES);
+		if (v < 0 || v >= M) return -1;
+		if (mode == HARM) {
+			int s = sections;
+			if (s < 1) s = 1;
+			if (s > M) s = M;
+			return rackmath::clamp((v * s) / M, 0, 7);
+		}
+		if (mode == JUST) return rackmath::clamp((v * 12) / M, 0, 11);
+		return -1;
+	}
+
 	void setSampleRate(float sr) {
 		sampleTime_ = 1.f / sr;
 	}
@@ -171,7 +238,13 @@ public:
 	//
 	// nullptr costs one predictable branch per member and changes nothing:
 	// the return value is accumulated in the same order either way.
-	float process(float voct, const Params& p, float* quads = nullptr) {
+	//
+	// tel follows the same rule for the same reason. A display reads at 30 Hz
+	// and this runs at 48 kHz, so a caller that fills it on every sample is
+	// doing sixteen hundred times the work it needs; pass it on one sample of
+	// a block and nullptr on the rest.
+	float process(float voct, const Params& p, float* quads = nullptr,
+	              Telemetry* tel = nullptr) {
 		using namespace rackmath;
 
 		const int M = clamp(p.voices, 1, MAX_VOICES);
@@ -189,6 +262,8 @@ public:
 		// At firstPartial 1 this is a multiply by exactly one, which is why
 		// it can sit on the hot path without changing the reference output.
 		const float freq = FREQ_C4 * exp2_taylor5(voct) * p.firstPartial;
+
+		if (tel) tel->count = M;
 
 		// Taper is the depth of a linear ramp from the bottom member to the
 		// top. TAPER_FLOOR is -6 dB as an amplitude, so at full taper the top
@@ -340,6 +415,14 @@ public:
 			const float memberLevel = (M > 1)
 				? 1.f - taperDrop * (float(v) / float(M - 1))
 				: 1.f;
+
+			// Written here rather than where voiceFreq is chosen, because this
+			// is the first point at which both halves of what a mark needs are
+			// known: where the member is and how tall it should be.
+			if (tel) {
+				tel->freq[v]  = voiceFreq;
+				tel->level[v] = memberLevel;
+			}
 
 			const float member = s * memberLevel;
 			sum += member;
