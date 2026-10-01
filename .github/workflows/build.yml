@@ -46,7 +46,7 @@ jobs:
           cd "$GITHUB_WORKSPACE/tests"
           make test
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: vcvplugin-win-x64
           path: dist/*.vcvplugin
@@ -125,7 +125,7 @@ jobs:
             *) echo "::error::expected ${{ matrix.arch }} in $f"; exit 1 ;;
           esac
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: vcvplugin-${{ matrix.arch }}
           path: dist/*.vcvplugin
