@@ -32,7 +32,40 @@
 
 
 // ─── Sample bank ─────────────────────────────────────────────
-struct SampleEntry { std::vector<float> data; int sr = 44100; std::string name; };
+struct SampleEntry {
+    std::vector<float> data;
+    int sr = 44100;
+    std::string name;
+    // Gain that brings this recording to the bank's reference loudness. Applied
+    // per voice at playback, not baked into `data`.
+    float gain = 1.f;
+};
+
+// Reference loudness for the bank, as RMS in linear terms. -20 dBFS: high
+// enough that a quiet recording is audible against the others, low enough that
+// eight of them summing in swarm mode still has headroom before the +-10 V
+// clamp.
+static constexpr float kBankTargetRms = 0.1f;
+
+// Ceiling on the correction. A recording at -46 dBFS RMS would otherwise be
+// lifted by 26 dB, which raises its noise floor and hiss with it; better a
+// specimen that is still a little quiet than one that is loud and grey.
+static constexpr float kMaxSampleGain = 8.f;      // +18 dB
+
+// RMS of a loaded recording, ignoring leading and trailing silence so a
+// recording with a long quiet tail is not judged quieter than it sounds.
+static float sampleRms(const std::vector<float>& d) {
+    if (d.empty()) return 0.f;
+    // Anything under -60 dBFS counts as silence for this purpose.
+    const float floorAbs = 0.001f;
+    size_t first = 0, last = d.size();
+    while (first < d.size() && std::fabs(d[first]) < floorAbs) ++first;
+    while (last > first && std::fabs(d[last - 1]) < floorAbs) --last;
+    if (last <= first) return 0.f;
+    double acc = 0.0;
+    for (size_t i = first; i < last; ++i) acc += (double) d[i] * d[i];
+    return (float) std::sqrt(acc / (double) (last - first));
+}
 
 static bool endsWith(const std::string& s, const std::string& suffix) {
     return s.size() >= suffix.size() &&
@@ -75,7 +108,16 @@ static std::vector<SampleEntry> loadBankFromDir(const std::string& dir) {
         const size_t idx = (paths.size() <= want) ? k : (k * paths.size()) / want;
         SampleEntry e;
         e.name = rack::system::getFilename(paths[idx]);
-        if (WavRead::loadWavMono(paths[idx], e.data, e.sr)) bank.push_back(std::move(e));
+        if (WavRead::loadWavMono(paths[idx], e.data, e.sr)) {
+            // Level-match on load. Without this the SPECIMEN knob is mostly a
+            // volume control: the bank spans 28 dB between its quietest and
+            // loudest recordings.
+            const float rms = sampleRms(e.data);
+            e.gain = (rms > 1e-6f)
+                       ? std::min(kBankTargetRms / rms, kMaxSampleGain)
+                       : 1.f;
+            bank.push_back(std::move(e));
+        }
     }
     return bank;
 }
@@ -88,13 +130,17 @@ struct Voice {
     float decayCoef = 0.f;
     int   sampleIdx = 0;
     bool  active = false;
+    // Per-trigger amplitude. Insects in a swarm are at different distances;
+    // eight voices at identical level is what makes a stack sound synthetic.
+    float level = 1.f;
 
-    void trigger(int idx, float speedRatio, float decay) {
+    void trigger(int idx, float speedRatio, float decay, float lvl = 1.f) {
         sampleIdx = idx;
         phase = 0.f;
         speed = speedRatio;
         env   = 1.f;
         decayCoef = decay;
+        level = lvl;
         active = true;
     }
 
@@ -182,7 +228,12 @@ struct SwarmCore : Module {
 
     // One directory under res/insects/banks per bank, each a curated 32.
     std::vector<std::string> bankNames;
+    // Full directory for each entry in bankNames. Banks come from two places
+    // now - the plug-in's own res/ and the user directory - so the path can no
+    // longer be reconstructed by gluing a name onto a single root.
+    std::vector<std::string> bankPaths;
     std::string banksRoot;
+    std::string userBanksRoot;
     std::string legacyRoot;
     int bankIndex = 0;
 
@@ -190,6 +241,38 @@ struct SwarmCore : Module {
     Voice  voices[NUM_VOICES];
     // Pan spread for stereo swarm (fixed cosine-law)
     float  voicePan[NUM_VOICES] = {-1.f, -.71f, -.33f, 0.f, 0.f, .33f, .71f, 1.f};
+    // Jitter applied around each voice's home pan, refreshed per trigger.
+    float  voicePanJitter[NUM_VOICES] = {};
+    // Each voice's pitch in volts, so the polyphonic CV out can report what the
+    // swarm is actually doing rather than an average of it.
+    float  voicePitchV[NUM_VOICES] = {};
+
+    // What the CV jack carries. Stored in the patch; 0 is what it always did.
+    enum CvMode { CV_SWARM_ENV = 0, CV_VOICE_ENV = 1, CV_VOICE_PITCH = 2 };
+    int cvMode = CV_SWARM_ENV;
+
+    // xorshift32. Seeded once per module rather than per trigger, so a patch
+    // is stable across a session while no two triggers are alike. Deliberately
+    // not std::rand: this runs on the audio thread.
+    uint32_t swarmRng = 0x9E3779B9u;
+    float rnd() {            // [0, 1)
+        swarmRng ^= swarmRng << 13;
+        swarmRng ^= swarmRng >> 17;
+        swarmRng ^= swarmRng << 5;
+        return (float) (swarmRng >> 8) * (1.f / 16777216.f);
+    }
+    float rndBi() { return rnd() * 2.f - 1.f; }   // [-1, 1)
+
+    // Which recording a voice should use. Voices take neighbours around the
+    // chosen specimen rather than the same one eight times - a related group,
+    // not a zoo, and not a chorus either.
+    int voiceSample(int base, int v, int bankSize) const {
+        if (bankSize <= 1) return 0;
+        const int off = (v + 1) / 2 * ((v % 2) ? 1 : -1);   // 0,+1,-1,+2,-2...
+        int idx = (base + off) % bankSize;
+        if (idx < 0) idx += bankSize;
+        return idx;
+    }
 
     // Trigger edge detection
     dsp::SchmittTrigger trigIn;
@@ -225,14 +308,30 @@ struct SwarmCore : Module {
 
         banksRoot  = asset::plugin(pluginInstance, "res/insects/banks");
         legacyRoot = asset::plugin(pluginInstance, "res/insects/insectset32");
+        // Rack wipes a plug-in's directory on update, so a bank added under
+        // res/ disappears the next time the plug-in is updated - silently, and
+        // long after it was put there. The user directory survives, which is
+        // why banks the user supplies belong here and nowhere else.
+        userBanksRoot = asset::user("amplified-futures/insect-banks");
 
-        if (rack::system::isDirectory(banksRoot)) {
-            for (const auto& e : rack::system::getEntries(banksRoot)) {
+        auto scanRoot = [this](const std::string& root, bool user) {
+            if (!rack::system::isDirectory(root))
+                return;
+            std::vector<std::string> found;
+            for (const auto& e : rack::system::getEntries(root)) {
                 if (rack::system::isDirectory(e))
-                    bankNames.push_back(rack::system::getFilename(e));
+                    found.push_back(rack::system::getFilename(e));
             }
-            std::sort(bankNames.begin(), bankNames.end());
-        }
+            std::sort(found.begin(), found.end());
+            for (const auto& n : found) {
+                // Marked in the menu, because a user bank and a shipped one of
+                // the same name are otherwise indistinguishable there.
+                bankNames.push_back(user ? (n + "  (user)") : n);
+                bankPaths.push_back(root + "/" + n);
+            }
+        };
+        scanRoot(banksRoot, false);
+        scanRoot(userBanksRoot, true);
         startLoad(0);
     }
 
@@ -262,9 +361,9 @@ struct SwarmCore : Module {
         }
 
         std::string dir;
-        bool legacy = bankNames.empty();
-        if (!legacy && idx >= 0 && idx < (int) bankNames.size())
-            dir = banksRoot + "/" + bankNames[idx];
+        bool legacy = bankPaths.empty();
+        if (!legacy && idx >= 0 && idx < (int) bankPaths.size())
+            dir = bankPaths[idx];
 
         const std::string base = legacyRoot;
         loadThread = std::thread([this, dir, legacy, base, idx]() {
@@ -296,12 +395,15 @@ struct SwarmCore : Module {
 
     json_t* dataToJson() override {
         json_t* root = json_object();
+        json_object_set_new(root, "cvMode", json_integer(cvMode));
         if (bankIndex >= 0 && bankIndex < (int) bankNames.size())
             json_object_set_new(root, "bank", json_string(bankNames[bankIndex].c_str()));
         return root;
     }
 
     void dataFromJson(json_t* root) override {
+        if (json_t* j = json_object_get(root, "cvMode"))
+            cvMode = (int) json_integer_value(j);
         json_t* b = json_object_get(root, "bank");
         if (!b)
             return;
@@ -403,19 +505,36 @@ struct SwarmCore : Module {
 
         if (fire) {
             for (int v = 0; v < numVoices; v++) {
-                // Scatter delay in samples
-                scatterDelay[v] = scatter * args.sampleRate * 0.25f * ((float)v / numVoices);
+                // Scatter delay, stochastic.
+                //
+                // This was scatter * sr * 0.25 * (v / numVoices): evenly
+                // spaced, and identical on every trigger. A repeating pattern
+                // is the opposite of unsettling - the ear locks onto it within
+                // a couple of seconds and the swarm becomes a machine. Voices
+                // now land anywhere in the window, independently each time.
+                scatterDelay[v] = scatter * args.sampleRate * 0.5f * rnd();
                 scatterAcc[v]   = 0.f;
-                // Per-voice detuning (cents)
+                // Pan jitter around the voice's home position, so the stereo
+                // image moves between triggers instead of standing still.
+                voicePanJitter[v] = rndBi() * 0.25f;
+                // Per-voice detuning, now with a random component. The old
+                // deterministic spread capped at ±0.25 st, which is a chorus
+                // width; insects are not that well tuned to each other.
                 float detuneSt = 0.f;
                 if (v > 0 && swarmMode) {
                     float spread = (v - numVoices * 0.5f) / numVoices;
-                    detuneSt = spread * detune * 0.5f; // ±0.25st max
+                    detuneSt = (spread + rndBi() * 0.5f) * detune;
                 }
                 float speed = baseSpeed * srRatio * std::pow(2.f, detuneSt / 12.f);
                 // Immediate trigger unless scattered
                 if (scatter < 0.01f || v == 0) {
-                    voices[v].trigger(sampleIdx, speed, decayCoef);
+                    // A different recording per voice, and a level that varies:
+                    // the two things that separate a swarm from one insect
+                    // played eight times.
+                    voicePitchV[v] = (pitchSt + detuneSt) / 12.f;
+                    voices[v].trigger(voiceSample(sampleIdx, v, numSamples),
+                                      speed, decayCoef,
+                                      0.55f + rnd() * 0.45f);
                     scatterDelay[v] = 0.f;
                 }
             }
@@ -426,11 +545,16 @@ struct SwarmCore : Module {
             if (scatterDelay[v] > 0.f && !voices[v].active) {
                 scatterAcc[v] += 1.f;
                 if (scatterAcc[v] >= scatterDelay[v]) {
-                    float detuneSt = 0.f;
                     float spread = (v - numVoices * 0.5f) / numVoices;
-                    detuneSt = spread * detune * 0.5f;
+                    const float detuneSt = (spread + rndBi() * 0.5f) * detune;
                     float speed = baseSpeed * srRatio * std::pow(2.f, detuneSt / 12.f);
-                    voices[v].trigger(sampleIdx, speed, decayCoef);
+                    // Scattered voices trigger here, later than the rest. The
+                    // CV has to learn their pitch too, or a polyphonic channel
+                    // reports the pitch of whatever last used that slot.
+                    voicePitchV[v] = (pitchSt + detuneSt) / 12.f;
+                    voices[v].trigger(voiceSample(sampleIdx, v, numSamples),
+                                      speed, decayCoef,
+                                      0.55f + rnd() * 0.45f);
                     scatterDelay[v] = 0.f;
                 }
             }
@@ -456,9 +580,13 @@ struct SwarmCore : Module {
                 // prvalue, so the whole sample buffer was copy-constructed on
                 // the heap once per active voice per sample - an unbounded
                 // allocation on the audio thread.
-                s = voices[v].tick((*bank)[voices[v].sampleIdx].data);
+                const SampleEntry& se = (*bank)[voices[v].sampleIdx];
+                // se.gain matches this recording to the bank's reference
+                // loudness; voices[v].level is this voice's distance in
+                // the swarm. Neither is baked into the sample data.
+                s = voices[v].tick(se.data) * se.gain * voices[v].level;
             }
-            float pan = voicePan[v];
+            float pan = clamp(voicePan[v] + voicePanJitter[v], -1.f, 1.f);
             float gainL = std::cos((pan + 1.f) * 0.25f * M_PI);
             float gainR = std::sin((pan + 1.f) * 0.25f * M_PI);
             outL += s * gainL;
@@ -470,7 +598,23 @@ struct SwarmCore : Module {
         outputs[OUT_R_OUTPUT].setVoltage(clamp(outR * norm * 5.f, -10.f, 10.f));
         // Unipolar 0-10V swarm envelope: the summed voice activity, so the CV
         // tracks how much of the swarm is currently sounding.
-        outputs[CV_OUTPUT].setVoltage(clamp(envSum * INV_SQRT_N, 0.f, 1.f) * 10.f);
+        // Polyphonic CV. One jack, every voice on its own channel - a
+        // downstream quantiser or VCA then sees eight insects rather than
+        // their sum, which is the individuation that summing throws away.
+        // A monophonic cable reads channel 0, so old patches are unaffected.
+        if (cvMode == CV_SWARM_ENV) {
+            outputs[CV_OUTPUT].setChannels(1);
+            outputs[CV_OUTPUT].setVoltage(clamp(envSum * INV_SQRT_N, 0.f, 1.f) * 10.f);
+        } else {
+            const int ch = std::max(1, numVoices);
+            outputs[CV_OUTPUT].setChannels(ch);
+            for (int v = 0; v < ch; v++) {
+                const float val = (cvMode == CV_VOICE_PITCH)
+                                    ? voicePitchV[v]
+                                    : clamp(voices[v].env, 0.f, 1.f) * 10.f;
+                outputs[CV_OUTPUT].setVoltage(val, v);
+            }
+        }
         lights[ACTIVE_LIGHT].setBrightness(anyActive ? 1.f : 0.f);
     }
 };
@@ -543,6 +687,20 @@ struct SwarmCoreWidget : ModuleWidget {
         SwarmCore* m = dynamic_cast<SwarmCore*>(module);
         if (!m || m->bankNames.empty())
             return;
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createMenuLabel("CV output"));
+        {
+            const char* names[3] = { "Swarm envelope (mono)",
+                                     "Per-voice envelope (poly)",
+                                     "Per-voice pitch V/oct (poly)" };
+            for (int i = 0; i < 3; i++) {
+                menu->addChild(createCheckMenuItem(
+                    names[i], "",
+                    [=]() { return m->cvMode == i; },
+                    [=]() { m->cvMode = i; }));
+            }
+        }
+
         menu->addChild(new MenuSeparator);
         menu->addChild(createMenuLabel("Sample bank"));
         for (size_t i = 0; i < m->bankNames.size(); i++) {
